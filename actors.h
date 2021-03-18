@@ -1,12 +1,7 @@
-/* File      : actors.h
- * Program   : mrtp
- * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
- * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
- */
-#pragma once
+#ifndef _ACTORS_H
+#define _ACTORS_H
 
 #include <Eigen/Core>
-
 #include "pixel.h"
 #include "texture.h"
 
@@ -106,3 +101,5 @@ class Cylinder : public Actor {
 };
 
 }  // namespace mrtp
+
+#endif //_ACTORS_H

@@ -1,8 +1,3 @@
-/* File      : texture.h
- * Program   : mrtp
- * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
- * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
- */
 #ifndef _TEXTURE_H
 #define _TEXTURE_H
 
@@ -10,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "pixel.h"
+
 
 namespace mrtp {
 
