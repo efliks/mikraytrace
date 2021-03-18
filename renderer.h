@@ -1,4 +1,4 @@
-/* File      : renderer.hpp
+/* File      : renderer.h
  * Program   : mrtp
  * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
  * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -9,11 +9,11 @@
 #include <Eigen/Core>
 #include <vector>
 
-#include "actors.hpp"
-#include "camera.hpp"
-#include "light.hpp"
-#include "pixel.hpp"
-#include "world.hpp"
+#include "actors.h"
+#include "camera.h"
+#include "light.h"
+#include "pixel.h"
+#include "world.h"
 
 
 namespace mrtp {

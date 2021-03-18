@@ -6,7 +6,7 @@
 #include <Eigen/Geometry>
 #include <cmath>
 
-#include "actors.hpp"
+#include "actors.h"
 
 
 namespace mrtp {

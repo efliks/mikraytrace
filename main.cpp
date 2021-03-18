@@ -10,8 +10,8 @@
 #include <vector>
 #include <cstdlib>
 
-#include "world.hpp"
-#include "renderer.hpp"
+#include "world.h"
+#include "renderer.h"
 
 
 //Default settings and limits

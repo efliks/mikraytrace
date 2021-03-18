@@ -6,7 +6,7 @@
 #include <Eigen/Geometry>
 #include <cmath>
 
-#include "camera.hpp"
+#include "camera.h"
 
 
 namespace mrtp {

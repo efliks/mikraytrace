@@ -13,7 +13,7 @@
 #endif
 
 #include "png.hpp"
-#include "renderer.hpp"
+#include "renderer.h"
 
 
 namespace mrtp {

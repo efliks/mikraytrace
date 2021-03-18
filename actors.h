@@ -1,4 +1,4 @@
-/* File      : actors.hpp
+/* File      : actors.h
  * Program   : mrtp
  * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
  * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -7,8 +7,8 @@
 
 #include <Eigen/Core>
 
-#include "pixel.hpp"
-#include "texture.hpp"
+#include "pixel.h"
+#include "texture.h"
 
 
 namespace mrtp {

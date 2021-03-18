@@ -5,7 +5,7 @@
  */
 #include <fstream>
 
-#include "world.hpp"
+#include "world.h"
 
 
 namespace mrtp {

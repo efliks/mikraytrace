@@ -6,7 +6,7 @@
 #include <cstring>
 
 #include "png.hpp"
-#include "texture.hpp"
+#include "texture.h"
 
 
 namespace mrtp {
