@@ -2,3 +2,8 @@
 *.o
 *.swp
 mrtp_cli
+mrtp.config
+mrtp.creator
+mrtp.creator.user
+mrtp.files
+mrtp.includes

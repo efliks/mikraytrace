@@ -1,6 +1,8 @@
 INCLUDE=-I/usr/include/eigen3 -I/usr/include/png++ -I. -I./cpptoml/include
 FLAGS=-W -Wall -pedantic -fPIC -O2
 
+all: mrtp_cli
+
 mrtp_cli: main.o actors.o texture.o light.o camera.o world.o renderer.o
 	g++ $^ -o $@ -fopenmp -lm -lpng
 
