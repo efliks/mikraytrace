@@ -1,8 +1,3 @@
-/* File      : world.hpp
- * Program   : mrtp
- * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
- * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
- */
 #ifndef _WORLD_H
 #define _WORLD_H
 
@@ -11,12 +6,9 @@
 #include <list>
 #include "cpptoml.h"
 
-#include "actor.hpp"
-#include "camera.hpp"
-#include "cylinder.hpp"
-#include "light.hpp"
-#include "plane.hpp"
-#include "sphere.hpp"
+#include "actors.h"
+#include "camera.h"
+#include "light.h"
 
 
 namespace mrtp {

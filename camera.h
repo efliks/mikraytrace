@@ -1,8 +1,3 @@
-/* File      : camera.hpp
- * Program   : mrtp
- * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
- * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
- */
 #ifndef _CAMERA_H
 #define _CAMERA_H
 

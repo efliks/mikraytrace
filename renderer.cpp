@@ -1,19 +1,13 @@
-/* File      : renderer.cpp
- * Program   : mrtp
- * Copyright : Mikolaj Feliks  <mikolaj.feliks@gmail.com>
- * License   : LGPL v3  (http://www.gnu.org/licenses/gpl-3.0.en.html)
- */
 #include <Eigen/Geometry>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include "png.hpp"
+#include "renderer.h"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
-#include "png.hpp"
-#include "renderer.hpp"
 
 
 namespace mrtp {
