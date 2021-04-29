@@ -71,7 +71,7 @@ bool Renderer::solve_shadows(Eigen::Vector3d *origin, Eigen::Vector3d *direction
 
     for (; iter != iter_end; ++iter) {
         Actor *actor = *iter;
-        if (actor->has_shadow()) {
+        if (actor->has_shadow) {
             double distance = actor->solve(origin, direction, 0.0, maxdist);
             if (distance > 0.0) {
                 return true;
@@ -114,34 +114,33 @@ Pixel Renderer::trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
         Eigen::Vector3d tolight = world_->ptr_light_->calculate_ray(&inter);
 
         double lightd = tolight.norm();
-        tolight *= (1.0 / lightd);
+        tolight *= (1 / lightd);
 
         double intensity = tolight.dot(normal);
 
-        if (intensity > 0.0) {
+        if (intensity > 0) {
             // Prevent self-intersection
             Eigen::Vector3d corr = inter + bias_ * normal;
 
             // Check if the intersection is in a shadow
             bool isshadow = solve_shadows(&corr, &tolight, lightd);
-            double shadow = (isshadow) ? shadow_ : 1.0;
+            double shadow = (isshadow) ? shadow_ : 1;
 
             // Decrease light intensity for actors away from the light
-            double ambient = 1.0 - std::pow(lightd / maxdist_, 2);
+            double ambient = 1 - std::pow(lightd / maxdist_, 2);
 
             // Combine pixels
             double lambda = intensity * shadow * ambient;
 
             Pixel pick = hitactor->pick_pixel(&inter, &normal);
-            pixel = (1.0 - lambda) * pixel + lambda * pick;
+            pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If the hit actor is reflective, trace a reflected ray
             if (depth < maxdepth_) {
-                double coeff = hitactor->get_reflect();
-                if (coeff > 0.0) {
-                    Eigen::Vector3d ray = (*direction) - (2.0 * direction->dot(normal)) * normal;
+                if (hitactor->reflect_coeff > 0) {
+                    Eigen::Vector3d ray = (*direction) - (2 * direction->dot(normal)) * normal;
                     Pixel reflected = trace_ray_r(&corr, &ray, depth + 1);
-                    pixel = (1.0 - coeff) * reflected + coeff * pixel;
+                    pixel = (1 - hitactor->reflect_coeff) * reflected + hitactor->reflect_coeff * pixel;
                 }
             }
         }

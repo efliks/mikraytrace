@@ -150,7 +150,7 @@ WorldStatus_t World::load_sphere(std::shared_ptr<cpptoml::table> items) {
     double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Sphere sphere(&center, radius, &axis, reflect, texture.c_str());
+    Sphere sphere(&center, &axis, radius, reflect, texture.c_str());
     spheres_.push_back(sphere);
     ptr_actors_.push_back(&spheres_.back());
 

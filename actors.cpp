@@ -29,7 +29,7 @@ double solve_quadratic(double a, double b, double c, double mint,
 }
 
 
-Eigen::Vector3d generate_unit_vector(Eigen::Vector3d *vector) {
+Eigen::Vector3d generate_unit_vector(Eigen::Vector3d* vector) {
     double tx = (*vector)[0];
     double ty = (*vector)[1];
     double tz = (*vector)[2];
@@ -54,32 +54,14 @@ Eigen::Vector3d generate_unit_vector(Eigen::Vector3d *vector) {
 }
 
 
-Actor::Actor() {
-}
-
-
-Actor::~Actor() {
-}
-
-
-bool Actor::has_shadow() {
-    return has_shadow_;
-}
-
-
-double Actor::get_reflect() {
-    return reflect_;
-}
-
-
-Plane::Plane(Eigen::Vector3d *center, Eigen::Vector3d *normal, double scale, 
-             double reflect, const char *texture) {
+Plane::Plane(Eigen::Vector3d* center, Eigen::Vector3d* normal, double scale,
+             double reflect, const char* texture) {
 
     center_ = *center;
     normal_ = (1 / normal->norm()) * (*normal);
     scale_ = scale;
-    reflect_ = reflect;
-    has_shadow_ = false;
+    reflect_coeff = reflect;
+    has_shadow = false;
 
     Eigen::Vector3d tmp = generate_unit_vector(&normal_);
     tx_ = tmp.cross(normal_);
@@ -91,11 +73,7 @@ Plane::Plane(Eigen::Vector3d *center, Eigen::Vector3d *normal, double scale,
 }
 
 
-Plane::~Plane() {
-}
-
-
-Pixel Plane::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+Pixel Plane::pick_pixel(Eigen::Vector3d* hit, Eigen::Vector3d* normal) {
     Eigen::Vector3d v = (*hit) - center_;
     // Calculate components of v (dot products)
     double vx = v.dot(tx_);
@@ -105,7 +83,7 @@ Pixel Plane::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
 }
 
 
-double Plane::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+double Plane::solve(Eigen::Vector3d* origin, Eigen::Vector3d* direction,
                    double mind, double maxd) {
     double bar = direction->dot(normal_);
 
@@ -120,17 +98,17 @@ double Plane::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
 }
 
 
-Eigen::Vector3d Plane::calculate_normal(Eigen::Vector3d *hit) {
+Eigen::Vector3d Plane::calculate_normal(Eigen::Vector3d* hit) {
     return normal_;
 }
 
 
-Sphere::Sphere(Eigen::Vector3d *center, double radius, Eigen::Vector3d *axis, 
-               double reflect, const char *texture) {
+Sphere::Sphere(Eigen::Vector3d* center, Eigen::Vector3d* axis, double radius,
+               double reflect, const char* texture) {
     center_ = *center;
     R_ = radius;
-    has_shadow_ = true;
-    reflect_ = reflect;
+    has_shadow = true;
+    reflect_coeff = reflect;
 
     ty_ = *axis;
     ty_ *= (1 / ty_.norm());
@@ -144,11 +122,7 @@ Sphere::Sphere(Eigen::Vector3d *center, double radius, Eigen::Vector3d *axis,
 }
 
 
-Sphere::~Sphere() {
-}
-
-
-double Sphere::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+double Sphere::solve(Eigen::Vector3d* origin, Eigen::Vector3d* direction,
                     double mind, double maxd) {
 
     Eigen::Vector3d t = (*origin) - center_;
@@ -160,7 +134,7 @@ double Sphere::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
 }
 
 
-Eigen::Vector3d Sphere::calculate_normal(Eigen::Vector3d *hit) {
+Eigen::Vector3d Sphere::calculate_normal(Eigen::Vector3d* hit) {
     Eigen::Vector3d normal = (*hit) - center_;
     return (normal * (1 / normal.norm()));
 }
@@ -170,7 +144,7 @@ Eigen::Vector3d Sphere::calculate_normal(Eigen::Vector3d *hit) {
 Guidelines:
 https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
 */
-Pixel Sphere::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+Pixel Sphere::pick_pixel(Eigen::Vector3d* hit, Eigen::Vector3d* normal) {
     double dot = normal->dot(ty_);
     double phi = std::acos(-dot);
     double fracy = phi / M_PI;
@@ -184,9 +158,9 @@ Pixel Sphere::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
 }
 
 
-Cylinder::Cylinder(Eigen::Vector3d *center, Eigen::Vector3d *direction,
+Cylinder::Cylinder(Eigen::Vector3d* center, Eigen::Vector3d* direction,
                    double radius, double span, double reflect,
-                   const char *texture) {
+                   const char* texture) {
 
     A_ = *center;
     B_ = *direction;
@@ -194,18 +168,14 @@ Cylinder::Cylinder(Eigen::Vector3d *center, Eigen::Vector3d *direction,
     R_ = radius;
 
     span_ = span;
-    reflect_ = reflect;
-    has_shadow_ = true;
+    reflect_coeff = reflect;
+    has_shadow = true;
 
     ty_ = generate_unit_vector(&B_);
     tx_ = ty_.cross(B_);
     tx_ *= (1 / tx_.norm());
 
     texture_ = textureCollector.add(texture);
-}
-
-
-Cylinder::~Cylinder() {
 }
 
 
@@ -238,7 +208,7 @@ Capital letters are vectors.
      -  d^2 - f = 0    => t = ...
  alpha = d + t * b
 */
-double Cylinder::solve(Eigen::Vector3d *O, Eigen::Vector3d *D,
+double Cylinder::solve(Eigen::Vector3d* O, Eigen::Vector3d* D,
                       double mind, double maxd) {
 
     Eigen::Vector3d tmp = (*O) - A_;
@@ -267,7 +237,7 @@ double Cylinder::solve(Eigen::Vector3d *O, Eigen::Vector3d *D,
 }
 
 
-Eigen::Vector3d Cylinder::calculate_normal(Eigen::Vector3d *hit) {
+Eigen::Vector3d Cylinder::calculate_normal(Eigen::Vector3d* hit) {
     // N = Hit - [B . (Hit - A)] * B
     Eigen::Vector3d tmp = (*hit) - A_;
     double alpha = B_.dot(tmp);
@@ -278,7 +248,7 @@ Eigen::Vector3d Cylinder::calculate_normal(Eigen::Vector3d *hit) {
 }
 
 
-Pixel Cylinder::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+Pixel Cylinder::pick_pixel(Eigen::Vector3d* hit, Eigen::Vector3d* normal) {
     Eigen::Vector3d tmp = (*hit) - A_;
     double alpha = tmp.dot(B_);
     double dot = normal->dot(tx_);
