@@ -26,13 +26,13 @@ static const unsigned int kDefaultThreads = 1;
 static const unsigned int kMinThreads = 0;
 static const unsigned int kMaxThreads = 64;
 
-static const float kDefaultFOV = 93.0f;
-static const float kMinFOV = 50.0f;
-static const float kMaxFOV = 170.0f;
+static const double kDefaultFOV = 93;
+static const double kMinFOV = 50;
+static const double kMaxFOV = 170;
 
-static const float kDefaultDistance = 60.0f;
-static const float kDefaultShadow = 0.25f;
-static const float kDefaultBias = 0.001f;
+static const double kDefaultDistance = 60;
+static const double kDefaultShadow = 0.25;
+static const double kDefaultBias = 0.001;
 
 //Exit codes
 
@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
     unsigned int height = kDefaultHeight;
     unsigned int recursion = kDefaultRecursionLevels;
     unsigned int threads = kDefaultThreads;
-    float fov = kDefaultFOV;
-    float distance = kDefaultDistance;
-    float shadow = kDefaultShadow;
+    double fov = kDefaultFOV;
+    double distance = kDefaultDistance;
+    double shadow = kDefaultShadow;
     bool quiet = false;
 
     std::vector<std::string> toml_files;
@@ -274,7 +274,7 @@ int main(int argc, char **argv) {
         mrtp::Renderer renderer(&world, width, height, fov, distance, shadow, kDefaultBias, 
                                 recursion, threads, png_file.c_str());
 
-        float time_used = renderer.render_scene();
+        double time_used = renderer.render_scene();
         if (!quiet) { std::cout << " (render time: " << std::setprecision(2) << time_used << "s)" << std::endl; }
 
         if (renderer.write_scene() != mrtp::rs_ok) {

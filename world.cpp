@@ -12,11 +12,11 @@ static bool file_exists(const char *path) {
 }
 
 static bool read_vector(std::shared_ptr<cpptoml::table> items, const char *id, 
-                        Eigen::Vector3f *vector) {
+                        Eigen::Vector3d *vector) {
     auto raw = items->get_array_of<double>(id);
     if (!raw) { return false; }
     Eigen::Vector3d tmp(raw->data());
-    *vector = tmp.cast<float>();
+    *vector = tmp.cast<double>();
     return true;
 }
 
@@ -50,12 +50,12 @@ WorldStatus_t World::initialize() {
     auto raw_lookat = tab_camera->get_array_of<double>("target");
     if (!raw_lookat) { return ws_camera_param; }
 
-    float camera_roll = static_cast<float>(tab_camera->get_as<double>("roll").value_or(0.0f));
+    double camera_roll = static_cast<double>(tab_camera->get_as<double>("roll").value_or(0));
 
     Eigen::Vector3d temp_eye(raw_eye->data());
-    Eigen::Vector3f camera_eye = temp_eye.cast<float>();
+    Eigen::Vector3d camera_eye = temp_eye.cast<double>();
     Eigen::Vector3d temp_lookat(raw_lookat->data());
-    Eigen::Vector3f camera_lookat = temp_lookat.cast<float>();
+    Eigen::Vector3d camera_lookat = temp_lookat.cast<double>();
 
     Camera camera(&camera_eye, &camera_lookat, camera_roll);
     cameras_.push_back(camera);
@@ -68,7 +68,7 @@ WorldStatus_t World::initialize() {
     if (!raw_center) { return ws_light_param; }
 
     Eigen::Vector3d temp_center(raw_center->data());
-    Eigen::Vector3f light_center = temp_center.cast<float>();
+    Eigen::Vector3d light_center = temp_center.cast<double>();
 
     Light light(&light_center);
     lights_.push_back(light);
@@ -118,17 +118,17 @@ WorldStatus_t World::load_cylinders(std::shared_ptr<cpptoml::table_array> array)
 }
 
 WorldStatus_t World::load_plane(std::shared_ptr<cpptoml::table> items) {
-    Eigen::Vector3f center;
+    Eigen::Vector3d center;
     if (!read_vector(items, "center", &center)) { return ws_plane_param; }
 
-    Eigen::Vector3f normal;
+    Eigen::Vector3d normal;
     if (!read_vector(items, "normal", &normal)) { return ws_plane_param; }
 
     std::string texture;
     if (!read_texture(items, &texture)) { return ws_plane_texture; }
 
-    float scale = static_cast<float>(items->get_as<double>("scale").value_or(0.15f));
-    float reflect = static_cast<float>(items->get_as<double>("reflect").value_or(0.0f));
+    double scale = static_cast<double>(items->get_as<double>("scale").value_or(0.15));
+    double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
     Plane plane(&center, &normal, scale, reflect, texture.c_str());
     planes_.push_back(plane);
@@ -138,17 +138,17 @@ WorldStatus_t World::load_plane(std::shared_ptr<cpptoml::table> items) {
 }
 
 WorldStatus_t World::load_sphere(std::shared_ptr<cpptoml::table> items) {
-    Eigen::Vector3f center;
+    Eigen::Vector3d center;
     if (!read_vector(items, "center", &center)) { return ws_sphere_param; }
 
-    Eigen::Vector3f axis(0.0f, 0.0f, 1.0f);
+    Eigen::Vector3d axis(0, 0, 1);
     read_vector(items, "axis", &axis);
 
     std::string texture;
     if (!read_texture(items, &texture)) { return ws_sphere_texture; }
 
-    float radius = static_cast<float>(items->get_as<double>("radius").value_or(1.0f));
-    float reflect = static_cast<float>(items->get_as<double>("reflect").value_or(0.0f));
+    double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
+    double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
     Sphere sphere(&center, radius, &axis, reflect, texture.c_str());
     spheres_.push_back(sphere);
@@ -158,18 +158,18 @@ WorldStatus_t World::load_sphere(std::shared_ptr<cpptoml::table> items) {
 }
 
 WorldStatus_t World::load_cylinder(std::shared_ptr<cpptoml::table> items) {
-    Eigen::Vector3f center;
+    Eigen::Vector3d center;
     if (!read_vector(items, "center", &center)) { return ws_cylinder_param; }
 
-    Eigen::Vector3f direction;
+    Eigen::Vector3d direction;
     if (!read_vector(items, "direction", &direction)) { return ws_cylinder_param; }
 
     std::string texture;
     if (!read_texture(items, &texture)) { return ws_cylinder_texture; }
 
-    float span = static_cast<float>(items->get_as<double>("span").value_or(-1.0f));
-    float radius = static_cast<float>(items->get_as<double>("radius").value_or(1.0f));
-    float reflect = static_cast<float>(items->get_as<double>("reflect").value_or(0.0f));
+    double span = static_cast<double>(items->get_as<double>("span").value_or(-1));
+    double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
+    double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
     Cylinder cylinder(&center, &direction, radius, span, reflect, texture.c_str());
     cylinders_.push_back(cylinder);

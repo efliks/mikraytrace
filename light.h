@@ -8,12 +8,12 @@ namespace mrtp {
 
 class Light {
   public:
-    Light(Eigen::Vector3f *center);
+    Light(Eigen::Vector3d *center);
     ~Light();
-    Eigen::Vector3f calculate_ray(Eigen::Vector3f *hit);
+    Eigen::Vector3d calculate_ray(Eigen::Vector3d *hit);
 
   private:
-    Eigen::Vector3f center_;
+    Eigen::Vector3d center_;
 };
 
 } //namespace mrtp

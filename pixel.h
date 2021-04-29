@@ -6,7 +6,7 @@
 
 namespace mrtp {
 
-typedef Eigen::Vector3f Pixel;
+typedef Eigen::Vector3d Pixel;
 
 } //namespace mrtp
 

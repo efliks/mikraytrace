@@ -15,7 +15,7 @@ class Texture {
     ~Texture();
     void load_texture();
     bool check_path(const char *path);
-    Pixel pick_pixel(float fracx, float fracy, float scale);
+    Pixel pick_pixel(double fracx, double fracy, double scale);
 
   private:
     int width_;

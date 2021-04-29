@@ -5,49 +5,49 @@
 
 namespace mrtp {
 
-float solve_quadratic(float a, float b, float c, float mint,
-                      float maxt) {
-    float t = -1.0f;
-    float delta = b * b - 4.0f * a * c;
+double solve_quadratic(double a, double b, double c, double mint,
+                      double maxt) {
+    double t = -1;
+    double delta = b * b - 4 * a * c;
 
-    if (delta >= 0.0f) {
-        if (delta > 0.0f) {
-            float sqdelta = sqrt(delta);
-            float tmp = 0.5f / a;
-            float ta = (-b - sqdelta) * tmp;
-            float tb = (-b + sqdelta) * tmp;
+    if (delta >= 0) {
+        if (delta > 0) {
+            double sqdelta = sqrt(delta);
+            double tmp = 0.5 / a;
+            double ta = (-b - sqdelta) * tmp;
+            double tb = (-b + sqdelta) * tmp;
             t = (ta < tb) ? ta : tb;
         } else {
-            t = -b / (2.0f * a);
+            t = -b / (2 * a);
         }
 
         if ((t < mint) || (t > maxt)) {
-            t = -1.0f;
+            t = -1;
         }
     }
     return t;
 }
 
 
-Eigen::Vector3f generate_unit_vector(Eigen::Vector3f *vector) {
-    float tx = (*vector)[0];
-    float ty = (*vector)[1];
-    float tz = (*vector)[2];
+Eigen::Vector3d generate_unit_vector(Eigen::Vector3d *vector) {
+    double tx = (*vector)[0];
+    double ty = (*vector)[1];
+    double tz = (*vector)[2];
 
-    float x = (tx < 0.0f) ? -tx : tx;
-    float y = (ty < 0.0f) ? -ty : ty;
-    float z = (tz < 0.0f) ? -tz : tz;
+    double x = (tx < 0) ? -tx : tx;
+    double y = (ty < 0) ? -ty : ty;
+    double z = (tz < 0) ? -tz : tz;
 
-    Eigen::Vector3f unit;
-    unit << 0.0f, 0.0f, 1.0f;
+    Eigen::Vector3d unit;
+    unit << 0, 0, 1;
 
     if (x < y) {
         if (x < z) {
-            unit << 1.0f, 0.0f, 0.0f;
+            unit << 1, 0, 0;
         }
     } else { // if ( x >= y)
         if (y < z) {
-            unit << 0.0f, 1.0f, 0.0f;
+            unit << 0, 1, 0;
         }
     }
     return unit;
@@ -67,25 +67,25 @@ bool Actor::has_shadow() {
 }
 
 
-float Actor::get_reflect() {
+double Actor::get_reflect() {
     return reflect_;
 }
 
 
-Plane::Plane(Eigen::Vector3f *center, Eigen::Vector3f *normal, float scale, 
-             float reflect, const char *texture) {
+Plane::Plane(Eigen::Vector3d *center, Eigen::Vector3d *normal, double scale, 
+             double reflect, const char *texture) {
 
     center_ = *center;
-    normal_ = (1.0f / normal->norm()) * (*normal);
+    normal_ = (1 / normal->norm()) * (*normal);
     scale_ = scale;
     reflect_ = reflect;
     has_shadow_ = false;
 
-    Eigen::Vector3f tmp = generate_unit_vector(&normal_);
+    Eigen::Vector3d tmp = generate_unit_vector(&normal_);
     tx_ = tmp.cross(normal_);
-    tx_ *= (1.0f / tx_.norm());
+    tx_ *= (1 / tx_.norm());
     ty_ = normal_.cross(tx_);
-    ty_ *= (1.0f / ty_.norm());
+    ty_ *= (1 / ty_.norm());
 
     texture_ = textureCollector.add(texture);
 }
@@ -95,50 +95,50 @@ Plane::~Plane() {
 }
 
 
-Pixel Plane::pick_pixel(Eigen::Vector3f *hit, Eigen::Vector3f *normal) {
-    Eigen::Vector3f v = (*hit) - center_;
+Pixel Plane::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+    Eigen::Vector3d v = (*hit) - center_;
     // Calculate components of v (dot products)
-    float vx = v.dot(tx_);
-    float vy = v.dot(ty_);
+    double vx = v.dot(tx_);
+    double vy = v.dot(ty_);
 
     return texture_->pick_pixel(vx, vy, scale_);
 }
 
 
-float Plane::solve(Eigen::Vector3f *origin, Eigen::Vector3f *direction,
-                   float mind, float maxd) {
-    float bar = direction->dot(normal_);
+double Plane::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+                   double mind, double maxd) {
+    double bar = direction->dot(normal_);
 
-    if (bar != 0.0f) {
-        Eigen::Vector3f tmp = (*origin) - center_;
-        float d = -tmp.dot(normal_) / bar;
+    if (bar != 0) {
+        Eigen::Vector3d tmp = (*origin) - center_;
+        double d = -tmp.dot(normal_) / bar;
         if ((d >= mind) && (d <= maxd)) {
             return d;
         }
     }
-    return -1.0f;
+    return -1;
 }
 
 
-Eigen::Vector3f Plane::calculate_normal(Eigen::Vector3f *hit) {
+Eigen::Vector3d Plane::calculate_normal(Eigen::Vector3d *hit) {
     return normal_;
 }
 
 
-Sphere::Sphere(Eigen::Vector3f *center, float radius, Eigen::Vector3f *axis, 
-               float reflect, const char *texture) {
+Sphere::Sphere(Eigen::Vector3d *center, double radius, Eigen::Vector3d *axis, 
+               double reflect, const char *texture) {
     center_ = *center;
     R_ = radius;
     has_shadow_ = true;
     reflect_ = reflect;
 
     ty_ = *axis;
-    ty_ *= (1.0f / ty_.norm());
-    Eigen::Vector3f tmp = generate_unit_vector(&ty_);
+    ty_ *= (1 / ty_.norm());
+    Eigen::Vector3d tmp = generate_unit_vector(&ty_);
     tx_ = tmp.cross(ty_);
-    tx_ *= (1.0f / tx_.norm());
+    tx_ *= (1 / tx_.norm());
     tz_ = ty_.cross(tx_);
-    tz_ *= (1.0f / tz_.norm());
+    tz_ *= (1 / tz_.norm());
 
     texture_ = textureCollector.add(texture);
 }
@@ -148,21 +148,21 @@ Sphere::~Sphere() {
 }
 
 
-float Sphere::solve(Eigen::Vector3f *origin, Eigen::Vector3f *direction,
-                    float mind, float maxd) {
+double Sphere::solve(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+                    double mind, double maxd) {
 
-    Eigen::Vector3f t = (*origin) - center_;
-    float a = direction->dot(*direction);
-    float b = 2.0f * direction->dot(t);
-    float c = t.dot(t) - (R_ * R_);
+    Eigen::Vector3d t = (*origin) - center_;
+    double a = direction->dot(*direction);
+    double b = 2 * direction->dot(t);
+    double c = t.dot(t) - (R_ * R_);
 
     return solve_quadratic(a, b, c, mind, maxd);
 }
 
 
-Eigen::Vector3f Sphere::calculate_normal(Eigen::Vector3f *hit) {
-    Eigen::Vector3f normal = (*hit) - center_;
-    return (normal * (1.0f / normal.norm()));
+Eigen::Vector3d Sphere::calculate_normal(Eigen::Vector3d *hit) {
+    Eigen::Vector3d normal = (*hit) - center_;
+    return (normal * (1 / normal.norm()));
 }
 
 
@@ -170,27 +170,27 @@ Eigen::Vector3f Sphere::calculate_normal(Eigen::Vector3f *hit) {
 Guidelines:
 https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
 */
-Pixel Sphere::pick_pixel(Eigen::Vector3f *hit, Eigen::Vector3f *normal) {
-    float dot = normal->dot(ty_);
-    float phi = std::acos(-dot);
-    float fracy = phi / M_PI;
+Pixel Sphere::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+    double dot = normal->dot(ty_);
+    double phi = std::acos(-dot);
+    double fracy = phi / M_PI;
 
     dot = normal->dot(tx_);
-    float theta = std::acos(dot / std::sin(phi)) / (2.0f * M_PI);
+    double theta = std::acos(dot / std::sin(phi)) / (2 * M_PI);
     dot = normal->dot(tz_);
-    float fracx = (dot > 0.0f) ? theta : (1.0f - theta);
+    double fracx = (dot > 0) ? theta : (1 - theta);
 
-    return texture_->pick_pixel(fracx, fracy, 1.0f);
+    return texture_->pick_pixel(fracx, fracy, 1);
 }
 
 
-Cylinder::Cylinder(Eigen::Vector3f *center, Eigen::Vector3f *direction,
-                   float radius, float span, float reflect,
+Cylinder::Cylinder(Eigen::Vector3d *center, Eigen::Vector3d *direction,
+                   double radius, double span, double reflect,
                    const char *texture) {
 
     A_ = *center;
     B_ = *direction;
-    B_ *= (1.0f / B_.norm());
+    B_ *= (1 / B_.norm());
     R_ = radius;
 
     span_ = span;
@@ -199,7 +199,7 @@ Cylinder::Cylinder(Eigen::Vector3f *center, Eigen::Vector3f *direction,
 
     ty_ = generate_unit_vector(&B_);
     tx_ = ty_.cross(B_);
-    tx_ *= (1.0f / tx_.norm());
+    tx_ *= (1 / tx_.norm());
 
     texture_ = textureCollector.add(texture);
 }
@@ -238,28 +238,28 @@ Capital letters are vectors.
      -  d^2 - f = 0    => t = ...
  alpha = d + t * b
 */
-float Cylinder::solve(Eigen::Vector3f *O, Eigen::Vector3f *D,
-                      float mind, float maxd) {
+double Cylinder::solve(Eigen::Vector3d *O, Eigen::Vector3d *D,
+                      double mind, double maxd) {
 
-    Eigen::Vector3f tmp = (*O) - A_;
+    Eigen::Vector3d tmp = (*O) - A_;
 
-    float a = D->dot(tmp);
-    float b = D->dot(B_);
-    float d = tmp.dot(B_);
-    float f = (R_ * R_) - tmp.dot(tmp);
+    double a = D->dot(tmp);
+    double b = D->dot(B_);
+    double d = tmp.dot(B_);
+    double f = (R_ * R_) - tmp.dot(tmp);
 
     // Solving a quadratic equation for t
-    float aa = 1.0f - (b * b);
-    float bb = 2.0f * (a - b * d);
-    float cc = -(d * d) - f;
-    float t = solve_quadratic(aa, bb, cc, mind, maxd);
+    double aa = 1 - (b * b);
+    double bb = 2 * (a - b * d);
+    double cc = -(d * d) - f;
+    double t = solve_quadratic(aa, bb, cc, mind, maxd);
 
-    if (t > 0.0f) {
+    if (t > 0) {
         // Check if the cylinder is finite
-        if (span_ > 0.0f) {
-            float alpha = d + t * b;
+        if (span_ > 0) {
+            double alpha = d + t * b;
             if ((alpha < -span_) || (alpha > span_)) {
-                return -1.0f;
+                return -1;
             }
         }
     }
@@ -267,25 +267,25 @@ float Cylinder::solve(Eigen::Vector3f *O, Eigen::Vector3f *D,
 }
 
 
-Eigen::Vector3f Cylinder::calculate_normal(Eigen::Vector3f *hit) {
+Eigen::Vector3d Cylinder::calculate_normal(Eigen::Vector3d *hit) {
     // N = Hit - [B . (Hit - A)] * B
-    Eigen::Vector3f tmp = (*hit) - A_;
-    float alpha = B_.dot(tmp);
-    Eigen::Vector3f bar = A_ + alpha * B_;
-    Eigen::Vector3f normal = (*hit) - bar;
+    Eigen::Vector3d tmp = (*hit) - A_;
+    double alpha = B_.dot(tmp);
+    Eigen::Vector3d bar = A_ + alpha * B_;
+    Eigen::Vector3d normal = (*hit) - bar;
 
-    return (normal * (1.0f / normal.norm()));
+    return (normal * (1 / normal.norm()));
 }
 
 
-Pixel Cylinder::pick_pixel(Eigen::Vector3f *hit, Eigen::Vector3f *normal) {
-    Eigen::Vector3f tmp = (*hit) - A_;
-    float alpha = tmp.dot(B_);
-    float dot = normal->dot(tx_);
-    float fracx = acos(dot) / M_PI;
-    float fracy = alpha / (2.0f * M_PI * R_);
+Pixel Cylinder::pick_pixel(Eigen::Vector3d *hit, Eigen::Vector3d *normal) {
+    Eigen::Vector3d tmp = (*hit) - A_;
+    double alpha = tmp.dot(B_);
+    double dot = normal->dot(tx_);
+    double fracx = acos(dot) / M_PI;
+    double fracy = alpha / (2 * M_PI * R_);
 
-    return texture_->pick_pixel(fracx, fracy, 1.0f);
+    return texture_->pick_pixel(fracx, fracy, 1);
 }
 
 }  // namespace mrtp

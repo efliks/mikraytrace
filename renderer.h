@@ -17,11 +17,11 @@ enum RendererStatus_t {rs_ok, rs_fail};
 
 class Renderer {
   public:
-    Renderer(World *world, int width, int height, float fov, float distance,
-             float shadow, float bias, int maxdepth, int nthreads, 
+    Renderer(World *world, int width, int height, double fov, double distance,
+             double shadow, double bias, int maxdepth, int nthreads, 
              const char *path);
     ~Renderer();
-    float render_scene();
+    double render_scene();
     bool write_scene();
 
   private:
@@ -32,18 +32,18 @@ class Renderer {
     int height_;
     int maxdepth_;
     int nthreads_;
-    float maxdist_;
-    float shadow_;
-    float bias_;
-    float fov_;
-    float ratio_;
-    float perspective_;
+    double maxdist_;
+    double shadow_;
+    double bias_;
+    double fov_;
+    double ratio_;
+    double perspective_;
 
-    bool solve_shadows(Eigen::Vector3f *origin, Eigen::Vector3f *direction,
-                       float maxdist);
-    Actor *solve_hits(Eigen::Vector3f *origin, Eigen::Vector3f *direction,
-                      float *currd);
-    Pixel trace_ray_r(Eigen::Vector3f *origin, Eigen::Vector3f *direction,
+    bool solve_shadows(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+                       double maxdist);
+    Actor *solve_hits(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
+                      double *currd);
+    Pixel trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
                       int depth);
     void render_block(int block, int nlines);
 };

@@ -6,8 +6,8 @@
 
 namespace mrtp {
 
-static const float kRealToByte = 255.0f;
-static const float kByteToReal = 1.0f / kRealToByte;
+static const double kRealToByte = 255;
+static const double kByteToReal = 1 / kRealToByte;
 
 TextureCollector textureCollector;
 
@@ -22,7 +22,7 @@ define fractions of the x- and y-dimension
 of a texture.
 A reasonable scale for a 256x256 texture is 0.15.
 */
-Pixel Texture::pick_pixel(float fracx, float fracy, float scale) {
+Pixel Texture::pick_pixel(double fracx, double fracy, double scale) {
     unsigned u = (static_cast<unsigned>(fracx * width_ * scale)) % width_;
     unsigned v = (static_cast<unsigned>(fracy * height_ * scale)) % height_;
 
@@ -44,7 +44,7 @@ void Texture::load_texture() {
         png::rgb_pixel *in = &image[i][0];
 
         for (int j = 0; j < width_; j++, in++) {
-            Pixel out(static_cast<float>(in->red), static_cast<float>(in->green), static_cast<float>(in->blue));
+            Pixel out(static_cast<double>(in->red), static_cast<double>(in->green), static_cast<double>(in->blue));
             out *= kByteToReal;
             data_.push_back(out);
         }

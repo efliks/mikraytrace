@@ -8,19 +8,19 @@ namespace mrtp {
 
 class Camera {
   public:
-    Camera(Eigen::Vector3f *eye, Eigen::Vector3f *lookat, float roll);
+    Camera(Eigen::Vector3d *eye, Eigen::Vector3d *lookat, double roll);
     ~Camera();
-    void calculate_window(int width, int height, float perspective);
-    Eigen::Vector3f calculate_origin(int windowx, int windowy);
-    Eigen::Vector3f calculate_direction(Eigen::Vector3f *origin);
+    void calculate_window(int width, int height, double perspective);
+    Eigen::Vector3d calculate_origin(int windowx, int windowy);
+    Eigen::Vector3d calculate_direction(Eigen::Vector3d *origin);
 
   private:
-    float roll_;
-    Eigen::Vector3f eye_;
-    Eigen::Vector3f lookat_;
-    Eigen::Vector3f wo_;
-    Eigen::Vector3f wh_;
-    Eigen::Vector3f wv_;
+    double roll_;
+    Eigen::Vector3d eye_;
+    Eigen::Vector3d lookat_;
+    Eigen::Vector3d wo_;
+    Eigen::Vector3d wh_;
+    Eigen::Vector3d wv_;
 };
 
 } //namespace mrtp
