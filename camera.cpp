@@ -5,9 +5,11 @@
 
 namespace mrtp {
 
-Camera::Camera(Eigen::Vector3d *eye, Eigen::Vector3d *lookat, double roll) : eye_(*eye), lookat_(*lookat), roll_(roll) {}
+Camera::Camera(const Eigen::Vector3d& eye, const Eigen::Vector3d& lookat, double roll) :
+  roll_(roll), eye_(eye), lookat_(lookat) {
 
-Camera::~Camera() {}
+}
+
 
 void Camera::calculate_window(int width, int height, double perspective) {
     // i is a vector between the camera and the center of the window
@@ -48,13 +50,15 @@ void Camera::calculate_window(int width, int height, double perspective) {
     wv_ = 1 / static_cast<double>(height) * (v - wo_);
 }
 
-Eigen::Vector3d Camera::calculate_origin(int windowx, int windowy) {
-    return (wo_ + static_cast<double>(windowx) * wh_ + static_cast<double>(windowy) * wv_);
+
+Eigen::Vector3d Camera::calculate_origin(int windowx, int windowy) const {
+    return wo_ + static_cast<double>(windowx) * wh_ + static_cast<double>(windowy) * wv_;
 }
 
-Eigen::Vector3d Camera::calculate_direction(Eigen::Vector3d *origin) {
-    Eigen::Vector3d direction = (*origin) - eye_;
-    return (direction * (1 / direction.norm()));
+
+Eigen::Vector3d Camera::calculate_direction(const Eigen::Vector3d& origin) const {
+    Eigen::Vector3d direction = origin - eye_;
+    return direction * (1 / direction.norm());
 }
 
 } //namespace mrtp

@@ -57,7 +57,7 @@ WorldStatus_t World::initialize() {
     Eigen::Vector3d temp_lookat(raw_lookat->data());
     Eigen::Vector3d camera_lookat = temp_lookat.cast<double>();
 
-    Camera camera(&camera_eye, &camera_lookat, camera_roll);
+    Camera camera = Camera(camera_eye, camera_lookat, camera_roll);
     cameras_.push_back(camera);
     ptr_camera_ = &cameras_.back();
 
@@ -70,7 +70,7 @@ WorldStatus_t World::initialize() {
     Eigen::Vector3d temp_center(raw_center->data());
     Eigen::Vector3d light_center = temp_center.cast<double>();
 
-    Light light(&light_center);
+    Light light = Light(light_center);
     lights_.push_back(light);
     ptr_light_ = &lights_.back();
 

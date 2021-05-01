@@ -115,7 +115,7 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
         Eigen::Vector3d normal = hitactor->calculate_normal(inter);
 
         // Calculate light intensity
-        Eigen::Vector3d tolight = world_->ptr_light_->calculate_ray(&inter);
+        Eigen::Vector3d tolight = world_->ptr_light_->calculate_ray(inter);
 
         double lightd = tolight.norm();
         tolight *= (1 / lightd);
@@ -158,7 +158,7 @@ void Renderer::render_block(int block, int nlines) {
     for (int j = 0; j < nlines; j++) {
         for (int i = 0; i < width_; i++, pixel++) {
             Eigen::Vector3d origin = world_->ptr_camera_->calculate_origin(i, j + block * nlines);
-            Eigen::Vector3d direction = world_->ptr_camera_->calculate_direction(&origin);
+            Eigen::Vector3d direction = world_->ptr_camera_->calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
         }
     }

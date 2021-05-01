@@ -7,14 +7,16 @@
 namespace mrtp {
 
 class Light {
-  public:
-    Light(Eigen::Vector3d *center);
-    ~Light();
-    Eigen::Vector3d calculate_ray(Eigen::Vector3d *hit);
+public:
+    Light(const Eigen::Vector3d& center);
+    ~Light() = default;
 
-  private:
+    Eigen::Vector3d calculate_ray(const Eigen::Vector3d& hit) const;
+
+private:
     Eigen::Vector3d center_;
 };
+
 
 } //namespace mrtp
 
