@@ -63,8 +63,9 @@ bool Renderer::write_scene() {
     return rs_ok;
 }
 
-bool Renderer::solve_shadows(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
-                             double maxdist) {
+bool Renderer::solve_shadows(const Eigen::Vector3d& origin,
+                             const Eigen::Vector3d& direction,
+                             double maxdist) const {
     std::vector<Actor *> actors = world_->ptr_actors_;
     std::vector<Actor *>::iterator iter = actors.begin();
     std::vector<Actor *>::iterator iter_end = actors.end();
@@ -72,8 +73,8 @@ bool Renderer::solve_shadows(Eigen::Vector3d *origin, Eigen::Vector3d *direction
     for (; iter != iter_end; ++iter) {
         Actor *actor = *iter;
         if (actor->has_shadow) {
-            double distance = actor->solve(origin, direction, 0.0, maxdist);
-            if (distance > 0.0) {
+            double distance = actor->solve(origin, direction, 0, maxdist);
+            if (distance > 0) {
                 return true;
             }
         }
@@ -81,8 +82,9 @@ bool Renderer::solve_shadows(Eigen::Vector3d *origin, Eigen::Vector3d *direction
     return false;
 }
 
-Actor *Renderer::solve_hits(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
-                            double *currd) {
+Actor *Renderer::solve_hits(const Eigen::Vector3d& origin,
+                            const Eigen::Vector3d& direction,
+                            double *currd) const {
     std::vector<Actor *> actors = world_->ptr_actors_;
     std::vector<Actor *>::iterator iter = actors.begin();
     std::vector<Actor *>::iterator iter_end = actors.end();
@@ -90,8 +92,8 @@ Actor *Renderer::solve_hits(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
 
     for (; iter != iter_end; ++iter) {
         Actor *actor = *iter;
-        double distance = actor->solve(origin, direction, 0.0, maxdist_);
-        if ((distance > 0.0) && (distance < (*currd))) {
+        double distance = actor->solve(origin, direction, 0, maxdist_);
+        if (distance > 0 && distance < (*currd)) {
             *currd = distance;
             hit = actor;
         }
@@ -99,7 +101,9 @@ Actor *Renderer::solve_hits(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
     return hit;
 }
 
-Pixel Renderer::trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction, int depth) {
+Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
+                            const Eigen::Vector3d& direction,
+                            int depth) const {
     Pixel pixel;
     pixel << 0, 0, 0;
 
@@ -107,8 +111,8 @@ Pixel Renderer::trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
     Actor *hitactor = solve_hits(origin, direction, &currd);
 
     if (hitactor) {
-        Eigen::Vector3d inter = ((*direction) * currd) + (*origin);
-        Eigen::Vector3d normal = hitactor->calculate_normal(&inter);
+        Eigen::Vector3d inter = (direction * currd) + origin;
+        Eigen::Vector3d normal = hitactor->calculate_normal(inter);
 
         // Calculate light intensity
         Eigen::Vector3d tolight = world_->ptr_light_->calculate_ray(&inter);
@@ -123,7 +127,7 @@ Pixel Renderer::trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
             Eigen::Vector3d corr = inter + bias_ * normal;
 
             // Check if the intersection is in a shadow
-            bool isshadow = solve_shadows(&corr, &tolight, lightd);
+            bool isshadow = solve_shadows(corr, tolight, lightd);
             double shadow = (isshadow) ? shadow_ : 1;
 
             // Decrease light intensity for actors away from the light
@@ -132,14 +136,14 @@ Pixel Renderer::trace_ray_r(Eigen::Vector3d *origin, Eigen::Vector3d *direction,
             // Combine pixels
             double lambda = intensity * shadow * ambient;
 
-            Pixel pick = hitactor->pick_pixel(&inter, &normal);
+            Pixel pick = hitactor->pick_pixel(inter, normal);
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If the hit actor is reflective, trace a reflected ray
             if (depth < maxdepth_) {
                 if (hitactor->reflect_coeff > 0) {
-                    Eigen::Vector3d ray = (*direction) - (2 * direction->dot(normal)) * normal;
-                    Pixel reflected = trace_ray_r(&corr, &ray, depth + 1);
+                    Eigen::Vector3d ray = direction - (2 * direction.dot(normal)) * normal;
+                    Pixel reflected = trace_ray_r(corr, ray, depth + 1);
                     pixel = (1 - hitactor->reflect_coeff) * reflected + hitactor->reflect_coeff * pixel;
                 }
             }
@@ -155,7 +159,7 @@ void Renderer::render_block(int block, int nlines) {
         for (int i = 0; i < width_; i++, pixel++) {
             Eigen::Vector3d origin = world_->ptr_camera_->calculate_origin(i, j + block * nlines);
             Eigen::Vector3d direction = world_->ptr_camera_->calculate_direction(&origin);
-            *pixel = trace_ray_r(&origin, &direction, 0);
+            *pixel = trace_ray_r(origin, direction, 0);
         }
     }
 }

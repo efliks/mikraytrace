@@ -14,16 +14,16 @@ public:
     virtual ~Actor() = default;
 
     virtual double solve(
-        Eigen::Vector3d* origin,
-        Eigen::Vector3d* direction,
-        double mind, double maxd) = 0;
+        const Eigen::Vector3d& origin,
+        const Eigen::Vector3d& direction,
+        double mind, double maxd) const = 0;
 
     virtual Pixel pick_pixel(
-        Eigen::Vector3d* hit,
-        Eigen::Vector3d* normal) = 0;
+        const Eigen::Vector3d& hit,
+        const Eigen::Vector3d& normal) const = 0;
 
     virtual Eigen::Vector3d calculate_normal(
-        Eigen::Vector3d* hit) = 0;
+        const Eigen::Vector3d& hit) const = 0;
 
     bool has_shadow;
     double reflect_coeff;
@@ -36,24 +36,24 @@ protected:
 class Plane : public Actor {
 public:
     Plane(
-        Eigen::Vector3d* center,
-        Eigen::Vector3d* normal,
+        const Eigen::Vector3d& center,
+        const Eigen::Vector3d& normal,
         double scale, double reflect,
         const char* texture);
 
     virtual ~Plane() override = default;
 
     virtual double solve(
-        Eigen::Vector3d* origin,
-        Eigen::Vector3d* direction,
-        double mind, double maxd) override;
+        const Eigen::Vector3d& origin,
+        const Eigen::Vector3d& direction,
+        double mind, double maxd) const override;
 
     virtual Pixel pick_pixel(
-        Eigen::Vector3d* hit,
-        Eigen::Vector3d* normal) override;
+        const Eigen::Vector3d& hit,
+        const Eigen::Vector3d& normal) const override;
 
     virtual Eigen::Vector3d calculate_normal(
-        Eigen::Vector3d* hit) override;
+        const Eigen::Vector3d& hit) const override;
 
 private:
     Eigen::Vector3d center_;
@@ -68,8 +68,8 @@ private:
 class Sphere : public Actor {
 public:
     Sphere(
-        Eigen::Vector3d* center,
-        Eigen::Vector3d* axis,
+        const Eigen::Vector3d& center,
+        const Eigen::Vector3d& axis,
         double radius,
         double reflect,
         const char* texture);
@@ -77,16 +77,16 @@ public:
     virtual ~Sphere() override = default;
 
     virtual double solve(
-        Eigen::Vector3d* origin,
-        Eigen::Vector3d* direction,
-        double mind, double maxd) override;
+        const Eigen::Vector3d& origin,
+        const Eigen::Vector3d& direction,
+        double mind, double maxd) const override;
 
     virtual Pixel pick_pixel(
-        Eigen::Vector3d* hit,
-        Eigen::Vector3d* normal) override;
+        const Eigen::Vector3d& hit,
+        const Eigen::Vector3d& normal) const override;
 
     virtual Eigen::Vector3d calculate_normal(
-        Eigen::Vector3d* hit) override;
+        const Eigen::Vector3d& hit) const override;
 
 private:
     Eigen::Vector3d center_;
@@ -101,24 +101,24 @@ private:
 class Cylinder : public Actor {
 public:
     Cylinder(
-        Eigen::Vector3d* center,
-        Eigen::Vector3d* direction,
+        const Eigen::Vector3d& center,
+        const Eigen::Vector3d& direction,
         double radius, double span, double reflect,
         const char* texture);
 
     virtual ~Cylinder() override = default;
 
     virtual double solve(
-        Eigen::Vector3d* origin,
-        Eigen::Vector3d* direction,
-        double mind, double maxd) override;
+        const Eigen::Vector3d& origin,
+        const Eigen::Vector3d& direction,
+        double mind, double maxd) const override;
 
     virtual Pixel pick_pixel(
-        Eigen::Vector3d* hit,
-        Eigen::Vector3d* normal) override;
+        const Eigen::Vector3d& hit,
+        const Eigen::Vector3d& normal) const override;
 
     virtual Eigen::Vector3d calculate_normal(
-        Eigen::Vector3d* hit) override;
+        const Eigen::Vector3d& hit) const override;
 
 private:
     Eigen::Vector3d A_;

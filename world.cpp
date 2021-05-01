@@ -130,7 +130,7 @@ WorldStatus_t World::load_plane(std::shared_ptr<cpptoml::table> items) {
     double scale = static_cast<double>(items->get_as<double>("scale").value_or(0.15));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Plane plane(&center, &normal, scale, reflect, texture.c_str());
+    Plane plane = Plane(center, normal, scale, reflect, texture.c_str());
     planes_.push_back(plane);
     ptr_actors_.push_back(&planes_.back());
 
@@ -150,7 +150,7 @@ WorldStatus_t World::load_sphere(std::shared_ptr<cpptoml::table> items) {
     double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Sphere sphere(&center, &axis, radius, reflect, texture.c_str());
+    Sphere sphere = Sphere(center, axis, radius, reflect, texture.c_str());
     spheres_.push_back(sphere);
     ptr_actors_.push_back(&spheres_.back());
 
@@ -171,7 +171,7 @@ WorldStatus_t World::load_cylinder(std::shared_ptr<cpptoml::table> items) {
     double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Cylinder cylinder(&center, &direction, radius, span, reflect, texture.c_str());
+    Cylinder cylinder = Cylinder(center, direction, radius, span, reflect, texture.c_str());
     cylinders_.push_back(cylinder);
     ptr_actors_.push_back(&cylinders_.back());
 
