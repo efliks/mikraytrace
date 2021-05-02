@@ -31,15 +31,23 @@ static bool read_texture(std::shared_ptr<cpptoml::table> items, std::string *out
 
 //Member functions
 
-World::World(const char *path) : path_(path) {}
+World::World(const std::string& world_filename, const TextureCollector& texture_collector) :
+  world_filename_(world_filename), texture_collector_(texture_collector) {
 
-World::~World() {}
+}
+
 
 WorldStatus_t World::initialize() {
-    if (!file_exists(path_)) { return ws_no_file; }
+    if (!file_exists(world_filename_.c_str())) {
+        return ws_no_file;
+    }
 
     std::shared_ptr<cpptoml::table> config;
-    try { config = cpptoml::parse_file(path_); } catch (...) { return ws_parse_error; }
+    try {
+      config = cpptoml::parse_file(world_filename_.c_str());
+    } catch (...) {
+      return ws_parse_error;
+    }
 
     auto tab_camera = config->get_table("camera");
     if (!tab_camera) { return ws_no_camera; }
@@ -130,7 +138,8 @@ WorldStatus_t World::load_plane(std::shared_ptr<cpptoml::table> items) {
     double scale = static_cast<double>(items->get_as<double>("scale").value_or(0.15));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Plane plane = Plane(center, normal, scale, reflect, texture.c_str());
+    Plane plane = Plane(center, normal, scale, reflect,
+                        texture, texture_collector_);
     planes_.push_back(plane);
     ptr_actors_.push_back(&planes_.back());
 
@@ -150,7 +159,8 @@ WorldStatus_t World::load_sphere(std::shared_ptr<cpptoml::table> items) {
     double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Sphere sphere = Sphere(center, axis, radius, reflect, texture.c_str());
+    Sphere sphere = Sphere(center, axis, radius, reflect,
+                           texture, texture_collector_);
     spheres_.push_back(sphere);
     ptr_actors_.push_back(&spheres_.back());
 
@@ -171,7 +181,8 @@ WorldStatus_t World::load_cylinder(std::shared_ptr<cpptoml::table> items) {
     double radius = static_cast<double>(items->get_as<double>("radius").value_or(1));
     double reflect = static_cast<double>(items->get_as<double>("reflect").value_or(0));
 
-    Cylinder cylinder = Cylinder(center, direction, radius, span, reflect, texture.c_str());
+    Cylinder cylinder = Cylinder(center, direction, radius, span, reflect,
+                                 texture, texture_collector_);
     cylinders_.push_back(cylinder);
     ptr_actors_.push_back(&cylinders_.back());
 

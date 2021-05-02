@@ -9,6 +9,7 @@
 #include "actors.h"
 #include "camera.h"
 #include "light.h"
+#include "texture.h"
 
 
 namespace mrtp {
@@ -22,8 +23,11 @@ enum WorldStatus_t {ws_ok, ws_no_file, ws_parse_error, ws_no_camera,
 
 class World {
   public:
-    World(const char *path);
-    ~World();
+    World(const std::string& world_filename,
+          const TextureCollector& texture_collector);
+    World() = delete;
+    ~World() = default;
+
     WorldStatus_t initialize();
 
     Camera *ptr_camera_;
@@ -39,12 +43,14 @@ class World {
     WorldStatus_t load_spheres(std::shared_ptr<cpptoml::table_array> array);
     WorldStatus_t load_cylinders(std::shared_ptr<cpptoml::table_array> array);
 
-    const char *path_;
     std::list<Camera> cameras_;
     std::list<Light> lights_;
     std::list<Plane> planes_;
     std::list<Sphere> spheres_;
     std::list<Cylinder> cylinders_;
+
+    std::string world_filename_;
+    TextureCollector texture_collector_;
 };
 
 } //namespace mrtp

@@ -10,30 +10,32 @@
 namespace mrtp {
 
 class Texture {
-  public:
-    Texture(const char *path);
-    ~Texture();
+public:
+    Texture(const std::string& texture_filename);
+    Texture() = delete;
+    ~Texture() = default;
+
     void load_texture();
-    bool check_path(const char *path);
+    bool is_same_texture(const std::string& texture_filename);
     Pixel pick_pixel(double fracx, double fracy, double scale);
 
-  private:
+private:
     int width_;
     int height_;
-    std::vector<Pixel> data_;
-    std::string spath_;
+
+    std::vector<Pixel> pixel_data_;
+    std::string texture_filename_;
 };
 
-class TextureCollector {
-  public:
-    Texture *add(const char *path);
 
-  private:
+class TextureCollector {
+public:
+    Texture *add_texture(const std::string& texture_filename);
+
+private:
     std::list<Texture> textures_;
 };
 
-
-extern TextureCollector textureCollector;
 
 } //namespace mrtp
 

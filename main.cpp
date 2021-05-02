@@ -7,6 +7,7 @@
 
 #include "world.h"
 #include "renderer.h"
+#include "texture.h"
 
 
 //Default settings and limits
@@ -237,13 +238,17 @@ int main(int argc, char **argv) {
     std::vector<std::string>::iterator iter = toml_files.begin();
     std::vector<std::string>::iterator iter_end = toml_files.end();
 
+    //Textures will be shared by all worlds
+    mrtp::TextureCollector texture_collector = mrtp::TextureCollector();
+
     //Iterate over all input files
     for (; iter != iter_end; ++iter) {
         std::string toml_file = *iter;
         if (!quiet) { std::cout << "processing " << toml_file << std::flush; }
 
-        mrtp::World world(toml_file.c_str());
+        mrtp::World world = mrtp::World(toml_file, texture_collector);
         mrtp::WorldStatus_t status = world.initialize();
+
         if (status != mrtp::ws_ok) {
             if (!quiet) { std::cout << std::endl; }
 
