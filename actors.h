@@ -37,7 +37,7 @@ class Plane : public Actor {
 public:
     Plane(const Eigen::Vector3d& center, const Eigen::Vector3d& normal,
           double scale, double reflect, const std::string& texture_filename,
-          TextureCollector& texture_collector);
+          TextureCollector* texture_collector);
 
     virtual ~Plane() override = default;
 
@@ -67,7 +67,7 @@ class Sphere : public Actor {
 public:
     Sphere(const Eigen::Vector3d& center, const Eigen::Vector3d& axis,
            double radius, double reflect, const std::string& texture_filename,
-           TextureCollector& texture_collector);
+           TextureCollector* texture_collector);
 
     virtual ~Sphere() override = default;
 
@@ -98,7 +98,7 @@ public:
     Cylinder(const Eigen::Vector3d& center, const Eigen::Vector3d& direction,
              double radius, double span, double reflect,
              const std::string& texture_filename,
-             TextureCollector& texture_collector);
+             TextureCollector* texture_collector);
 
     virtual ~Cylinder() override = default;
 

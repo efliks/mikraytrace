@@ -61,7 +61,7 @@ Plane::Plane(const Eigen::Vector3d& center,
              double scale,
              double reflect,
              const std::string& texture_filename,
-             TextureCollector& texture_collector) {
+             TextureCollector* texture_collector) {
     center_ = center;
     normal_ = (1 / normal.norm()) * normal;
     scale_ = scale;
@@ -74,7 +74,7 @@ Plane::Plane(const Eigen::Vector3d& center,
     ty_ = normal_.cross(tx_);
     ty_ *= (1 / ty_.norm());
 
-    texture_ = texture_collector.add_texture(texture_filename);
+    texture_ = texture_collector->add_texture(texture_filename);
 }
 
 
@@ -114,7 +114,7 @@ Sphere::Sphere(const Eigen::Vector3d& center,
                double radius,
                double reflect,
                const std::string& texture_filename,
-               TextureCollector& texture_collector) {
+               TextureCollector* texture_collector) {
     center_ = center;
     R_ = radius;
     has_shadow = true;
@@ -129,7 +129,7 @@ Sphere::Sphere(const Eigen::Vector3d& center,
     tz_ = ty_.cross(tx_);
     tz_ *= (1 / tz_.norm());
 
-    texture_ = texture_collector.add_texture(texture_filename);
+    texture_ = texture_collector->add_texture(texture_filename);
 }
 
 
@@ -176,7 +176,7 @@ Cylinder::Cylinder(const Eigen::Vector3d& center,
                    double span,
                    double reflect,
                    const std::string& texture_filename,
-                   TextureCollector& texture_collector) {
+                   TextureCollector* texture_collector) {
     A_ = center;
     B_ = direction;
     B_ *= (1 / B_.norm());
@@ -190,7 +190,7 @@ Cylinder::Cylinder(const Eigen::Vector3d& center,
     tx_ = ty_.cross(B_);
     tx_ *= (1 / tx_.norm());
 
-    texture_ = texture_collector.add_texture(texture_filename);
+    texture_ = texture_collector->add_texture(texture_filename);
 }
 
 

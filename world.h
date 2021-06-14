@@ -24,7 +24,7 @@ enum WorldStatus_t {ws_ok, ws_no_file, ws_parse_error, ws_no_camera,
 class World {
   public:
     World(const std::string& world_filename,
-          const TextureCollector& texture_collector);
+          TextureCollector* texture_collector);
     World() = delete;
     ~World() = default;
 
@@ -50,8 +50,57 @@ class World {
     std::list<Cylinder> cylinders_;
 
     std::string world_filename_;
-    TextureCollector texture_collector_;
+    TextureCollector* texture_collector_;
 };
+
+class SceneWorld {
+public:
+    SceneWorld(TextureCollector* texture_collector);
+    SceneWorld() = delete;
+    ~SceneWorld() = default;
+
+    void add_light(const Light& light);
+    void add_camera(const Camera& camera);
+    void add_plane(const Plane& plane);
+    void add_sphere(const Sphere& sphere);
+    void add_cylinder(const Cylinder& cylinder);
+
+private:
+    std::vector<Light> lights_;
+    std::vector<Camera> cameras_;
+    std::vector<Plane> planes_;
+    std::vector<Sphere> spheres_;
+    std::vector<Cylinder> cylinders_;
+
+    TextureCollector* texture_collector;
+};
+
+
+class WorldBuilder {
+public:
+    WorldBuilder(const std::string& world_filename,
+                 TextureCollector* texture_collector);
+    WorldBuilder() = delete;
+    ~WorldBuilder() = default;
+
+    Light make_light(std::shared_ptr<cpptoml::table> light_items) const;
+    Camera make_camera(std::shared_ptr<cpptoml::table> camera_items) const;
+
+    Plane make_plane(std::shared_ptr<cpptoml::table> plane_items) const;
+    Sphere make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const;
+    Cylinder make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const;
+
+    SceneWorld build() const;
+
+private:
+    std::string world_filename_;
+    TextureCollector* texture_collector_;
+};
+
+
+SceneWorld build_world(const std::string& world_filename,
+                       TextureCollector* texture_collector);
+
 
 } //namespace mrtp
 
