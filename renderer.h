@@ -17,18 +17,18 @@ enum RendererStatus_t {rs_ok, rs_fail};
 
 class Renderer {
   public:
-    Renderer(World *world, int width, int height,
+    Renderer(SceneWorld *world, int width, int height,
              double fov, double distance,
              double shadow, double bias, int maxdepth,
              int nthreads, const char *path);
-
-    ~Renderer();
+    Renderer() = delete;
+    ~Renderer() = default;
 
     double render_scene();
     bool write_scene();
 
   private:
-    World *world_;
+    SceneWorld *world_;
     const char *path_;
     std::vector<Pixel> framebuffer_;
 

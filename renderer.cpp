@@ -22,7 +22,7 @@ bias: correction to shadows to avoid self-intersection
 distance: maximum distance reached by rays
 maxdepth: number of recursion levels of a reflected ray
 */
-Renderer::Renderer(World *world, int width, int height, double fov,
+Renderer::Renderer(SceneWorld *world, int width, int height, double fov,
                    double distance, double shadow, double bias, int maxdepth,
                    int nthreads, const char *path) : 
     world_(world), 
@@ -42,8 +42,6 @@ Renderer::Renderer(World *world, int width, int height, double fov,
     Pixel dummy;
     framebuffer_.assign(width_ * height_, dummy);
 }
-
-Renderer::~Renderer() {}
 
 bool Renderer::write_scene() {
     png::image<png::rgb_pixel> image(width_, height_);
@@ -66,12 +64,10 @@ bool Renderer::write_scene() {
 bool Renderer::solve_shadows(const Eigen::Vector3d& origin,
                              const Eigen::Vector3d& direction,
                              double maxdist) const {
-    std::vector<Actor *> actors = world_->ptr_actors_;
-    std::vector<Actor *>::iterator iter = actors.begin();
-    std::vector<Actor *>::iterator iter_end = actors.end();
+    ActorIterator actor_iterator = world_->get_actor_iterator();
 
-    for (; iter != iter_end; ++iter) {
-        Actor *actor = *iter;
+    for (; !actor_iterator.is_done(); actor_iterator.next()) {
+        Actor* actor = *actor_iterator.current();
         if (actor->has_shadow) {
             double distance = actor->solve(origin, direction, 0, maxdist);
             if (distance > 0) {
@@ -82,16 +78,15 @@ bool Renderer::solve_shadows(const Eigen::Vector3d& origin,
     return false;
 }
 
-Actor *Renderer::solve_hits(const Eigen::Vector3d& origin,
+Actor* Renderer::solve_hits(const Eigen::Vector3d& origin,
                             const Eigen::Vector3d& direction,
-                            double *currd) const {
-    std::vector<Actor *> actors = world_->ptr_actors_;
-    std::vector<Actor *>::iterator iter = actors.begin();
-    std::vector<Actor *>::iterator iter_end = actors.end();
-    Actor *hit = nullptr;
+                            double* currd) const {
+    Actor* hit = nullptr;
 
-    for (; iter != iter_end; ++iter) {
-        Actor *actor = *iter;
+    ActorIterator actor_iterator = world_->get_actor_iterator();
+
+    for (; !actor_iterator.is_done(); actor_iterator.next()) {
+        Actor* actor = *actor_iterator.current();
         double distance = actor->solve(origin, direction, 0, maxdist_);
         if (distance > 0 && distance < (*currd)) {
             *currd = distance;
@@ -115,7 +110,8 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
         Eigen::Vector3d normal = hitactor->calculate_normal(inter);
 
         // Calculate light intensity
-        Eigen::Vector3d tolight = world_->ptr_light_->calculate_ray(inter);
+        Light my_light = world_->get_light();
+        Eigen::Vector3d tolight = my_light.calculate_ray(inter);
 
         double lightd = tolight.norm();
         tolight *= (1 / lightd);
@@ -155,10 +151,12 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
 void Renderer::render_block(int block, int nlines) {
     Pixel *pixel = &framebuffer_[block * nlines * width_];
 
+    Camera my_camera = world_->get_camera();
+
     for (int j = 0; j < nlines; j++) {
         for (int i = 0; i < width_; i++, pixel++) {
-            Eigen::Vector3d origin = world_->ptr_camera_->calculate_origin(i, j + block * nlines);
-            Eigen::Vector3d direction = world_->ptr_camera_->calculate_direction(origin);
+            Eigen::Vector3d origin = my_camera.calculate_origin(i, j + block * nlines);
+            Eigen::Vector3d direction = my_camera.calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
         }
     }
@@ -177,7 +175,9 @@ Returns rendering time in seconds, corrected for
 the number of threads.
 */
 double Renderer::render_scene() {
-    world_->ptr_camera_->calculate_window(width_, height_, perspective_);
+    Camera my_camera = world_->get_camera();
+
+    my_camera.calculate_window(width_, height_, perspective_);
 
     int time_start = clock();
 

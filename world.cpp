@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include "world.h"
 
 
@@ -187,6 +188,69 @@ WorldStatus_t World::load_cylinder(std::shared_ptr<cpptoml::table> items) {
 }
 
 
+SceneWorld::SceneWorld(TextureCollector* texture_collector) :
+    texture_collector_(texture_collector) {
+
+}
+
+void SceneWorld::add_light(const Light& light) {
+    lights_.push_back(light);
+}
+
+void SceneWorld::add_camera(const Camera& camera) {
+    cameras_.push_back(camera);
+}
+
+void SceneWorld::add_plane(const Plane& plane) {
+    planes_.push_back(plane);
+    actor_ptrs_.push_back(&planes_.back());
+}
+
+void SceneWorld::add_sphere(const Sphere& sphere) {
+    spheres_.push_back(sphere);
+    actor_ptrs_.push_back(&spheres_.back());
+}
+
+void SceneWorld::add_cylinder(const Cylinder& cylinder) {
+    cylinders_.push_back(cylinder);
+    actor_ptrs_.push_back(&cylinders_.back());
+}
+
+ActorIterator SceneWorld::get_actor_iterator() {
+    return ActorIterator(&actor_ptrs_);
+}
+
+Camera SceneWorld::get_camera() {
+    return *cameras_.begin();  // ignore other cameras
+}
+
+Light SceneWorld::get_light() {
+    return *lights_.begin();  // ignore other lights
+}
+
+
+ActorIterator::ActorIterator(std::vector<Actor* >* actor_ptrs):
+    actor_ptrs_(actor_ptrs) {
+    actor_iter_ = actor_ptrs_->begin();
+}
+
+void ActorIterator::first() {
+    actor_iter_ = actor_ptrs_->begin();
+}
+
+void ActorIterator::next() {
+    actor_iter_++;
+}
+
+bool ActorIterator::is_done() {
+    return actor_iter_ == actor_ptrs_->end();
+}
+
+std::vector<Actor* >::iterator ActorIterator::current() {
+    return actor_iter_;
+}
+
+
 WorldBuilder::WorldBuilder(const std::string& world_filename,
                            TextureCollector* texture_collector) :
     world_filename_(world_filename),
@@ -372,23 +436,27 @@ SceneWorld WorldBuilder::build() const {
     auto spheres_array = world_config->get_table_array("spheres");
     auto cylinders_array = world_config->get_table_array("cylinders");
 
-    for (const auto& plane_items : *planes_array) {
-        my_world.add_plane(make_plane(plane_items));
+    if (planes_array) {
+        for (const auto& plane_items : *planes_array) {
+            my_world.add_plane(make_plane(plane_items));
+        }
     }
 
-    for (const auto& sphere_items : *planes_array) {
-        my_world.add_sphere(make_sphere(sphere_items));
+    if (spheres_array) {
+        for (const auto& sphere_items : *spheres_array) {
+            my_world.add_sphere(make_sphere(sphere_items));
+        }
     }
 
-    for (const auto& cylinder_items : *planes_array) {
-        my_world.add_cylinder(make_cylinder(cylinder_items));
+    if (cylinders_array) {
+        for (const auto& cylinder_items : *cylinders_array) {
+            my_world.add_cylinder(make_cylinder(cylinder_items));
+        }
     }
 
-    Camera my_camera = make_camera(world_config);
-    my_world.add_camera(my_camera);
+    my_world.add_camera(make_camera(world_config));
 
-    Light my_light = make_light(world_config);
-    my_world.add_light(my_light);
+    my_world.add_light(make_light(world_config));
 
     return my_world;
 }

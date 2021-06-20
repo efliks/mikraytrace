@@ -53,6 +53,24 @@ class World {
     TextureCollector* texture_collector_;
 };
 
+
+class ActorIterator {
+public:
+    ActorIterator(std::vector<Actor* >* actor_ptrs);
+    ActorIterator() = delete;
+    ~ActorIterator() = default;
+
+    void first();
+    void next();
+    bool is_done();
+    std::vector<Actor* >::iterator current();
+
+private:
+    std::vector<Actor* >* actor_ptrs_;
+    std::vector<Actor* >::iterator actor_iter_;
+};
+
+
 class SceneWorld {
 public:
     SceneWorld(TextureCollector* texture_collector);
@@ -65,14 +83,21 @@ public:
     void add_sphere(const Sphere& sphere);
     void add_cylinder(const Cylinder& cylinder);
 
-private:
-    std::vector<Light> lights_;
-    std::vector<Camera> cameras_;
-    std::vector<Plane> planes_;
-    std::vector<Sphere> spheres_;
-    std::vector<Cylinder> cylinders_;
+    Light get_light();
+    Camera get_camera();
 
-    TextureCollector* texture_collector;
+    ActorIterator get_actor_iterator();
+
+private:
+    std::list<Light> lights_;
+    std::list<Camera> cameras_;
+    std::list<Plane> planes_;
+    std::list<Sphere> spheres_;
+    std::list<Cylinder> cylinders_;
+
+    std::vector<Actor* > actor_ptrs_;
+
+    TextureCollector* texture_collector_;
 };
 
 

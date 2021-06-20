@@ -246,11 +246,9 @@ int main(int argc, char **argv) {
         std::string toml_file = *iter;
         if (!quiet) { std::cout << "processing " << toml_file << std::flush; }
 
-        mrtp::World world(toml_file, &texture_collector);
-        mrtp::WorldStatus_t status = world.initialize();
+        mrtp::SceneWorld world = mrtp::build_world(toml_file, &texture_collector);
 
-//        mrtp::SceneWorld world = mrtp::build_world(toml_file, &texture_collector);
-//        mrtp::WorldStatus_t status = mrtp::ws_ok;
+        mrtp::WorldStatus_t status = mrtp::ws_ok;  // TODO Properly handle statuses
 
         if (status != mrtp::ws_ok) {
             if (!quiet) { std::cout << std::endl; }
