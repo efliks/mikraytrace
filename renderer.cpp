@@ -110,8 +110,8 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
         Eigen::Vector3d normal = hitactor->calculate_normal(inter);
 
         // Calculate light intensity
-        Light my_light = world_->get_light();
-        Eigen::Vector3d tolight = my_light.calculate_ray(inter);
+        Light* my_light = world_->get_light_ptr();
+        Eigen::Vector3d tolight = my_light->calculate_ray(inter);
 
         double lightd = tolight.norm();
         tolight *= (1 / lightd);
@@ -151,12 +151,12 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
 void Renderer::render_block(int block, int nlines) {
     Pixel *pixel = &framebuffer_[block * nlines * width_];
 
-    Camera my_camera = world_->get_camera();
+    Camera* my_camera = world_->get_camera_ptr();
 
     for (int j = 0; j < nlines; j++) {
         for (int i = 0; i < width_; i++, pixel++) {
-            Eigen::Vector3d origin = my_camera.calculate_origin(i, j + block * nlines);
-            Eigen::Vector3d direction = my_camera.calculate_direction(origin);
+            Eigen::Vector3d origin = my_camera->calculate_origin(i, j + block * nlines);
+            Eigen::Vector3d direction = my_camera->calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
         }
     }
@@ -175,9 +175,9 @@ Returns rendering time in seconds, corrected for
 the number of threads.
 */
 double Renderer::render_scene() {
-    Camera my_camera = world_->get_camera();
+    Camera* my_camera = world_->get_camera_ptr();
 
-    my_camera.calculate_window(width_, height_, perspective_);
+    my_camera->calculate_window(width_, height_, perspective_);
 
     int time_start = clock();
 

@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
         std::string toml_file = *iter;
         if (!quiet) { std::cout << "processing " << toml_file << std::flush; }
 
-        mrtp::SceneWorld world = mrtp::build_world(toml_file, &texture_collector);
+        auto my_world_ptr = mrtp::build_world(toml_file, &texture_collector);
 
         mrtp::WorldStatus_t status = mrtp::ws_ok;  // TODO Properly handle statuses
 
@@ -277,7 +277,7 @@ int main(int argc, char **argv) {
             png_file = foo + ".png";
         }
 
-        mrtp::Renderer renderer(&world, width, height, fov, distance, shadow, kDefaultBias, 
+        mrtp::Renderer renderer(my_world_ptr.get(), width, height, fov, distance, shadow, kDefaultBias,
                                 recursion, threads, png_file.c_str());
 
         double time_used = renderer.render_scene();

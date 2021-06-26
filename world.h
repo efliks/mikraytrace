@@ -83,8 +83,8 @@ public:
     void add_sphere(const Sphere& sphere);
     void add_cylinder(const Cylinder& cylinder);
 
-    Light get_light();
-    Camera get_camera();
+    Light* get_light_ptr();
+    Camera* get_camera_ptr();
 
     ActorIterator get_actor_iterator();
 
@@ -115,7 +115,7 @@ public:
     Sphere make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const;
     Cylinder make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const;
 
-    SceneWorld build() const;
+    std::shared_ptr<SceneWorld> build() const;
 
 private:
     std::string world_filename_;
@@ -123,8 +123,8 @@ private:
 };
 
 
-SceneWorld build_world(const std::string& world_filename,
-                       TextureCollector* texture_collector);
+std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
+                                        TextureCollector* texture_collector);
 
 
 } //namespace mrtp

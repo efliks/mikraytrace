@@ -220,12 +220,12 @@ ActorIterator SceneWorld::get_actor_iterator() {
     return ActorIterator(&actor_ptrs_);
 }
 
-Camera SceneWorld::get_camera() {
-    return *cameras_.begin();  // ignore other cameras
+Camera* SceneWorld::get_camera_ptr() {
+    return &(*cameras_.begin());  // ignore other cameras
 }
 
-Light SceneWorld::get_light() {
-    return *lights_.begin();  // ignore other lights
+Light* SceneWorld::get_light_ptr() {
+    return &(*lights_.begin());  // ignore other lights
 }
 
 
@@ -418,7 +418,7 @@ Camera WorldBuilder::make_camera(std::shared_ptr<cpptoml::table> config) const {
 }
 
 
-SceneWorld WorldBuilder::build() const {
+std::shared_ptr<SceneWorld> WorldBuilder::build() const {
     if (!file_exists(world_filename_.c_str())) {
         //TODO
     }
@@ -430,7 +430,7 @@ SceneWorld WorldBuilder::build() const {
         //TODO
     }
 
-    SceneWorld my_world(texture_collector_);
+    auto my_world = std::shared_ptr<SceneWorld>(new SceneWorld(texture_collector_));
 
     auto planes_array = world_config->get_table_array("planes");
     auto spheres_array = world_config->get_table_array("spheres");
@@ -438,34 +438,34 @@ SceneWorld WorldBuilder::build() const {
 
     if (planes_array) {
         for (const auto& plane_items : *planes_array) {
-            my_world.add_plane(make_plane(plane_items));
+            my_world->add_plane(make_plane(plane_items));
         }
     }
 
     if (spheres_array) {
         for (const auto& sphere_items : *spheres_array) {
-            my_world.add_sphere(make_sphere(sphere_items));
+            my_world->add_sphere(make_sphere(sphere_items));
         }
     }
 
     if (cylinders_array) {
         for (const auto& cylinder_items : *cylinders_array) {
-            my_world.add_cylinder(make_cylinder(cylinder_items));
+            my_world->add_cylinder(make_cylinder(cylinder_items));
         }
     }
 
-    my_world.add_camera(make_camera(world_config));
+    my_world->add_camera(make_camera(world_config));
 
-    my_world.add_light(make_light(world_config));
+    my_world->add_light(make_light(world_config));
 
     return my_world;
 }
 
 
-SceneWorld build_world(const std::string& world_filename,
-                       TextureCollector* texture_collector) {
+std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
+                                        TextureCollector* texture_collector) {
     WorldBuilder my_builder(world_filename, texture_collector);
-    SceneWorld my_world = my_builder.build();
+    std::shared_ptr<SceneWorld> my_world = my_builder.build();
 
     return my_world;
 }
