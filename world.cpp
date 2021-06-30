@@ -270,7 +270,7 @@ Plane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_items) cons
     if (!plane_normal) {
         //TODO
     }
-    Eigen::Vector3d plane_normal_vec(plane_center->data());
+    Eigen::Vector3d plane_normal_vec(plane_normal->data());
 
     auto plane_texture = plane_items->get_as<std::string>("texture");
     if (!plane_texture) {
@@ -303,12 +303,12 @@ Sphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_items) c
     }
     Eigen::Vector3d sphere_center_vec(sphere_center->data());
 
-//    Eigen::Vector3d sphere_axis_vec(0, 0, 1);
+    Eigen::Vector3d sphere_axis_vec(0, 0, 1);
     auto sphere_axis = sphere_items->get_array_of<double>("axis");
-    if (sphere_center) {
-        //TODO
+    if (sphere_axis) {
+        Eigen::Vector3d tmp_vec(sphere_axis->data());
+        sphere_axis_vec = tmp_vec;
     }
-    Eigen::Vector3d sphere_axis_vec(sphere_axis->data());
 
     auto sphere_texture = sphere_items->get_as<std::string>("texture");
     if (!sphere_texture) {
