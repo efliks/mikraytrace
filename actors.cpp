@@ -5,98 +5,75 @@
 
 namespace mrtp {
 
-const double kAlmostZero = 0.0001;
+using Vector3d = Eigen::Vector3d;
+
+const double kMyZero = 0.0001;
 
 
-double solve_quadratic(double a, double b, double c,
-                       double mint, double maxt) {
-    double t = -1;
+double solve_quadratic(double a, double b, double c) {
     double delta = b * b - 4 * a * c;
-
-    if (delta >= 0) {
-        if (delta > 0) {
-            double sqdelta = sqrt(delta);
-            double tmp = 0.5 / a;
-            double ta = (-b - sqdelta) * tmp;
-            double tb = (-b + sqdelta) * tmp;
-            t = (ta < tb) ? ta : tb;
-        } else {
-            t = -b / (2 * a);
-        }
-        if ((t < mint) || (t > maxt)) {
-            t = -1;
-        }
+    if (delta < 0) {
+        return -1;
     }
-    return t;
-}
 
-
-Eigen::Vector3d generate_unit_vector(const Eigen::Vector3d& vector) {
-    double tx = vector[0];
-    double ty = vector[1];
-    double tz = vector[2];
-
-    double x = (tx < 0) ? -tx : tx;
-    double y = (ty < 0) ? -ty : ty;
-    double z = (tz < 0) ? -tz : tz;
-
-    Eigen::Vector3d unit;
-    unit << 0, 0, 1;
-
-    if (x < y) {
-        if (x < z) {
-            unit << 1, 0, 0;
-        }
-    } else { // if ( x >= y)
-        if (y < z) {
-            unit << 0, 1, 0;
-        }
+    if (-kMyZero < delta < kMyZero) {
+        return -b / (2 * a);
     }
-    return unit;
+
+    double sqdelta = sqrt(delta);
+    double t = 0.5 / a;
+    double ta = (-b - sqdelta) * t;
+    double tb = (-b + sqdelta) * t;
+
+    return (ta < tb) ? ta : tb;
 }
 
 
-Plane::Plane(const Eigen::Vector3d& center,
-             const Eigen::Vector3d& normal,
-             double scale,
-             double reflect,
-             const std::string& texture_filename,
-             TextureCollector* texture_collector) {
-    center_ = center;
-    normal_ = (1 / normal.norm()) * normal;
-    scale_ = scale;
-    reflect_coeff = reflect;
-    has_shadow = false;
+StandardBasis::StandardBasis(const Vector3d& o,
+                             const Vector3d& i,
+                             const Vector3d& j,
+                             const Vector3d& k) :
+    o(o), vi(i), vj(j), vk(k) {
 
-    Eigen::Vector3d tmp = generate_unit_vector(normal_);
-    tx_ = tmp.cross(normal_);
-    tx_ *= (1 / tx_.norm());
-    ty_ = normal_.cross(tx_);
-    ty_ *= (1 / ty_.norm());
-
-    texture_ = texture_collector->add_texture(texture_filename);
 }
 
 
-Pixel Plane::pick_pixel(const Eigen::Vector3d& hit,
-                        const Eigen::Vector3d& normal) const {
-    Eigen::Vector3d v = hit - center_;
-    // Calculate components of v (dot products)
-    double vx = v.dot(tx_);
-    double vy = v.dot(ty_);
-
-    return texture_->pick_pixel(vx, vy, scale_);
+StandardBasis::StandardBasis() {
+    o << 0, 0, 0;
+    vi << 1, 0, 0;
+    vj << 0, 1, 0;
+    vk << 0, 0, 1;
 }
 
 
-double Plane::solve(const Eigen::Vector3d& origin,
-                    const Eigen::Vector3d& direction,
-                    double mind, double maxd) const {
-  double bar = direction.dot(normal_);
-    if (bar > kAlmostZero or bar < -kAlmostZero) {
-        Eigen::Vector3d tmp = origin - center_;
-        double d = -tmp.dot(normal_) / bar;
-        if ((d >= mind) && (d <= maxd)) {
+ActorBase::ActorBase(const StandardBasis& local_basis) :
+    local_basis_(local_basis) {
+
+}
+
+
+TexturedPlane::TexturedPlane(const StandardBasis& local_basis,
+                             Texture* texture) :
+    ActorBase(local_basis), texture_(texture) {
+
+}
+
+
+bool TexturedPlane::has_shadow() const {
+    return false;
+}
+
+
+double TexturedPlane::solve_light_ray(const Vector3d& O,
+                                      const Vector3d& D,
+                                      double min_dist,
+                                      double max_dist) const {
+    double t = D.dot(local_basis_.vk);
+
+    if (t > kMyZero || t < -kMyZero) {
+        Vector3d v = O - local_basis_.o;
+        double d = -v.dot(local_basis_.vk) / t;
+        if (min_dist < d < max_dist) {
             return d;
         }
     }
@@ -104,93 +81,87 @@ double Plane::solve(const Eigen::Vector3d& origin,
 }
 
 
-Eigen::Vector3d Plane::calculate_normal(const Eigen::Vector3d& hit) const {
-    return normal_;
+Pixel TexturedPlane::pick_pixel(const Vector3d& hit,
+                                const Vector3d& normal_at_hit) const {
+   Vector3d v = hit - local_basis_.o;
+
+   double tx_i = v.dot(local_basis_.vi);
+   double tx_j = v.dot(local_basis_.vj);
+
+   return texture_->pick_pixel(tx_i, tx_j, 0.15);  // TODO scale!
 }
 
 
-Sphere::Sphere(const Eigen::Vector3d& center,
-               const Eigen::Vector3d& axis,
-               double radius,
-               double reflect,
-               const std::string& texture_filename,
-               TextureCollector* texture_collector) {
-    center_ = center;
-    R_ = radius;
-    has_shadow = true;
-    reflect_coeff = reflect;
-
-    ty_ = axis;
-    ty_ *= (1 / ty_.norm());
-
-    Eigen::Vector3d tmp = generate_unit_vector(ty_);
-    tx_ = tmp.cross(ty_);
-    tx_ *= (1 / tx_.norm());
-    tz_ = ty_.cross(tx_);
-    tz_ *= (1 / tz_.norm());
-
-    texture_ = texture_collector->add_texture(texture_filename);
+Vector3d TexturedPlane::calculate_normal_at_hit(const Vector3d& hit) const {
+    return local_basis_.vk;
 }
 
 
-double Sphere::solve(const Eigen::Vector3d& origin,
-                     const Eigen::Vector3d& direction,
-                     double mind, double maxd) const {
-    Eigen::Vector3d t = origin - center_;
-    double a = direction.dot(direction);
-    double b = 2 * direction.dot(t);
-    double c = t.dot(t) - (R_ * R_);
+TexturedSphere::TexturedSphere(const StandardBasis& local_basis,
+                               double radius,
+                               Texture* texture) :
+    ActorBase(local_basis), texture_(texture), radius_(radius) {
 
-    return solve_quadratic(a, b, c, mind, maxd);
 }
 
 
-Eigen::Vector3d Sphere::calculate_normal(const Eigen::Vector3d& hit) const {
-    Eigen::Vector3d normal = hit - center_;
-    return (normal * (1 / normal.norm()));
+bool TexturedSphere::has_shadow() const {
+    return true;
 }
 
 
-/*
-Guidelines:
-https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
-*/
-Pixel Sphere::pick_pixel(const Eigen::Vector3d& hit,
-                         const Eigen::Vector3d& normal) const {
-    double dot = normal.dot(ty_);
+double TexturedSphere::solve_light_ray(const Vector3d& O,
+                                       const Vector3d& D,
+                                       double min_dist,
+                                       double max_dist) const {
+    Vector3d t = O - local_basis_.o;
+
+    double a = D.dot(D);
+    double b = 2 * D.dot(t);
+    double c = t.dot(t) - radius_ * radius_;
+    double dist = solve_quadratic(a, b, c);
+
+    return (min_dist < dist < max_dist) ? dist : -1;
+}
+
+
+Pixel TexturedSphere::pick_pixel(const Vector3d& hit,
+                                 const Vector3d& normal_at_hit) const {
+    // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
+
+    double dot = normal_at_hit.dot(local_basis_.vj);
     double phi = std::acos(-dot);
     double fracy = phi / M_PI;
 
-    dot = normal.dot(tx_);
+    dot = normal_at_hit.dot(local_basis_.vi);
     double theta = std::acos(dot / std::sin(phi)) / (2 * M_PI);
-    dot = normal.dot(tz_);
+    dot = normal_at_hit.dot(local_basis_.vk);
     double fracx = (dot > 0) ? theta : (1 - theta);
 
     return texture_->pick_pixel(fracx, fracy, 1);
 }
 
 
-Cylinder::Cylinder(const Eigen::Vector3d& center,
-                   const Eigen::Vector3d& direction,
-                   double radius,
-                   double span,
-                   double reflect,
-                   const std::string& texture_filename,
-                   TextureCollector* texture_collector) {
-    A_ = center;
-    B_ = direction;
-    B_ *= (1 / B_.norm());
-    R_ = radius;
+Vector3d TexturedSphere::calculate_normal_at_hit(const Vector3d& hit) const {
+    Vector3d t = hit - local_basis_.o;
+    return t * (1 / t.norm());
+}
 
-    span_ = span;
-    reflect_coeff = reflect;
-    has_shadow = true;
 
-    ty_ = generate_unit_vector(B_);
-    tx_ = ty_.cross(B_);
-    tx_ *= (1 / tx_.norm());
+TexturedCylinder::TexturedCylinder(const StandardBasis& local_basis,
+                                   double cylinder_radius,
+                                   double cylinder_lenght,
+                                   Texture* texture) :
+    ActorBase(local_basis),
+    texture_(texture),
+    radius_(cylinder_radius),
+    length_(cylinder_lenght) {
 
-    texture_ = texture_collector->add_texture(texture_filename);
+}
+
+
+bool TexturedCylinder::has_shadow() const {
+    return false;
 }
 
 
@@ -223,27 +194,29 @@ Capital letters are vectors.
      -  d^2 - f = 0    => t = ...
  alpha = d + t * b
 */
-double Cylinder::solve(const Eigen::Vector3d& O,
-                       const Eigen::Vector3d& D,
-                      double mind, double maxd) const {
-    Eigen::Vector3d tmp = O - A_;
+double TexturedCylinder::solve_light_ray(const Vector3d& O,
+                                         const Vector3d& D,
+                                         double min_dist,
+                                         double max_dist) const {
+    Vector3d vec = O - local_basis_.o;
 
-    double a = D.dot(tmp);
-    double b = D.dot(B_);
-    double d = tmp.dot(B_);
-    double f = (R_ * R_) - tmp.dot(tmp);
+    double a = D.dot(vec);
+    double b = D.dot(local_basis_.vk);
+    double d = vec.dot(local_basis_.vk);
+    double f = radius_ * radius_ - vec.dot(vec);
 
-    // Solving a quadratic equation for t
+    // Solving quadratic equation for t
     double aa = 1 - (b * b);
     double bb = 2 * (a - b * d);
     double cc = -(d * d) - f;
-    double t = solve_quadratic(aa, bb, cc, mind, maxd);
+    double t = solve_quadratic(aa, bb, cc);
 
+    t = (min_dist < t < max_dist) ? t : -1;
     if (t > 0) {
-        // Check if the cylinder is finite
-        if (span_ > 0) {
+        // Check if cylinder is finite
+        if (length_ > 0) {
             double alpha = d + t * b;
-            if ((alpha < -span_) || (alpha > span_)) {
+            if (alpha < -length_ || alpha > length_) {
                 return -1;
             }
         }
@@ -252,27 +225,29 @@ double Cylinder::solve(const Eigen::Vector3d& O,
 }
 
 
-Eigen::Vector3d Cylinder::calculate_normal(const Eigen::Vector3d& hit) const {
+Vector3d TexturedCylinder::calculate_normal_at_hit(const Vector3d& hit) const {
     // N = Hit - [B . (Hit - A)] * B
-    Eigen::Vector3d tmp = hit - A_;
-    double alpha = B_.dot(tmp);
-    Eigen::Vector3d bar = A_ + alpha * B_;
-    Eigen::Vector3d normal = hit - bar;
+    Vector3d v = hit - local_basis_.o;
+    double alpha = local_basis_.vk.dot(v);
+    Vector3d w = local_basis_.o + alpha * local_basis_.vk;
+    Vector3d normal = hit - w;
 
-    return (normal * (1 / normal.norm()));
+    return normal * (1 / normal.norm());
 }
 
 
-Pixel Cylinder::pick_pixel(const Eigen::Vector3d& hit,
-                           const Eigen::Vector3d& normal) const {
-    Eigen::Vector3d tmp = hit - A_;
-    double alpha = tmp.dot(B_);
-    double dot = normal.dot(tx_);
-    double fracx = acos(dot) / M_PI;
-    double fracy = alpha / (2 * M_PI * R_);
+Pixel TexturedCylinder::pick_pixel(const Vector3d& hit,
+                                   const Vector3d& normal_at_hit) const {
+    Vector3d t = hit - local_basis_.o;
 
-    return texture_->pick_pixel(fracx, fracy, 1);
+    double alpha = t.dot(local_basis_.vk);
+    double dot = normal_at_hit.dot(local_basis_.vi);
+    double frac_x = acos(dot) / M_PI;
+    double frac_y = alpha / (2 * M_PI * radius_);
+
+    return texture_->pick_pixel(frac_x, frac_y, 1);  // TODO scale!
 }
+
 
 }  // namespace mrtp
 

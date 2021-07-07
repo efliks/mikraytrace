@@ -24,17 +24,17 @@ void SceneWorld::add_camera(const Camera& camera) {
     cameras_.push_back(camera);
 }
 
-void SceneWorld::add_plane(const Plane& plane) {
+void SceneWorld::add_plane(const TexturedPlane& plane) {
     planes_.push_back(plane);
     actor_ptrs_.push_back(&planes_.back());
 }
 
-void SceneWorld::add_sphere(const Sphere& sphere) {
+void SceneWorld::add_sphere(const TexturedSphere& sphere) {
     spheres_.push_back(sphere);
     actor_ptrs_.push_back(&spheres_.back());
 }
 
-void SceneWorld::add_cylinder(const Cylinder& cylinder) {
+void SceneWorld::add_cylinder(const TexturedCylinder& cylinder) {
     cylinders_.push_back(cylinder);
     actor_ptrs_.push_back(&cylinders_.back());
 }
@@ -52,7 +52,7 @@ Light* SceneWorld::get_light_ptr() {
 }
 
 
-ActorIterator::ActorIterator(std::vector<Actor* >* actor_ptrs):
+ActorIterator::ActorIterator(std::vector<ActorBase* >* actor_ptrs):
     actor_ptrs_(actor_ptrs) {
     actor_iter_ = actor_ptrs_->begin();
 }
@@ -69,7 +69,7 @@ bool ActorIterator::is_done() {
     return actor_iter_ == actor_ptrs_->end();
 }
 
-std::vector<Actor* >::iterator ActorIterator::current() {
+std::vector<ActorBase* >::iterator ActorIterator::current() {
     return actor_iter_;
 }
 
@@ -82,7 +82,7 @@ WorldBuilder::WorldBuilder(const std::string& world_filename,
 }
 
 
-Plane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_items) const {
+TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_items) const {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
         //TODO
@@ -106,20 +106,24 @@ Plane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_items) cons
 
     double scale_coef = plane_items->get_as<double>("scale").value_or(0.15);
     double reflect_coef = plane_items->get_as<double>("reflect").value_or(0);
+    Texture* plane_texture_ptr = texture_collector_->add_texture(plane_texture_str);
 
-    Plane new_plane(
+    Vector3d plane_vec_i{1, 0, 0};
+    Vector3d plane_vec_j{0, 1, 0};  // TODO !!!
+
+    StandardBasis plane_basis(
         plane_center_vec,
-        plane_normal_vec,
-        scale_coef,
-        reflect_coef,
-        plane_texture_str,
-        texture_collector_
+        plane_vec_i,
+        plane_vec_j,
+        plane_normal_vec
     );
+    TexturedPlane new_plane(plane_basis, plane_texture_ptr);
+
     return new_plane;
 }
 
 
-Sphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const {
+TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const {
     auto sphere_center = sphere_items->get_array_of<double>("center");
     if (!sphere_center) {
         //TODO
@@ -144,20 +148,28 @@ Sphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_items) c
 
     double sphere_radius = sphere_items->get_as<double>("radius").value_or(1);
     double reflect_coef = sphere_items->get_as<double>("reflect").value_or(0);
+    Texture* sphere_texture_ptr = texture_collector_->add_texture(sphere_texture_str);
 
-    Sphere new_sphere(
+    Vector3d sphere_vec_i{1, 0, 0};
+    Vector3d sphere_vec_j{0, 1, 0};
+
+    StandardBasis sphere_basis(
         sphere_center_vec,
-        sphere_axis_vec,
+        sphere_vec_i,
+        sphere_vec_j,
+        sphere_axis_vec
+    );
+
+    TexturedSphere new_sphere(
+        sphere_basis,
         sphere_radius,
-        reflect_coef,
-        sphere_texture_str,
-        texture_collector_
+        sphere_texture_ptr
     );
     return new_sphere;
 }
 
 
-Cylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const {
+TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const {
     auto cylinder_center = cylinder_items->get_array_of<double>("center");
     if (!cylinder_center) {
         //TODO
@@ -183,14 +195,23 @@ Cylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cylinder_it
     double cylinder_radius = cylinder_items->get_as<double>("radius").value_or(1);
     double cylinder_reflect = cylinder_items->get_as<double>("reflect").value_or(0);
 
-    Cylinder new_cylinder(
+    Texture* cylinder_texture_ptr = texture_collector_->add_texture(cylinder_texture_str);
+
+    Vector3d cylinder_vec_i{1, 0, 0};
+    Vector3d cylinder_vec_j{0, 1, 0};
+
+    StandardBasis cylinder_basis(
         cylinder_center_vec,
-        cylinder_direction_vec,
+        cylinder_vec_i,
+        cylinder_vec_j,
+        cylinder_direction_vec
+    );
+
+    TexturedCylinder new_cylinder(
+        cylinder_basis,
         cylinder_radius,
         cylinder_span,
-        cylinder_reflect,
-        cylinder_texture_str,
-        texture_collector_
+        cylinder_texture_ptr
     );
     return new_cylinder;
 }

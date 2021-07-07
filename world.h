@@ -23,18 +23,18 @@ enum WorldStatus_t {ws_ok, ws_no_file, ws_parse_error, ws_no_camera,
 
 class ActorIterator {
 public:
-    ActorIterator(std::vector<Actor* >* actor_ptrs);
+    ActorIterator(std::vector<ActorBase* >* actor_ptrs);
     ActorIterator() = delete;
     ~ActorIterator() = default;
 
     void first();
     void next();
     bool is_done();
-    std::vector<Actor* >::iterator current();
+    std::vector<ActorBase* >::iterator current();
 
 private:
-    std::vector<Actor* >* actor_ptrs_;
-    std::vector<Actor* >::iterator actor_iter_;
+    std::vector<ActorBase* >* actor_ptrs_;
+    std::vector<ActorBase* >::iterator actor_iter_;
 };
 
 
@@ -46,9 +46,9 @@ public:
 
     void add_light(const Light& light);
     void add_camera(const Camera& camera);
-    void add_plane(const Plane& plane);
-    void add_sphere(const Sphere& sphere);
-    void add_cylinder(const Cylinder& cylinder);
+    void add_plane(const TexturedPlane& plane);
+    void add_sphere(const TexturedSphere& sphere);
+    void add_cylinder(const TexturedCylinder& cylinder);
 
     Light* get_light_ptr();
     Camera* get_camera_ptr();
@@ -58,11 +58,11 @@ public:
 private:
     std::list<Light> lights_;
     std::list<Camera> cameras_;
-    std::list<Plane> planes_;
-    std::list<Sphere> spheres_;
-    std::list<Cylinder> cylinders_;
+    std::list<TexturedPlane> planes_;
+    std::list<TexturedSphere> spheres_;
+    std::list<TexturedCylinder> cylinders_;
 
-    std::vector<Actor* > actor_ptrs_;
+    std::vector<ActorBase* > actor_ptrs_;
 
     TextureCollector* texture_collector_;
 };
@@ -78,9 +78,9 @@ public:
     Light make_light(std::shared_ptr<cpptoml::table> light_items) const;
     Camera make_camera(std::shared_ptr<cpptoml::table> camera_items) const;
 
-    Plane make_plane(std::shared_ptr<cpptoml::table> plane_items) const;
-    Sphere make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const;
-    Cylinder make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const;
+    TexturedPlane make_plane(std::shared_ptr<cpptoml::table> plane_items) const;
+    TexturedSphere make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const;
+    TexturedCylinder make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const;
 
     std::shared_ptr<SceneWorld> build() const;
 

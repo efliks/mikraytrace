@@ -67,9 +67,9 @@ bool Renderer::solve_shadows(const Eigen::Vector3d& origin,
     ActorIterator actor_iterator = world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        Actor* actor = *actor_iterator.current();
-        if (actor->has_shadow) {
-            double distance = actor->solve(origin, direction, 0, maxdist);
+        ActorBase* actor = *actor_iterator.current();
+        if (actor->has_shadow()) {
+            double distance = actor->solve_light_ray(origin, direction, 0, maxdist);
             if (distance > 0) {
                 return true;
             }
@@ -78,16 +78,16 @@ bool Renderer::solve_shadows(const Eigen::Vector3d& origin,
     return false;
 }
 
-Actor* Renderer::solve_hits(const Eigen::Vector3d& origin,
+ActorBase* Renderer::solve_hits(const Eigen::Vector3d& origin,
                             const Eigen::Vector3d& direction,
                             double* currd) const {
-    Actor* hit = nullptr;
+    ActorBase* hit = nullptr;
 
     ActorIterator actor_iterator = world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        Actor* actor = *actor_iterator.current();
-        double distance = actor->solve(origin, direction, 0, maxdist_);
+        ActorBase* actor = *actor_iterator.current();
+        double distance = actor->solve_light_ray(origin, direction, 0, maxdist_);
         if (distance > 0 && distance < (*currd)) {
             *currd = distance;
             hit = actor;
@@ -103,11 +103,11 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
     pixel << 0, 0, 0;
 
     double currd = maxdist_;
-    Actor *hitactor = solve_hits(origin, direction, &currd);
+    ActorBase *hitactor = solve_hits(origin, direction, &currd);
 
     if (hitactor) {
         Eigen::Vector3d inter = (direction * currd) + origin;
-        Eigen::Vector3d normal = hitactor->calculate_normal(inter);
+        Eigen::Vector3d normal = hitactor->calculate_normal_at_hit(inter);
 
         // Calculate light intensity
         Light* my_light = world_->get_light_ptr();
@@ -136,13 +136,13 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If the hit actor is reflective, trace a reflected ray
-            if (depth < maxdepth_) {
-                if (hitactor->reflect_coeff > 0) {
-                    Eigen::Vector3d ray = direction - (2 * direction.dot(normal)) * normal;
-                    Pixel reflected = trace_ray_r(corr, ray, depth + 1);
-                    pixel = (1 - hitactor->reflect_coeff) * reflected + hitactor->reflect_coeff * pixel;
-                }
-            }
+//            if (depth < maxdepth_) {
+//                if (hitactor->reflect_coeff > 0) {
+//                    Eigen::Vector3d ray = direction - (2 * direction.dot(normal)) * normal;
+//                    Pixel reflected = trace_ray_r(corr, ray, depth + 1);
+//                    pixel = (1 - hitactor->reflect_coeff) * reflected + hitactor->reflect_coeff * pixel;
+//                }
+//            }
         }
     }
     return pixel;

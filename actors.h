@@ -1,6 +1,7 @@
-#ifndef _ACTORS_H
-#define _ACTORS_H
+#ifndef ACTORS_H
+#define ACTORS_H
 
+#include <memory>
 #include <Eigen/Core>
 #include "pixel.h"
 #include "texture.h"
@@ -8,123 +9,92 @@
 
 namespace mrtp {
 
-class Actor {
+using Vector3d = Eigen::Vector3d;
+
+
+class StandardBasis {
 public:
-    Actor() = default;
-    virtual ~Actor() = default;
+    StandardBasis(const Vector3d&, const Vector3d&,
+                    const Vector3d&, const Vector3d&);
+    StandardBasis();
+    ~StandardBasis() = default;
 
-    virtual double solve(
-        const Eigen::Vector3d& origin,
-        const Eigen::Vector3d& direction,
-        double mind, double maxd) const = 0;
+    Vector3d o;
+    Vector3d vi;
+    Vector3d vj;
+    Vector3d vk;
+};
 
-    virtual Pixel pick_pixel(
-        const Eigen::Vector3d& hit,
-        const Eigen::Vector3d& normal) const = 0;
 
-    virtual Eigen::Vector3d calculate_normal(
-        const Eigen::Vector3d& hit) const = 0;
+class ActorBase {
+public:
+    ActorBase(const StandardBasis&);
+    ActorBase() = default;
+    virtual ~ActorBase() = default;
 
-    bool has_shadow;
-    double reflect_coeff;
+    virtual double solve_light_ray(const Vector3d&, const Vector3d&, double,
+                                   double) const = 0;
+    virtual Pixel pick_pixel(const Vector3d&, const Vector3d&) const = 0;
+    virtual Vector3d calculate_normal_at_hit(const Vector3d&) const = 0;
+    virtual bool has_shadow() const = 0;
 
 protected:
+    StandardBasis local_basis_;
+};
+
+
+class TexturedPlane : public ActorBase {
+public:
+    TexturedPlane(const StandardBasis&, Texture*);  // texture has scale and reflection
+    ~TexturedPlane() override = default;
+
+    double solve_light_ray(const Vector3d&, const Vector3d&, double,
+                           double) const override;
+    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
+    bool has_shadow() const override;
+
+private:
     Texture* texture_;
 };
 
 
-class Plane : public Actor {
+class TexturedSphere : public ActorBase {
 public:
-    Plane(const Eigen::Vector3d& center, const Eigen::Vector3d& normal,
-          double scale, double reflect, const std::string& texture_filename,
-          TextureCollector* texture_collector);
+    TexturedSphere(const StandardBasis&, double, Texture*);
+    ~TexturedSphere() override = default;
 
-    virtual ~Plane() override = default;
-
-    virtual double solve(
-        const Eigen::Vector3d& origin,
-        const Eigen::Vector3d& direction,
-        double mind, double maxd) const override;
-
-    virtual Pixel pick_pixel(
-        const Eigen::Vector3d& hit,
-        const Eigen::Vector3d& normal) const override;
-
-    virtual Eigen::Vector3d calculate_normal(
-        const Eigen::Vector3d& hit) const override;
+    double solve_light_ray(const Vector3d&, const Vector3d&, double,
+                           double) const override;
+    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
+    bool has_shadow() const override;
 
 private:
-    Eigen::Vector3d center_;
-    Eigen::Vector3d normal_;
-    Eigen::Vector3d tx_;
-    Eigen::Vector3d ty_;
+    Texture* texture_;
 
-    double scale_;
+    double radius_;
 };
 
 
-class Sphere : public Actor {
+class TexturedCylinder : public ActorBase {
 public:
-    Sphere(const Eigen::Vector3d& center, const Eigen::Vector3d& axis,
-           double radius, double reflect, const std::string& texture_filename,
-           TextureCollector* texture_collector);
+    TexturedCylinder(const StandardBasis&, double, double, Texture*);
+    ~TexturedCylinder() override = default;
 
-    virtual ~Sphere() override = default;
-
-    virtual double solve(
-        const Eigen::Vector3d& origin,
-        const Eigen::Vector3d& direction,
-        double mind, double maxd) const override;
-
-    virtual Pixel pick_pixel(
-        const Eigen::Vector3d& hit,
-        const Eigen::Vector3d& normal) const override;
-
-    virtual Eigen::Vector3d calculate_normal(
-        const Eigen::Vector3d& hit) const override;
+    double solve_light_ray(const Vector3d&, const Vector3d&, double,
+                           double) const override;
+    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
+    bool has_shadow() const override;
 
 private:
-    Eigen::Vector3d center_;
-    Eigen::Vector3d tx_;
-    Eigen::Vector3d ty_;
-    Eigen::Vector3d tz_;
+    Texture* texture_;
 
-    double R_;
+    double radius_, length_;
 };
 
 
-class Cylinder : public Actor {
-public:
-    Cylinder(const Eigen::Vector3d& center, const Eigen::Vector3d& direction,
-             double radius, double span, double reflect,
-             const std::string& texture_filename,
-             TextureCollector* texture_collector);
+}
 
-    virtual ~Cylinder() override = default;
-
-    virtual double solve(
-        const Eigen::Vector3d& origin,
-        const Eigen::Vector3d& direction,
-        double mind, double maxd) const override;
-
-    virtual Pixel pick_pixel(
-        const Eigen::Vector3d& hit,
-        const Eigen::Vector3d& normal) const override;
-
-    virtual Eigen::Vector3d calculate_normal(
-        const Eigen::Vector3d& hit) const override;
-
-private:
-    Eigen::Vector3d A_;
-    Eigen::Vector3d B_;
-    Eigen::Vector3d tx_;
-    Eigen::Vector3d ty_;
-
-    double R_;
-    double span_;
-};
-
-
-}  // namespace mrtp
-
-#endif //_ACTORS_H
+#endif // ACTORS_H

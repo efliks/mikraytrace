@@ -47,7 +47,7 @@ class Renderer {
                        const Eigen::Vector3d& direction,
                        double maxdist) const;
 
-    Actor *solve_hits(const Eigen::Vector3d& origin,
+    ActorBase *solve_hits(const Eigen::Vector3d& origin,
                       const Eigen::Vector3d& direction,
                       double *currd) const;
 
