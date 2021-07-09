@@ -1,13 +1,37 @@
 #include <fstream>
 #include <iostream>
+#include <Eigen/Geometry>
 #include "world.h"
 
 
 namespace mrtp {
 
+using Vector3d = Eigen::Vector3d;
+
+
 bool file_exists(const std::string& filename) {
     std::fstream check(filename.c_str());
     return check.good();
+}
+
+
+Vector3d fill_vector(const Vector3d& vec) {
+    double x = (vec[0] < 0) ? -vec[0] : vec[0];
+    double y = (vec[1] < 0) ? -vec[1] : vec[1];
+    double z = (vec[2] < 0) ? -vec[2] : vec[2];
+
+    Vector3d unit{0, 0, 1};
+
+    if (x < y) {
+        if (x < z) {
+            unit << 1, 0, 0;
+        }
+    } else { // if ( x >= y)
+        if (y < z) {
+            unit << 0, 1, 0;
+        }
+    }
+    return unit;
 }
 
 
@@ -87,13 +111,13 @@ TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_ite
     if (!plane_center) {
         //TODO
     }
-    Eigen::Vector3d plane_center_vec(plane_center->data());
+    Vector3d plane_center_vec(plane_center->data());
 
     auto plane_normal = plane_items->get_array_of<double>("normal");
     if (!plane_normal) {
         //TODO
     }
-    Eigen::Vector3d plane_normal_vec(plane_normal->data());
+    Vector3d plane_normal_vec(plane_normal->data());
 
     auto plane_texture = plane_items->get_as<std::string>("texture");
     if (!plane_texture) {
@@ -108,8 +132,14 @@ TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_ite
     double reflect_coef = plane_items->get_as<double>("reflect").value_or(0);
     Texture* plane_texture_ptr = texture_collector_->add_texture(plane_texture_str);
 
-    Vector3d plane_vec_i{1, 0, 0};
-    Vector3d plane_vec_j{0, 1, 0};  // TODO !!!
+    Vector3d fill_vec = fill_vector(plane_normal_vec);
+
+    Vector3d plane_vec_i = fill_vec.cross(plane_normal_vec);
+    Vector3d plane_vec_j = plane_normal_vec.cross(plane_vec_i);
+
+    plane_vec_i *= (1 / plane_vec_i.norm());
+    plane_vec_j *= (1 / plane_vec_j.norm());
+    plane_normal_vec *= (1 / plane_normal_vec.norm());
 
     StandardBasis plane_basis(
         plane_center_vec,
@@ -128,12 +158,12 @@ TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_
     if (!sphere_center) {
         //TODO
     }
-    Eigen::Vector3d sphere_center_vec(sphere_center->data());
+    Vector3d sphere_center_vec(sphere_center->data());
 
-    Eigen::Vector3d sphere_axis_vec(0, 0, 1);
+    Vector3d sphere_axis_vec(0, 0, 1);
     auto sphere_axis = sphere_items->get_array_of<double>("axis");
     if (sphere_axis) {
-        Eigen::Vector3d tmp_vec(sphere_axis->data());
+        Vector3d tmp_vec(sphere_axis->data());
         sphere_axis_vec = tmp_vec;
     }
 
@@ -150,8 +180,14 @@ TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_
     double reflect_coef = sphere_items->get_as<double>("reflect").value_or(0);
     Texture* sphere_texture_ptr = texture_collector_->add_texture(sphere_texture_str);
 
-    Vector3d sphere_vec_i{1, 0, 0};
-    Vector3d sphere_vec_j{0, 1, 0};
+    Vector3d fill_vec = fill_vector(sphere_axis_vec);
+
+    Vector3d sphere_vec_i = fill_vec.cross(sphere_axis_vec);
+    Vector3d sphere_vec_j = sphere_axis_vec.cross(sphere_vec_i);
+
+    sphere_vec_i *= (1 / sphere_vec_i.norm());
+    sphere_vec_j *= (1 / sphere_vec_j.norm());
+    sphere_axis_vec *= (1 / sphere_axis_vec.norm());
 
     StandardBasis sphere_basis(
         sphere_center_vec,
@@ -174,13 +210,13 @@ TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cyl
     if (!cylinder_center) {
         //TODO
     }
-    Eigen::Vector3d cylinder_center_vec(cylinder_center->data());
+    Vector3d cylinder_center_vec(cylinder_center->data());
 
     auto cylinder_direction = cylinder_items->get_array_of<double>("direction");
     if (!cylinder_direction) {
         //TODO
     }
-    Eigen::Vector3d cylinder_direction_vec(cylinder_direction->data());
+    Vector3d cylinder_direction_vec(cylinder_direction->data());
 
     auto cylinder_texture = cylinder_items->get_as<std::string>("texture");
     if (!cylinder_texture) {
@@ -197,8 +233,14 @@ TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cyl
 
     Texture* cylinder_texture_ptr = texture_collector_->add_texture(cylinder_texture_str);
 
-    Vector3d cylinder_vec_i{1, 0, 0};
-    Vector3d cylinder_vec_j{0, 1, 0};
+    Vector3d fill_vec = fill_vector(cylinder_direction_vec);
+
+    Vector3d cylinder_vec_i = fill_vec.cross(cylinder_direction_vec);
+    Vector3d cylinder_vec_j = cylinder_direction_vec.cross(cylinder_vec_i);
+
+    cylinder_vec_i *= (1 / cylinder_vec_i.norm());
+    cylinder_vec_j *= (1 / cylinder_vec_j.norm());
+    cylinder_direction_vec *= (1 / cylinder_direction_vec.norm());
 
     StandardBasis cylinder_basis(
         cylinder_center_vec,
@@ -228,8 +270,8 @@ Light WorldBuilder::make_light(std::shared_ptr<cpptoml::table> config) const {
         //TODO
     }
 
-    Eigen::Vector3d temp_center(raw_center->data());
-    Eigen::Vector3d light_center = temp_center.cast<double>();
+    Vector3d temp_center(raw_center->data());
+    Vector3d light_center = temp_center.cast<double>();
 
     return Light(light_center);
 }
@@ -253,10 +295,10 @@ Camera WorldBuilder::make_camera(std::shared_ptr<cpptoml::table> config) const {
 
     double camera_roll = tab_camera->get_as<double>("roll").value_or(0);
 
-    Eigen::Vector3d temp_eye(raw_eye->data());
-    Eigen::Vector3d camera_eye = temp_eye.cast<double>();
-    Eigen::Vector3d temp_lookat(raw_lookat->data());
-    Eigen::Vector3d camera_lookat = temp_lookat.cast<double>();
+    Vector3d temp_eye(raw_eye->data());
+    Vector3d camera_eye = temp_eye.cast<double>();
+    Vector3d temp_lookat(raw_lookat->data());
+    Vector3d camera_lookat = temp_lookat.cast<double>();
 
     return Camera(camera_eye, camera_lookat, camera_roll);
 }

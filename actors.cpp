@@ -161,7 +161,7 @@ TexturedCylinder::TexturedCylinder(const StandardBasis& local_basis,
 
 
 bool TexturedCylinder::has_shadow() const {
-    return false;
+    return true;
 }
 
 
