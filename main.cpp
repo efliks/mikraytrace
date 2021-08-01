@@ -239,14 +239,14 @@ int main(int argc, char **argv) {
     std::vector<std::string>::iterator iter_end = toml_files.end();
 
     //Textures will be shared by all worlds
-    mrtp::TextureCollector texture_collector;
+    mrtp::TextureFactory texture_factory;
 
     //Iterate over all input files
     for (; iter != iter_end; ++iter) {
         std::string toml_file = *iter;
         if (!quiet) { std::cout << "processing " << toml_file << std::flush; }
 
-        auto my_world_ptr = mrtp::build_world(toml_file, &texture_collector);
+        auto my_world_ptr = mrtp::build_world(toml_file, &texture_factory);
 
         mrtp::WorldStatus_t status = mrtp::ws_ok;  // TODO Properly handle statuses
 

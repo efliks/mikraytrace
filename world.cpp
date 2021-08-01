@@ -35,8 +35,8 @@ Vector3d fill_vector(const Vector3d& vec) {
 }
 
 
-SceneWorld::SceneWorld(TextureCollector* texture_collector) :
-    texture_collector_(texture_collector) {
+SceneWorld::SceneWorld(TextureFactory* texture_factory) :
+    texture_factory_(texture_factory) {
 
 }
 
@@ -99,9 +99,9 @@ std::vector<ActorBase* >::iterator ActorIterator::current() {
 
 
 WorldBuilder::WorldBuilder(const std::string& world_filename,
-                           TextureCollector* texture_collector) :
+                           TextureFactory* texture_factory) :
     world_filename_(world_filename),
-    texture_collector_(texture_collector) {
+    texture_factory_(texture_factory) {
 
 }
 
@@ -130,7 +130,7 @@ TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_ite
 
     double scale_coef = plane_items->get_as<double>("scale").value_or(0.15);
     double reflect_coef = plane_items->get_as<double>("reflect").value_or(0);
-    Texture* plane_texture_ptr = texture_collector_->add_texture(plane_texture_str);
+    MyTexture* plane_texture_ptr = texture_factory_->create_texture(plane_texture_str, reflect_coef, scale_coef);
 
     Vector3d fill_vec = fill_vector(plane_normal_vec);
 
@@ -178,7 +178,7 @@ TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_
 
     double sphere_radius = sphere_items->get_as<double>("radius").value_or(1);
     double reflect_coef = sphere_items->get_as<double>("reflect").value_or(0);
-    Texture* sphere_texture_ptr = texture_collector_->add_texture(sphere_texture_str);
+    MyTexture* sphere_texture_ptr = texture_factory_->create_texture(sphere_texture_str, reflect_coef, 1);
 
     Vector3d fill_vec = fill_vector(sphere_axis_vec);
 
@@ -231,7 +231,7 @@ TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cyl
     double cylinder_radius = cylinder_items->get_as<double>("radius").value_or(1);
     double cylinder_reflect = cylinder_items->get_as<double>("reflect").value_or(0);
 
-    Texture* cylinder_texture_ptr = texture_collector_->add_texture(cylinder_texture_str);
+    MyTexture* cylinder_texture_ptr = texture_factory_->create_texture(cylinder_texture_str, cylinder_reflect, 1);
 
     Vector3d fill_vec = fill_vector(cylinder_direction_vec);
 
@@ -316,7 +316,7 @@ std::shared_ptr<SceneWorld> WorldBuilder::build() const {
         //TODO
     }
 
-    auto my_world = std::shared_ptr<SceneWorld>(new SceneWorld(texture_collector_));
+    auto my_world = std::shared_ptr<SceneWorld>(new SceneWorld(texture_factory_));
 
     auto planes_array = world_config->get_table_array("planes");
     auto spheres_array = world_config->get_table_array("spheres");
@@ -349,8 +349,8 @@ std::shared_ptr<SceneWorld> WorldBuilder::build() const {
 
 
 std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
-                                        TextureCollector* texture_collector) {
-    WorldBuilder my_builder(world_filename, texture_collector);
+                                        TextureFactory* texture_factory) {
+    WorldBuilder my_builder(world_filename, texture_factory);
     std::shared_ptr<SceneWorld> my_world = my_builder.build();
 
     return my_world;

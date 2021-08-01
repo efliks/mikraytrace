@@ -19,8 +19,8 @@ TextureSharedState::TextureSharedState(const std::string& texture_filename) {
     texture_data_.reserve(texture_width_ * texture_heigth_);
 
     for (unsigned int i = 0; i < texture_heigth_; i++) {
-        png::rgb_pixel *in = &image[i][0];
-        for (unsigned j = 0; j < texture_heigth_; j++, in++) {
+        png::rgb_pixel* in = &image[i][0];
+        for (unsigned j = 0; j < texture_width_; j++, in++) {
             MyPixel pixel{in->red, in->green, in->blue};
             texture_data_.push_back(pixel);
         }
@@ -28,12 +28,15 @@ TextureSharedState::TextureSharedState(const std::string& texture_filename) {
 }
 
 
-MyPixel TextureSharedState::pick_pickel(double frac_x, double frac_y, double scale_coeff) const {
-    unsigned int u = (static_cast<unsigned int>(
-                          frac_x * texture_width_ * scale_coeff)) % texture_width_;
+MyPixel TextureSharedState::pick_pixel(double frac_x, double frac_y, double scale_coeff) const {
+    //DEBUG
+    std::cout << "TEX WIDTH: " << texture_width_ << std::endl;
+    std::cout << "TEX HEIGTH: " << texture_heigth_ << std::endl;
 
+    unsigned int u = (static_cast<unsigned int>(
+                          frac_x * static_cast<double>(texture_width_) * scale_coeff)) % texture_width_;
     unsigned int v = (static_cast<unsigned int>(
-                          frac_y * texture_heigth_ * scale_coeff)) % texture_heigth_;
+                          frac_y * static_cast<double>(texture_heigth_) * scale_coeff)) % texture_heigth_;
 
     return texture_data_[u + v * texture_width_];
 }
@@ -68,20 +71,28 @@ MyTexture::~MyTexture() {
 }
 
 
-MyPixel MyTexture::pick_pickel(double frac_x, double frac_y) const {
-    return shared_state_->pick_pickel(frac_x, frac_y, scale_coeff_);
+TextureSharedState* MyTexture::get_shared_state() const {
+    return shared_state_;
 }
 
 
-MyTexture* TextureFactory::get_texture(const std::string& texture_filename,
-                                       double reflection_coeff,
-                                       double scale_coeff) {
+MyPixel MyTexture::pick_pixel(double frac_x, double frac_y) const {
+    return shared_state_->pick_pixel(frac_x, frac_y, scale_coeff_);
+}
+
+
+MyTexture* TextureFactory::create_texture(const std::string& texture_filename,
+                                          double reflection_coeff,
+                                          double scale_coeff) {
     if (texture_map_.find(texture_filename) == texture_map_.end()) {
         // Create new texture data
         MyTexture new_texture(texture_filename, reflection_coeff, scale_coeff);
         textures_.push_back(new_texture);
         MyTexture* texture_ptr = &textures_.back();
         texture_map_.insert(std::pair<std::string, MyTexture*>(texture_filename, texture_ptr));
+
+        //DEBUG
+        std::cout << "Added texture " << texture_filename << std::endl;
 
         return texture_ptr;
     }
@@ -92,6 +103,9 @@ MyTexture* TextureFactory::get_texture(const std::string& texture_filename,
 
     textures_.push_back(new_texture);
     MyTexture* texture_ptr = &textures_.back();
+
+    //DEBUG
+    std::cout << "Reused texture " << texture_filename << std::endl;
 
     return texture_ptr;
 }

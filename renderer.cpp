@@ -132,7 +132,13 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
             // Combine pixels
             double lambda = intensity * shadow * ambient;
 
-            Pixel pick = hitactor->pick_pixel(inter, normal);
+            MyPixel my_pick = hitactor->pick_pixel(inter, normal);
+            Pixel pick(
+                static_cast<double>(my_pick.red),
+                static_cast<double>(my_pick.green),
+                static_cast<double>(my_pick.blue)
+            );
+            pick /= 255;
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If the hit actor is reflective, trace a reflected ray

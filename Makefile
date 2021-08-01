@@ -1,5 +1,5 @@
 INCLUDE=-I/usr/include/eigen3 -I/usr/include/png++ -I. -I./cpptoml/include
-FLAGS=-W -Wall -pedantic -fPIC -O2
+FLAGS=-W -Wall -pedantic -fPIC -g
 
 all: mrtp_cli
 

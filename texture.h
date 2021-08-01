@@ -24,7 +24,7 @@ public:
     TextureSharedState() = delete;
     ~TextureSharedState() = default;
 
-    MyPixel pick_pickel(double, double, double) const;
+    MyPixel pick_pixel(double, double, double) const;
 
 private:
     std::vector<MyPixel> texture_data_;
@@ -42,7 +42,7 @@ public:
     ~MyTexture();
 
     TextureSharedState* get_shared_state() const;
-    MyPixel pick_pickel(double, double) const;
+    MyPixel pick_pixel(double, double) const;
 
 private:
     double reflection_coeff_;
@@ -58,7 +58,7 @@ public:
     TextureFactory() = default;
     ~TextureFactory() = default;
 
-    MyTexture* get_texture(const std::string&, double, double);
+    MyTexture* create_texture(const std::string&, double, double);
 
 private:
     std::list<MyTexture> textures_;

@@ -53,7 +53,7 @@ ActorBase::ActorBase(const StandardBasis& local_basis) :
 
 
 TexturedPlane::TexturedPlane(const StandardBasis& local_basis,
-                             Texture* texture) :
+                             MyTexture* texture) :
     ActorBase(local_basis), texture_(texture) {
 
 }
@@ -81,14 +81,14 @@ double TexturedPlane::solve_light_ray(const Vector3d& O,
 }
 
 
-Pixel TexturedPlane::pick_pixel(const Vector3d& hit,
-                                const Vector3d& normal_at_hit) const {
+MyPixel TexturedPlane::pick_pixel(const Vector3d& hit,
+                                  const Vector3d& normal_at_hit) const {
    Vector3d v = hit - local_basis_.o;
 
    double tx_i = v.dot(local_basis_.vi);
    double tx_j = v.dot(local_basis_.vj);
 
-   return texture_->pick_pixel(tx_i, tx_j, 0.15);  // TODO scale!
+   return texture_->pick_pixel(tx_i, tx_j);
 }
 
 
@@ -99,7 +99,7 @@ Vector3d TexturedPlane::calculate_normal_at_hit(const Vector3d& hit) const {
 
 TexturedSphere::TexturedSphere(const StandardBasis& local_basis,
                                double radius,
-                               Texture* texture) :
+                               MyTexture* texture) :
     ActorBase(local_basis), texture_(texture), radius_(radius) {
 
 }
@@ -125,8 +125,8 @@ double TexturedSphere::solve_light_ray(const Vector3d& O,
 }
 
 
-Pixel TexturedSphere::pick_pixel(const Vector3d& hit,
-                                 const Vector3d& normal_at_hit) const {
+MyPixel TexturedSphere::pick_pixel(const Vector3d& hit,
+                                   const Vector3d& normal_at_hit) const {
     // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
 
     double dot = normal_at_hit.dot(local_basis_.vj);
@@ -138,7 +138,7 @@ Pixel TexturedSphere::pick_pixel(const Vector3d& hit,
     dot = normal_at_hit.dot(local_basis_.vk);
     double fracx = (dot > 0) ? theta : (1 - theta);
 
-    return texture_->pick_pixel(fracx, fracy, 1);
+    return texture_->pick_pixel(fracx, fracy);
 }
 
 
@@ -151,7 +151,7 @@ Vector3d TexturedSphere::calculate_normal_at_hit(const Vector3d& hit) const {
 TexturedCylinder::TexturedCylinder(const StandardBasis& local_basis,
                                    double cylinder_radius,
                                    double cylinder_lenght,
-                                   Texture* texture) :
+                                   MyTexture* texture) :
     ActorBase(local_basis),
     texture_(texture),
     radius_(cylinder_radius),
@@ -236,8 +236,8 @@ Vector3d TexturedCylinder::calculate_normal_at_hit(const Vector3d& hit) const {
 }
 
 
-Pixel TexturedCylinder::pick_pixel(const Vector3d& hit,
-                                   const Vector3d& normal_at_hit) const {
+MyPixel TexturedCylinder::pick_pixel(const Vector3d& hit,
+                                     const Vector3d& normal_at_hit) const {
     Vector3d t = hit - local_basis_.o;
 
     double alpha = t.dot(local_basis_.vk);
@@ -245,7 +245,7 @@ Pixel TexturedCylinder::pick_pixel(const Vector3d& hit,
     double frac_x = acos(dot) / M_PI;
     double frac_y = alpha / (2 * M_PI * radius_);
 
-    return texture_->pick_pixel(frac_x, frac_y, 1);  // TODO scale!
+    return texture_->pick_pixel(frac_x, frac_y);
 }
 
 

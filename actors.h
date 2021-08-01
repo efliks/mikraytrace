@@ -34,7 +34,7 @@ public:
 
     virtual double solve_light_ray(const Vector3d&, const Vector3d&, double,
                                    double) const = 0;
-    virtual Pixel pick_pixel(const Vector3d&, const Vector3d&) const = 0;
+    virtual MyPixel pick_pixel(const Vector3d&, const Vector3d&) const = 0;
     virtual Vector3d calculate_normal_at_hit(const Vector3d&) const = 0;
     virtual bool has_shadow() const = 0;
 
@@ -45,33 +45,33 @@ protected:
 
 class TexturedPlane : public ActorBase {
 public:
-    TexturedPlane(const StandardBasis&, Texture*);  // texture has scale and reflection
+    TexturedPlane(const StandardBasis&, MyTexture*);  // texture has scale and reflection
     ~TexturedPlane() override = default;
 
     double solve_light_ray(const Vector3d&, const Vector3d&, double,
                            double) const override;
-    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
     Vector3d calculate_normal_at_hit(const Vector3d&) const override;
     bool has_shadow() const override;
 
 private:
-    Texture* texture_;
+    MyTexture* texture_;
 };
 
 
 class TexturedSphere : public ActorBase {
 public:
-    TexturedSphere(const StandardBasis&, double, Texture*);
+    TexturedSphere(const StandardBasis&, double, MyTexture*);
     ~TexturedSphere() override = default;
 
     double solve_light_ray(const Vector3d&, const Vector3d&, double,
                            double) const override;
-    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
     Vector3d calculate_normal_at_hit(const Vector3d&) const override;
     bool has_shadow() const override;
 
 private:
-    Texture* texture_;
+    MyTexture* texture_;
 
     double radius_;
 };
@@ -79,17 +79,17 @@ private:
 
 class TexturedCylinder : public ActorBase {
 public:
-    TexturedCylinder(const StandardBasis&, double, double, Texture*);
+    TexturedCylinder(const StandardBasis&, double, double, MyTexture*);
     ~TexturedCylinder() override = default;
 
     double solve_light_ray(const Vector3d&, const Vector3d&, double,
                            double) const override;
-    Pixel pick_pixel(const Vector3d&, const Vector3d&) const override;
+    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
     Vector3d calculate_normal_at_hit(const Vector3d&) const override;
     bool has_shadow() const override;
 
 private:
-    Texture* texture_;
+    MyTexture* texture_;
 
     double radius_, length_;
 };

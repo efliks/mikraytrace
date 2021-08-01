@@ -40,7 +40,7 @@ private:
 
 class SceneWorld {
 public:
-    SceneWorld(TextureCollector* texture_collector);
+    SceneWorld(TextureFactory* texture_factory);
     SceneWorld() = delete;
     ~SceneWorld() = default;
 
@@ -64,14 +64,14 @@ private:
 
     std::vector<ActorBase* > actor_ptrs_;
 
-    TextureCollector* texture_collector_;
+    TextureFactory* texture_factory_;
 };
 
 
 class WorldBuilder {
 public:
     WorldBuilder(const std::string& world_filename,
-                 TextureCollector* texture_collector);
+                 TextureFactory* texture_factory);
     WorldBuilder() = delete;
     ~WorldBuilder() = default;
 
@@ -86,12 +86,12 @@ public:
 
 private:
     std::string world_filename_;
-    TextureCollector* texture_collector_;
+    TextureFactory* texture_factory_;
 };
 
 
 std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
-                                        TextureCollector* texture_collector);
+                                        TextureFactory* texture_factory);
 
 
 } //namespace mrtp
