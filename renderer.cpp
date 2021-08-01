@@ -134,21 +134,21 @@ Pixel Renderer::trace_ray_r(const Eigen::Vector3d& origin,
 
             MyPixel my_pick = hitactor->pick_pixel(inter, normal);
             Pixel pick(
-                static_cast<double>(my_pick.red),
-                static_cast<double>(my_pick.green),
-                static_cast<double>(my_pick.blue)
+                static_cast<double>(my_pick.pixel.red),
+                static_cast<double>(my_pick.pixel.green),
+                static_cast<double>(my_pick.pixel.blue)
             );
             pick /= 255;
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If the hit actor is reflective, trace a reflected ray
-//            if (depth < maxdepth_) {
-//                if (hitactor->reflect_coeff > 0) {
-//                    Eigen::Vector3d ray = direction - (2 * direction.dot(normal)) * normal;
-//                    Pixel reflected = trace_ray_r(corr, ray, depth + 1);
-//                    pixel = (1 - hitactor->reflect_coeff) * reflected + hitactor->reflect_coeff * pixel;
-//                }
-//            }
+            if (depth < maxdepth_) {
+                if (my_pick.reflection_coeff > 0) {
+                    Eigen::Vector3d ray = direction - (2 * direction.dot(normal)) * normal;
+                    Pixel reflected = trace_ray_r(corr, ray, depth + 1);
+                    pixel = (1 - my_pick.reflection_coeff) * reflected + my_pick.reflection_coeff * pixel;
+                }
+            }
         }
     }
     return pixel;

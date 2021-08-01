@@ -17,7 +17,7 @@ TextureSharedState::TextureSharedState(const std::string& texture_filename) {
     for (unsigned int i = 0; i < texture_heigth_; i++) {
         png::rgb_pixel* in = &image[i][0];
         for (unsigned j = 0; j < texture_width_; j++, in++) {
-            MyPixel pixel{in->red, in->green, in->blue};
+            TexturePixel pixel{in->red, in->green, in->blue};
             texture_data_.push_back(pixel);
         }
     }
@@ -30,7 +30,7 @@ define fractions of the x- and y-dimension
 of a texture.
 A reasonable scale for a 256x256 texture is 0.15.
 */
-MyPixel TextureSharedState::pick_pixel(double frac_x, double frac_y, double scale_coeff) const {
+TexturePixel TextureSharedState::pick_pixel(double frac_x, double frac_y, double scale_coeff) const {
     unsigned int u = (static_cast<unsigned int>(
                           frac_x * static_cast<double>(texture_width_) * scale_coeff)) % texture_width_;
     unsigned int v = (static_cast<unsigned int>(
@@ -56,7 +56,9 @@ MyTexture::MyTexture(TextureSharedState* shared_state,
 
 
 MyPixel MyTexture::pick_pixel(double frac_x, double frac_y) const {
-    return shared_state_->pick_pixel(frac_x, frac_y, scale_coeff_);
+    TexturePixel pixel = shared_state_->pick_pixel(frac_x, frac_y, scale_coeff_);
+
+    return MyPixel{pixel, reflection_coeff_};
 }
 
 
@@ -78,5 +80,6 @@ MyTexture* TextureFactory::create_texture(const std::string& texture_filename,
     textures_.push_back(new_texture);
     return &textures_.back();
 }
+
 
 }  // namespace mrtp

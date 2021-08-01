@@ -2,19 +2,22 @@
 #define _TEXTURE_H
 
 #include <list>
-#include <string>
 #include <vector>
-#include <unordered_map>
-#include <memory>
-#include "pixel.h"
+#include <string>
 
 
 namespace mrtp {
 
-struct MyPixel {
+struct TexturePixel {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
+};
+
+
+struct MyPixel {
+    TexturePixel pixel;
+    double reflection_coeff;
 };
 
 
@@ -24,11 +27,11 @@ public:
     TextureSharedState() = delete;
     ~TextureSharedState() = default;
 
-    MyPixel pick_pixel(double, double, double) const;
+    TexturePixel pick_pixel(double, double, double) const;
     bool is_same_texture(const std::string&) const;
 
 private:
-    std::vector<MyPixel> texture_data_;
+    std::vector<TexturePixel> texture_data_;
 
     std::string texture_filename_;
 
