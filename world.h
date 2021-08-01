@@ -21,6 +21,68 @@ enum WorldStatus_t {ws_ok, ws_no_file, ws_parse_error, ws_no_camera,
                     ws_cylinder_texture};
 
 
+class PlaneActorFactory;
+class SphereActorFactory;
+class CylinderActorFactory;
+
+class SceneWorld;
+class WorldBuilder;
+
+class ActorIterator;
+
+
+class ActorFactory {
+public:
+    ActorFactory(TextureFactory*);
+    ActorFactory() = delete;
+    virtual ~ActorFactory() = default;
+
+    virtual ActorBase* create_actor(std::shared_ptr<cpptoml::table>) = 0;
+
+protected:
+    TextureFactory* texture_factory_;
+};
+
+
+class PlaneActorFactory : public ActorFactory {
+public:
+    PlaneActorFactory(TextureFactory*, std::list<TexturedPlane>*);
+    PlaneActorFactory() = delete;
+    ~PlaneActorFactory() override = default;
+
+    ActorBase* create_actor(std::shared_ptr<cpptoml::table>) override;
+
+private:
+    std::list<TexturedPlane>* planes_;
+};
+
+
+class SphereActorFactory : public ActorFactory {
+public:
+    SphereActorFactory(TextureFactory*, std::list<TexturedSphere>*);
+    SphereActorFactory() = delete;
+    ~SphereActorFactory() override = default;
+
+    ActorBase* create_actor(std::shared_ptr<cpptoml::table>) override;
+
+private:
+    std::list<TexturedSphere>* spheres_;
+};
+
+
+class CylinderActorFactory : public ActorFactory {
+public:
+    CylinderActorFactory(TextureFactory*, std::list<TexturedCylinder>*);
+    CylinderActorFactory() = delete;
+    ~CylinderActorFactory() override = default;
+
+    ActorBase* create_actor(std::shared_ptr<cpptoml::table>) override;
+
+private:
+    std::list<TexturedCylinder>* cylinders_;
+};
+
+
 class ActorIterator {
 public:
     ActorIterator(std::vector<ActorBase* >* actor_ptrs);
@@ -39,16 +101,11 @@ private:
 
 
 class SceneWorld {
-public:
-    SceneWorld(TextureFactory* texture_factory);
-    SceneWorld() = delete;
-    ~SceneWorld() = default;
+    friend class WorldBuilder;
 
-    void add_light(const Light& light);
-    void add_camera(const Camera& camera);
-    void add_plane(const TexturedPlane& plane);
-    void add_sphere(const TexturedSphere& sphere);
-    void add_cylinder(const TexturedCylinder& cylinder);
+public:
+    SceneWorld() = default;
+    ~SceneWorld() = default;
 
     Light* get_light_ptr();
     Camera* get_camera_ptr();
@@ -63,29 +120,23 @@ private:
     std::list<TexturedCylinder> cylinders_;
 
     std::vector<ActorBase* > actor_ptrs_;
-
-    TextureFactory* texture_factory_;
 };
 
 
 class WorldBuilder {
 public:
-    WorldBuilder(const std::string& world_filename,
-                 TextureFactory* texture_factory);
+    WorldBuilder(const std::string&, TextureFactory*);
     WorldBuilder() = delete;
     ~WorldBuilder() = default;
 
-    Light make_light(std::shared_ptr<cpptoml::table> light_items) const;
-    Camera make_camera(std::shared_ptr<cpptoml::table> camera_items) const;
-
-    TexturedPlane make_plane(std::shared_ptr<cpptoml::table> plane_items) const;
-    TexturedSphere make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const;
-    TexturedCylinder make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const;
-
     std::shared_ptr<SceneWorld> build() const;
+
+    Light make_light(std::shared_ptr<cpptoml::table>) const;
+    Camera make_camera(std::shared_ptr<cpptoml::table>) const;
 
 private:
     std::string world_filename_;
+
     TextureFactory* texture_factory_;
 };
 

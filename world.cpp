@@ -35,78 +35,37 @@ Vector3d fill_vector(const Vector3d& vec) {
 }
 
 
-SceneWorld::SceneWorld(TextureFactory* texture_factory) :
-    texture_factory_(texture_factory) {
-
-}
-
-void SceneWorld::add_light(const Light& light) {
-    lights_.push_back(light);
-}
-
-void SceneWorld::add_camera(const Camera& camera) {
-    cameras_.push_back(camera);
-}
-
-void SceneWorld::add_plane(const TexturedPlane& plane) {
-    planes_.push_back(plane);
-    actor_ptrs_.push_back(&planes_.back());
-}
-
-void SceneWorld::add_sphere(const TexturedSphere& sphere) {
-    spheres_.push_back(sphere);
-    actor_ptrs_.push_back(&spheres_.back());
-}
-
-void SceneWorld::add_cylinder(const TexturedCylinder& cylinder) {
-    cylinders_.push_back(cylinder);
-    actor_ptrs_.push_back(&cylinders_.back());
-}
-
-ActorIterator SceneWorld::get_actor_iterator() {
-    return ActorIterator(&actor_ptrs_);
-}
-
-Camera* SceneWorld::get_camera_ptr() {
-    return &(*cameras_.begin());  // ignore other cameras
-}
-
-Light* SceneWorld::get_light_ptr() {
-    return &(*lights_.begin());  // ignore other lights
-}
-
-
-ActorIterator::ActorIterator(std::vector<ActorBase* >* actor_ptrs):
-    actor_ptrs_(actor_ptrs) {
-    actor_iter_ = actor_ptrs_->begin();
-}
-
-void ActorIterator::first() {
-    actor_iter_ = actor_ptrs_->begin();
-}
-
-void ActorIterator::next() {
-    actor_iter_++;
-}
-
-bool ActorIterator::is_done() {
-    return actor_iter_ == actor_ptrs_->end();
-}
-
-std::vector<ActorBase* >::iterator ActorIterator::current() {
-    return actor_iter_;
-}
-
-
-WorldBuilder::WorldBuilder(const std::string& world_filename,
-                           TextureFactory* texture_factory) :
-    world_filename_(world_filename),
+ActorFactory::ActorFactory(TextureFactory* texture_factory) :
     texture_factory_(texture_factory) {
 
 }
 
 
-TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_items) const {
+PlaneActorFactory::PlaneActorFactory(TextureFactory* texture_factory,
+                                     std::list<TexturedPlane>* planes) :
+    ActorFactory(texture_factory),
+    planes_(planes) {
+
+}
+
+
+SphereActorFactory::SphereActorFactory(TextureFactory* texture_factory,
+                                       std::list<TexturedSphere>* spheres) :
+    ActorFactory(texture_factory),
+    spheres_(spheres) {
+
+}
+
+
+CylinderActorFactory::CylinderActorFactory(TextureFactory* texture_factory,
+                                           std::list<TexturedCylinder>* cylinders) :
+    ActorFactory(texture_factory),
+    cylinders_(cylinders) {
+
+}
+
+
+ActorBase* PlaneActorFactory::create_actor(std::shared_ptr<cpptoml::table> plane_items) {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
         //TODO
@@ -130,6 +89,7 @@ TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_ite
 
     double scale_coef = plane_items->get_as<double>("scale").value_or(0.15);
     double reflect_coef = plane_items->get_as<double>("reflect").value_or(0);
+
     MyTexture* plane_texture_ptr = texture_factory_->create_texture(plane_texture_str, reflect_coef, scale_coef);
 
     Vector3d fill_vec = fill_vector(plane_normal_vec);
@@ -147,13 +107,15 @@ TexturedPlane WorldBuilder::make_plane(std::shared_ptr<cpptoml::table> plane_ite
         plane_vec_j,
         plane_normal_vec
     );
-    TexturedPlane new_plane(plane_basis, plane_texture_ptr);
 
-    return new_plane;
+    TexturedPlane new_plane(plane_basis, plane_texture_ptr);
+    planes_->push_back(new_plane);
+
+    return &planes_->back();
 }
 
 
-TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_items) const {
+ActorBase* SphereActorFactory::create_actor(std::shared_ptr<cpptoml::table> sphere_items) {
     auto sphere_center = sphere_items->get_array_of<double>("center");
     if (!sphere_center) {
         //TODO
@@ -178,6 +140,7 @@ TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_
 
     double sphere_radius = sphere_items->get_as<double>("radius").value_or(1);
     double reflect_coef = sphere_items->get_as<double>("reflect").value_or(0);
+
     MyTexture* sphere_texture_ptr = texture_factory_->create_texture(sphere_texture_str, reflect_coef, 1);
 
     Vector3d fill_vec = fill_vector(sphere_axis_vec);
@@ -201,11 +164,13 @@ TexturedSphere WorldBuilder::make_sphere(std::shared_ptr<cpptoml::table> sphere_
         sphere_radius,
         sphere_texture_ptr
     );
-    return new_sphere;
+    spheres_->push_back(new_sphere);
+
+    return &spheres_->back();
 }
 
 
-TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) const {
+ActorBase* CylinderActorFactory::create_actor(std::shared_ptr<cpptoml::table> cylinder_items) {
     auto cylinder_center = cylinder_items->get_array_of<double>("center");
     if (!cylinder_center) {
         //TODO
@@ -255,7 +220,52 @@ TexturedCylinder WorldBuilder::make_cylinder(std::shared_ptr<cpptoml::table> cyl
         cylinder_span,
         cylinder_texture_ptr
     );
-    return new_cylinder;
+    cylinders_->push_back(new_cylinder);
+
+    return &cylinders_->back();
+}
+
+
+ActorIterator SceneWorld::get_actor_iterator() {
+    return ActorIterator(&actor_ptrs_);
+}
+
+Camera* SceneWorld::get_camera_ptr() {
+    return &(*cameras_.begin());  // ignore other cameras
+}
+
+Light* SceneWorld::get_light_ptr() {
+    return &(*lights_.begin());  // ignore other lights
+}
+
+
+ActorIterator::ActorIterator(std::vector<ActorBase* >* actor_ptrs):
+    actor_ptrs_(actor_ptrs) {
+    actor_iter_ = actor_ptrs_->begin();
+}
+
+void ActorIterator::first() {
+    actor_iter_ = actor_ptrs_->begin();
+}
+
+void ActorIterator::next() {
+    actor_iter_++;
+}
+
+bool ActorIterator::is_done() {
+    return actor_iter_ == actor_ptrs_->end();
+}
+
+std::vector<ActorBase* >::iterator ActorIterator::current() {
+    return actor_iter_;
+}
+
+
+WorldBuilder::WorldBuilder(const std::string& world_filename,
+                           TextureFactory* texture_factory) :
+    world_filename_(world_filename),
+    texture_factory_(texture_factory) {
+
 }
 
 
@@ -316,33 +326,37 @@ std::shared_ptr<SceneWorld> WorldBuilder::build() const {
         //TODO
     }
 
-    auto my_world = std::shared_ptr<SceneWorld>(new SceneWorld(texture_factory_));
+    auto my_world = std::shared_ptr<SceneWorld>(new SceneWorld());
 
     auto planes_array = world_config->get_table_array("planes");
     auto spheres_array = world_config->get_table_array("spheres");
     auto cylinders_array = world_config->get_table_array("cylinders");
 
+    PlaneActorFactory plane_factory(texture_factory_, &my_world->planes_);
+    SphereActorFactory sphere_factory(texture_factory_, &my_world->spheres_);
+    CylinderActorFactory cylinder_factory(texture_factory_, &my_world->cylinders_);
+
     if (planes_array) {
         for (const auto& plane_items : *planes_array) {
-            my_world->add_plane(make_plane(plane_items));
+            my_world->actor_ptrs_.push_back(plane_factory.create_actor(plane_items));
         }
     }
 
     if (spheres_array) {
         for (const auto& sphere_items : *spheres_array) {
-            my_world->add_sphere(make_sphere(sphere_items));
+            my_world->actor_ptrs_.push_back(sphere_factory.create_actor(sphere_items));
         }
     }
 
     if (cylinders_array) {
         for (const auto& cylinder_items : *cylinders_array) {
-            my_world->add_cylinder(make_cylinder(cylinder_items));
+            my_world->actor_ptrs_.push_back(cylinder_factory.create_actor(cylinder_items));
         }
     }
 
-    my_world->add_camera(make_camera(world_config));
+    my_world->cameras_.push_back(make_camera(world_config));
 
-    my_world->add_light(make_light(world_config));
+    my_world->lights_.push_back(make_light(world_config));
 
     return my_world;
 }
