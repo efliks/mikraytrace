@@ -277,16 +277,23 @@ int main(int argc, char **argv) {
             png_file = foo + ".png";
         }
 
-        mrtp::Renderer renderer(my_world_ptr.get(), width, height, fov, distance, shadow, kDefaultBias,
-                                recursion, threads, png_file.c_str());
+        mrtp::RendererConfig renderer_config{
+            fov,
+            distance,
+            shadow,
+            kDefaultBias,
+            width,
+            height,
+            recursion
+        };
 
-        double time_used = renderer.render_scene();
-        if (!quiet) { std::cout << " (render time: " << std::setprecision(2) << time_used << "s)" << std::endl; }
+        mrtp::SceneRenderer scene_renderer(my_world_ptr.get(), renderer_config);
+        scene_renderer.do_render();
 
-        if (renderer.write_scene() != mrtp::rs_ok) {
-            std::cerr << "error writing scene" << std::endl;
-            return exit_write_scene;
-        }
+        mrtp::ScenePNGWriter scene_writer(&scene_renderer);
+        scene_writer.write_to_file(png_file);
+
+        std::cout << " OK" << std::endl;
     }
     
     return exit_ok;

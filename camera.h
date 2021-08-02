@@ -12,9 +12,9 @@ public:
 
     ~Camera() = default;
 
-    void calculate_window(int width, int height, double perspective);
+    void calculate_window(unsigned int width, unsigned int height, double perspective);
 
-    Eigen::Vector3d calculate_origin(int windowx, int windowy) const;
+    Eigen::Vector3d calculate_origin(unsigned int windowx, unsigned int windowy) const;
     Eigen::Vector3d calculate_direction(const Eigen::Vector3d& origin) const;
 
 private:

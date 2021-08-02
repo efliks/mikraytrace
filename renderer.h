@@ -12,52 +12,85 @@
 
 namespace mrtp {
 
-enum RendererStatus_t {rs_ok, rs_fail};
+using Vector3d = Eigen::Vector3d;
+
+class ScenePNGWriter;
 
 
-class Renderer {
-  public:
-    Renderer(SceneWorld *world, int width, int height,
-             double fov, double distance,
-             double shadow, double bias, int maxdepth,
-             int nthreads, const char *path);
-    Renderer() = delete;
-    ~Renderer() = default;
+struct RendererConfig {
+    double field_of_vision;
+    double max_distance;
+    double shadow_bias;
+    double ray_bias;
 
-    double render_scene();
-    bool write_scene();
+    unsigned int width;
+    unsigned int height;
 
-  private:
-    SceneWorld *world_;
-    const char *path_;
-    std::vector<Pixel> framebuffer_;
+    unsigned int max_ray_depth;
+};
 
-    int width_;
-    int height_;
-    int maxdepth_;
-    int nthreads_;
-    double maxdist_;
-    double shadow_;
-    double bias_;
-    double fov_;
+
+class SceneRendererBase {
+    friend class ScenePNGWriter;
+
+public:
+    SceneRendererBase(SceneWorld*, const RendererConfig&);
+    SceneRendererBase() = delete;
+    virtual ~SceneRendererBase() = default;
+
+    virtual void do_render() = 0;
+
+protected:
     double ratio_;
     double perspective_;
 
-    bool solve_shadows(const Eigen::Vector3d& origin,
-                       const Eigen::Vector3d& direction,
-                       double maxdist) const;
+    SceneWorld* scene_world_;
+    RendererConfig config_;
+    std::vector<Pixel> framebuffer_;
 
-    ActorBase *solve_hits(const Eigen::Vector3d& origin,
-                      const Eigen::Vector3d& direction,
-                      double *currd) const;
-
-    Pixel trace_ray_r(const Eigen::Vector3d& origin,
-                      const Eigen::Vector3d& direction,
-                      int depth) const;
-
-    void render_block(int block, int nlines);
+    Pixel trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
+    ActorBase* solve_hits(const Vector3d&, const Vector3d&, double*) const;
+    bool solve_shadows(const Vector3d&, const Vector3d&, double) const;
+    void render_block(unsigned int, unsigned int);
 };
 
-} //namespace mrtp
 
-#endif //_RENDERER_H
+class ParallelSceneRenderer : public SceneRendererBase {
+public:
+    ParallelSceneRenderer(SceneWorld*, const RendererConfig&, unsigned int);
+    ParallelSceneRenderer() = delete;
+    ~ParallelSceneRenderer() override = default;
+
+    void do_render() override;
+
+private:
+    unsigned int num_threads_;
+};
+
+
+class SceneRenderer : public SceneRendererBase {
+public:
+    SceneRenderer(SceneWorld*, const RendererConfig&);
+    SceneRenderer() = delete;
+    ~SceneRenderer() override = default;
+
+    void do_render() override;
+};
+
+
+class ScenePNGWriter {
+public:
+    ScenePNGWriter(SceneRendererBase*);
+    ScenePNGWriter() = delete;
+    ~ScenePNGWriter() = default;
+
+    void write_to_file(const std::string&);
+
+private:
+    SceneRendererBase* scene_renderer_;
+};
+
+
+}  //namespace mrtp
+
+#endif  //_RENDERER_H

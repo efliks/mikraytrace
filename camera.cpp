@@ -11,7 +11,9 @@ Camera::Camera(const Eigen::Vector3d& eye, const Eigen::Vector3d& lookat, double
 }
 
 
-void Camera::calculate_window(int width, int height, double perspective) {
+void Camera::calculate_window(unsigned int width,
+                              unsigned int height,
+                              double perspective) {
     // i is a vector between the camera and the center of the window
     Eigen::Vector3d i = lookat_ - eye_;
     i *= (1 / i.norm());
@@ -51,7 +53,8 @@ void Camera::calculate_window(int width, int height, double perspective) {
 }
 
 
-Eigen::Vector3d Camera::calculate_origin(int windowx, int windowy) const {
+Eigen::Vector3d Camera::calculate_origin(unsigned int windowx,
+                                         unsigned int windowy) const {
     return wo_ + static_cast<double>(windowx) * wh_ + static_cast<double>(windowy) * wv_;
 }
 
