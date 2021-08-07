@@ -126,10 +126,6 @@ void SceneRendererBase::render_block(unsigned int block_index,
                                      unsigned int num_lines) {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    if (block_index < 1) {
-        my_camera->calculate_window(config_.width, config_.height, perspective_);
-    }
-
     Pixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
 
     for (unsigned int j = 0; j < num_lines; j++) {
@@ -152,6 +148,10 @@ ParallelSceneRenderer::ParallelSceneRenderer(SceneWorld* scene_world,
 
 
 void ParallelSceneRenderer::do_render() {
+    Camera* my_camera = scene_world_->get_camera_ptr();
+
+    my_camera->calculate_window(config_.width, config_.height, perspective_);
+
 #ifdef _OPENMP
     if (num_threads_ == 1) {
         // Serial execution
@@ -190,6 +190,9 @@ SceneRenderer::SceneRenderer(SceneWorld* scene_world,
 
 
 void SceneRenderer::do_render() {
+    Camera* my_camera = scene_world_->get_camera_ptr();
+    my_camera->calculate_window(config_.width, config_.height, perspective_);
+
     render_block(0, config_.height);
 }
 

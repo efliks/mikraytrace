@@ -287,11 +287,20 @@ int main(int argc, char **argv) {
             recursion
         };
 
-        mrtp::SceneRenderer scene_renderer(my_world_ptr.get(), renderer_config);
-        scene_renderer.do_render();
+        if (threads == 1) {
+            mrtp::SceneRenderer scene_renderer(my_world_ptr.get(), renderer_config);
+            mrtp::ScenePNGWriter scene_writer(&scene_renderer);
 
-        mrtp::ScenePNGWriter scene_writer(&scene_renderer);
-        scene_writer.write_to_file(png_file);
+            scene_renderer.do_render();
+            scene_writer.write_to_file(png_file);
+        }
+        else {
+            mrtp::ParallelSceneRenderer scene_renderer(my_world_ptr.get(), renderer_config, threads);
+            mrtp::ScenePNGWriter scene_writer(&scene_renderer);
+
+            scene_renderer.do_render();
+            scene_writer.write_to_file(png_file);
+        }
 
         std::cout << " OK" << std::endl;
     }
