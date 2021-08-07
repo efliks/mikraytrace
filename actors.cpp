@@ -73,7 +73,7 @@ double TexturedPlane::solve_light_ray(const Vector3d& O,
     if (t > kMyZero || t < -kMyZero) {
         Vector3d v = O - local_basis_.o;
         double d = -v.dot(local_basis_.vk) / t;
-        if (min_dist < d < max_dist) {
+        if (d > min_dist && d < max_dist) {
             return d;
         }
     }
@@ -121,7 +121,10 @@ double TexturedSphere::solve_light_ray(const Vector3d& O,
     double c = t.dot(t) - radius_ * radius_;
     double dist = solve_quadratic(a, b, c);
 
-    return (min_dist < dist < max_dist) ? dist : -1;
+    if (dist > min_dist && dist < max_dist) {
+        return dist;
+    }
+    return -1;
 }
 
 
@@ -211,14 +214,14 @@ double TexturedCylinder::solve_light_ray(const Vector3d& O,
     double cc = -(d * d) - f;
     double t = solve_quadratic(aa, bb, cc);
 
-    t = (min_dist < t < max_dist) ? t : -1;
-    if (t > 0) {
-        // Check if cylinder is finite
-        if (length_ > 0) {
-            double alpha = d + t * b;
-            if (alpha < -length_ || alpha > length_) {
-                return -1;
-            }
+    if (t < min_dist || t > max_dist) {
+        return -1;
+    }
+    // Check if cylinder is finite
+    if (length_ > 0) {
+        double alpha = d + t * b;
+        if (alpha < -length_ || alpha > length_) {
+            return -1;
         }
     }
     return t;
