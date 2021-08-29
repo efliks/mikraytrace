@@ -1,7 +1,10 @@
+#include <memory>
+#include <vector>
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <unistd.h>
 
 #include "config.h"
 
@@ -22,10 +25,20 @@ RendererConfig::RendererConfig() {
 }
 
 
-OptionParser::OptionParser(RendererConfig* renderer_config) :
-    renderer_config_(renderer_config) {
+class OptionParser {
+public:
+    OptionParser(RendererConfig* renderer_config) :
+        renderer_config_(renderer_config) {
+    }
 
-}
+    virtual ~OptionParser() = default;
+    virtual void parse(const std::string&) = 0;
+
+    bool is_parsed;
+
+protected:
+    RendererConfig* renderer_config_;
+};
 
 
 class FieldOfVisionParser : public OptionParser {
@@ -191,6 +204,73 @@ std::shared_ptr<OptionParser> get_option_parser(int c, RendererConfig* renderer_
         return std::shared_ptr<OptionParser>(new ShadowBiasParser(renderer_config));
     // c == 't'
     return std::shared_ptr<OptionParser>(new ThreadsParser(renderer_config));
+}
+
+
+void display_help() {
+    std::cout << R"(Usage: mrtp_cli [OPTION]... FILE...
+  Options:
+    -d   distance to darken light
+    -f   field of vision in degrees
+    -h   print this help screen
+    -o   output filename in PNG format
+    -q   suppress messages, except errors
+    -r   resolution, eg. 640x480
+    -R   levels of recursion for reflected rays
+    -s   shadow factor
+    -t   rendering threads: 0 (auto), 1, 2, ...
+
+Example:
+  mrtp_cli -r 1620x1080 -f 110.0 -o scene2.png scene2.toml)" << std::endl;
+}
+
+
+bool process_command_line(int argc,
+                          char** argv,
+                          RendererConfig* renderer_config,
+                          std::vector<std::string>* input_files,
+                          std::string* output_file,
+                          bool* quiet_mode) {
+    if (argc < 2) {
+        display_help();
+        return false;
+    }
+
+    int c;
+    *quiet_mode = false;
+
+    while ((c = getopt(argc, argv, "d:f:ho:qr:R:s:t:")) != -1) {
+        if (c == 'h') {
+            display_help();
+            return false;
+        }
+        else if (c == 'o') {
+            *output_file = std::string(optarg);
+        }
+        else if (c == 'q') {
+            *quiet_mode = true;
+        }
+        else if (c == '?') {
+            return false;
+        }
+        else {
+            auto parser_ptr = get_option_parser(c, renderer_config);
+            parser_ptr->parse(std::string(optarg));
+            if (!parser_ptr->is_parsed) {
+                std::cerr << "error parsing option" << std::endl;
+                return false;
+            }
+        }
+    }
+
+    for (int i = optind; i < argc; i++) {
+        input_files->push_back(std::string(argv[i]));
+    }
+    if (input_files->empty()) {
+        std::cerr << "missing toml file" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 

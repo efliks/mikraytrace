@@ -1,7 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <memory>
+#include <string>
+#include <vector>
 
 
 namespace mrtp {
@@ -24,20 +25,8 @@ public:
 };
 
 
-class OptionParser {
-public:
-    OptionParser(RendererConfig*);
-    virtual ~OptionParser() = default;
-    virtual void parse(const std::string&) = 0;
-
-    bool is_parsed;
-
-protected:
-    RendererConfig* renderer_config_;
-};
-
-
-std::shared_ptr<OptionParser> get_option_parser(int, RendererConfig*);
+bool process_command_line(int, char**, RendererConfig*,
+                          std::vector<std::string>*, std::string*, bool*);
 
 
 }

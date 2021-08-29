@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <unistd.h>
 
 #include "world.h"
 #include "renderer.h"
@@ -10,71 +9,23 @@
 #include "config.h"
 
 
-void help_message() {
-    std::cout << R"(Usage: mrtp_cli [OPTION]... FILE...
-  Options:
-    -d   distance to darken light
-    -f   field of vision in degrees
-    -h   print this help screen
-    -o   output filename in PNG format
-    -q   suppress messages, except errors
-    -r   resolution, eg. 640x480
-    -R   levels of recursion for reflected rays
-    -s   shadow factor
-    -t   rendering threads: 0 (auto), 1, 2, ...
-
-Example:
-  mrtp_cli -r 1620x1080 -f 110.0 -o scene2.png scene2.toml)" << std::endl;
-}
-
-
 int main(int argc, char** argv) {
-    int c;
     bool quiet_flag = false;
-
     std::string png_file;
     std::vector<std::string> toml_files;
-
     mrtp::RendererConfig renderer_config;
 
-    if (argc < 2) {
-        // no arguments - do exit
-        help_message();
-        return 0;
-    }
-
-    while ((c = getopt(argc, argv, "d:f:ho:qr:R:s:t:")) != -1) {
-        if (c == 'h') {
-            help_message();
-            return 0;
-        }
-        else if (c == 'o') {
-            png_file = std::string(optarg);
-        }
-        else if (c == 'q') {
-            quiet_flag = true;
-        }
-        else if (c == '?') {
-            return 1;
-        }
-        else {
-            std::shared_ptr<mrtp::OptionParser> parser_ptr =
-                    mrtp::get_option_parser(c, &renderer_config);
-            parser_ptr->parse(std::string(optarg));
-            if (!parser_ptr->is_parsed) {
-                std::cerr << "error parsing option" << std::endl;
-                return 1;
-            }
-        }
-    }
-
-    for (int i = optind; i < argc; i++) {
-        toml_files.push_back(std::string(argv[i]));
-    }
-    if (toml_files.empty()) {
-        std::cerr << "missing toml file" << std::endl;
+    if (!(mrtp::process_command_line(
+              argc,
+              argv,
+              &renderer_config,
+              &toml_files,
+              &png_file,
+              &quiet_flag
+              ))) {
         return 1;
     }
+
     bool use_auto_name = (toml_files.size() > 1) || (png_file == "");
     if (use_auto_name) {
         if (png_file != "") {
