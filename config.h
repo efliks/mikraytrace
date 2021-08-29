@@ -28,7 +28,7 @@ class OptionParser {
 public:
     OptionParser(RendererConfig*);
     virtual ~OptionParser() = default;
-    virtual void parse(char*) = 0;
+    virtual void parse(const std::string&) = 0;
 
     bool is_parsed;
 

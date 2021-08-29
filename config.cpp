@@ -8,41 +8,17 @@
 
 namespace mrtp {
 
-static const unsigned int kDefaultWidth = 640;
-static const unsigned int kDefaultHeight = 480;
-static const unsigned int kMinWidth = kDefaultWidth / 2;
-static const unsigned int kMaxWidth = kDefaultWidth * 10;
-static const unsigned int kMinHeight = kDefaultHeight / 2;
-static const unsigned int kMaxHeight = kDefaultHeight * 10;
-
-static const unsigned int kDefaultRecursionLevels = 3;
-static const unsigned int kMinRecursionLevels = 0;
-static const unsigned int kMaxRecursionLevels = 10;
-
-static const unsigned int kDefaultThreads = 1;
-static const unsigned int kMinThreads = 0;
-static const unsigned int kMaxThreads = 64;
-
-static const double kDefaultFOV = 93;
-static const double kMinFOV = 50;
-static const double kMaxFOV = 170;
-
-static const double kDefaultDistance = 60;
-static const double kDefaultShadow = 0.25;
-static const double kDefaultBias = 0.001;
-
-
 RendererConfig::RendererConfig() {
-    field_of_vision = kDefaultFOV;
-    max_distance = kDefaultDistance;
-    shadow_bias = kDefaultShadow;
-    ray_bias = kDefaultBias;
+    field_of_vision = 93;
+    max_distance = 60;
+    shadow_bias = 0.25;
+    ray_bias = 0.001;
 
-    buffer_width = kDefaultWidth;
-    buffer_height = kDefaultHeight;
+    buffer_width = 640;
+    buffer_height = 480;
 
-    max_ray_depth = kDefaultRecursionLevels;
-    num_threads = kDefaultThreads;
+    max_ray_depth = 3;
+    num_threads = 1;
 }
 
 
@@ -60,14 +36,12 @@ public:
 
     ~FieldOfVisionParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->field_of_vision;
         is_parsed = (!convert.bad() &&
-                     renderer_config_->field_of_vision >= kMinFOV &&
-                     renderer_config_->field_of_vision <= kMaxFOV);
+                     renderer_config_->field_of_vision >= 50 &&
+                     renderer_config_->field_of_vision <= 170);
     }
 };
 
@@ -80,10 +54,8 @@ public:
 
     ~MaxDistanceParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->max_distance;
         is_parsed = !convert.bad();
     }
@@ -98,10 +70,8 @@ public:
 
     ~ShadowBiasParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->shadow_bias;
         is_parsed = !convert.bad();
     }
@@ -116,10 +86,8 @@ public:
 
     ~RayBiasParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->ray_bias;
         is_parsed = !convert.bad();
     }
@@ -134,8 +102,7 @@ public:
 
     ~ResolutionParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         is_parsed = false;
 
         size_t p = str.find('x');
@@ -153,8 +120,8 @@ public:
             // unable to convert width
             return;
         }
-        if (renderer_config_->buffer_width < kMinWidth ||
-                renderer_config_->buffer_width > kMaxWidth) {
+        if (renderer_config_->buffer_width < 320 ||
+                renderer_config_->buffer_width > 3200) {
             // width is out of range
             return;
         }
@@ -165,8 +132,8 @@ public:
             // unable to convert heigth
             return;
         }
-        if (renderer_config_->buffer_height < kMinHeight ||
-                renderer_config_->buffer_height > kMaxHeight) {
+        if (renderer_config_->buffer_height < 240 ||
+                renderer_config_->buffer_height > 2400) {
             // height is out of range
             return;
         }
@@ -183,14 +150,12 @@ public:
 
     ~RayDepthParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->max_ray_depth;
         is_parsed = (!convert.bad() &&
-                     renderer_config_->max_ray_depth >= kMinRecursionLevels &&
-                     renderer_config_->max_ray_depth <= kMaxRecursionLevels);
+                     renderer_config_->max_ray_depth >= 0 &&
+                     renderer_config_->max_ray_depth <= 10);
     }
 };
 
@@ -203,14 +168,12 @@ public:
 
     ~ThreadsParser() override = default;
 
-    void parse(char* s) override {
-        std::string str(s);
+    void parse(const std::string& str) override {
         std::stringstream convert(str);
-
         convert >> renderer_config_->num_threads;
         is_parsed = (!convert.bad() &&
-                     renderer_config_->num_threads >= kMinThreads &&
-                     renderer_config_->num_threads <= kMaxThreads);
+                     renderer_config_->num_threads >= 0 &&
+                     renderer_config_->num_threads <= 64);
     }
 };
 

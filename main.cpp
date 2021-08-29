@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
         else {
             std::shared_ptr<mrtp::OptionParser> parser_ptr =
                     mrtp::get_option_parser(c, &renderer_config);
-            parser_ptr->parse(optarg);
+            parser_ptr->parse(std::string(optarg));
             if (!parser_ptr->is_parsed) {
                 std::cerr << "error parsing option" << std::endl;
                 return 1;
