@@ -47,148 +47,187 @@ RendererConfig::RendererConfig() {
 
 
 OptionParser::OptionParser(RendererConfig* renderer_config) :
-    is_parsed(false), renderer_config_(renderer_config) {
+    renderer_config_(renderer_config) {
 
 }
 
 
-FieldOfVisionParser::FieldOfVisionParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
+class FieldOfVisionParser : public OptionParser {
+public:
+    FieldOfVisionParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
+    }
 
-}
+    ~FieldOfVisionParser() override = default;
 
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
 
-MaxDistanceParser::MaxDistanceParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
-
-}
-
-
-ShadowBiasParser::ShadowBiasParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
-
-}
-
-RayBiasParser::RayBiasParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
-
-}
+        convert >> renderer_config_->field_of_vision;
+        is_parsed = (!convert.bad() &&
+                     renderer_config_->field_of_vision >= kMinFOV &&
+                     renderer_config_->field_of_vision <= kMaxFOV);
+    }
+};
 
 
-ResolutionParser::ResolutionParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
+class MaxDistanceParser : public OptionParser {
+public:
+    MaxDistanceParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
+    }
 
-}
+    ~MaxDistanceParser() override = default;
 
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
 
-RayDepthParser::RayDepthParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
-
-}
-
-
-ThreadsParser::ThreadsParser(RendererConfig* renderer_config) :
-    OptionParser(renderer_config) {
-
-}
-
-
-void FieldOfVisionParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
-
-    convert >> renderer_config_->field_of_vision;
-    is_parsed = (!convert.bad() &&
-                 renderer_config_->field_of_vision >= kMinFOV &&
-                 renderer_config_->field_of_vision <= kMaxFOV);
-}
+        convert >> renderer_config_->max_distance;
+        is_parsed = !convert.bad();
+    }
+};
 
 
-void MaxDistanceParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
+class ShadowBiasParser : public OptionParser {
+public:
+    ShadowBiasParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
+    }
 
-    convert >> renderer_config_->max_distance;
-    is_parsed = !convert.bad();
-}
+    ~ShadowBiasParser() override = default;
 
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
 
-void ShadowBiasParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
-
-    convert >> renderer_config_->shadow_bias;
-    is_parsed = !convert.bad();
-}
-
-
-void RayBiasParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
-
-    convert >> renderer_config_->ray_bias;
-    is_parsed = !convert.bad();
-}
+        convert >> renderer_config_->shadow_bias;
+        is_parsed = !convert.bad();
+    }
+};
 
 
-void ResolutionParser::parse(char* s) {
-    std::string str(s);
+class RayBiasParser : public OptionParser {
+public:
+    RayBiasParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
+    }
 
-    size_t p = str.find('x');
-    if (p == std::string::npos) {
-        p = str.find('X');
+    ~RayBiasParser() override = default;
+
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
+
+        convert >> renderer_config_->ray_bias;
+        is_parsed = !convert.bad();
+    }
+};
+
+
+class ResolutionParser : public OptionParser {
+public:
+    ResolutionParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
+    }
+
+    ~ResolutionParser() override = default;
+
+    void parse(char* s) override {
+        std::string str(s);
+        is_parsed = false;
+
+        size_t p = str.find('x');
         if (p == std::string::npos) {
-            // invalid format of resolution
+            p = str.find('X');
+            if (p == std::string::npos) {
+                // invalid format of resolution
+                return;
+            }
+        }
+        std::string left(str.substr(0, p));
+        std::stringstream convert(left);
+        convert >> renderer_config_->buffer_width;
+        if (!convert) {
+            // unable to convert width
             return;
         }
+        if (renderer_config_->buffer_width < kMinWidth ||
+                renderer_config_->buffer_width > kMaxWidth) {
+            // width is out of range
+            return;
+        }
+        std::string right(str.substr(p+1, str.length()-p-1));
+        std::stringstream convert_other(right);
+        convert_other >> renderer_config_->buffer_height;
+        if (!convert_other) {
+            // unable to convert heigth
+            return;
+        }
+        if (renderer_config_->buffer_height < kMinHeight ||
+                renderer_config_->buffer_height > kMaxHeight) {
+            // height is out of range
+            return;
+        }
+        is_parsed = true;
     }
-    std::string left(str.substr(0, p));
-    std::stringstream convert(left);
-    convert >> renderer_config_->buffer_width;
-    if (!convert) {
-        // unable to convert width
-        return;
+};
+
+
+class RayDepthParser : public OptionParser {
+public:
+    RayDepthParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
     }
-    if (renderer_config_->buffer_width < kMinWidth ||
-            renderer_config_->buffer_width > kMaxWidth) {
-        // width is out of range
-        return;
+
+    ~RayDepthParser() override = default;
+
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
+
+        convert >> renderer_config_->max_ray_depth;
+        is_parsed = (!convert.bad() &&
+                     renderer_config_->max_ray_depth >= kMinRecursionLevels &&
+                     renderer_config_->max_ray_depth <= kMaxRecursionLevels);
     }
-    std::string right(str.substr(p+1, str.length()-p-1));
-    std::stringstream convert_other(right);
-    convert_other >> renderer_config_->buffer_height;
-    if (!convert_other) {
-        // unable to convert heigth
-        return;
+};
+
+
+class ThreadsParser : public OptionParser {
+public:
+    ThreadsParser(RendererConfig* renderer_config) :
+        OptionParser(renderer_config) {
     }
-    if (renderer_config_->buffer_height < kMinHeight ||
-            renderer_config_->buffer_height > kMaxHeight) {
-        // height is out of range
-        return;
+
+    ~ThreadsParser() override = default;
+
+    void parse(char* s) override {
+        std::string str(s);
+        std::stringstream convert(str);
+
+        convert >> renderer_config_->num_threads;
+        is_parsed = (!convert.bad() &&
+                     renderer_config_->num_threads >= kMinThreads &&
+                     renderer_config_->num_threads <= kMaxThreads);
     }
-    is_parsed = true;
-}
+};
 
 
-void RayDepthParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
-
-    convert >> renderer_config_->max_ray_depth;
-    is_parsed = (!convert.bad() &&
-                 renderer_config_->max_ray_depth >= kMinRecursionLevels &&
-                 renderer_config_->max_ray_depth <= kMaxRecursionLevels);
-}
-
-
-void ThreadsParser::parse(char* s) {
-    std::string str(s);
-    std::stringstream convert(str);
-
-    convert >> renderer_config_->num_threads;
-    is_parsed = (!convert.bad() &&
-                 renderer_config_->num_threads >= kMinThreads &&
-                 renderer_config_->num_threads <= kMaxThreads);
+std::shared_ptr<OptionParser> get_option_parser(int c, RendererConfig* renderer_config) {
+    if (c == 'd')
+        return std::shared_ptr<OptionParser>(new MaxDistanceParser(renderer_config));
+    if (c == 'f')
+        return std::shared_ptr<OptionParser>(new FieldOfVisionParser(renderer_config));
+    if (c == 'r')
+        return std::shared_ptr<OptionParser>(new ResolutionParser(renderer_config));
+    if (c == 'R')
+        return std::shared_ptr<OptionParser>(new RayDepthParser(renderer_config));
+    if (c == 's')
+        return std::shared_ptr<OptionParser>(new ShadowBiasParser(renderer_config));
+    // c == 't'
+    return std::shared_ptr<OptionParser>(new ThreadsParser(renderer_config));
 }
 
 

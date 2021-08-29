@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <memory>
+
 
 namespace mrtp {
 
@@ -35,67 +37,7 @@ protected:
 };
 
 
-class FieldOfVisionParser : public OptionParser {
-public:
-    FieldOfVisionParser(RendererConfig*);
-    ~FieldOfVisionParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class MaxDistanceParser : public OptionParser {
-public:
-    MaxDistanceParser(RendererConfig*);
-    ~MaxDistanceParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class ShadowBiasParser : public OptionParser {
-public:
-    ShadowBiasParser(RendererConfig*);
-    ~ShadowBiasParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class RayBiasParser : public OptionParser {
-public:
-    RayBiasParser(RendererConfig*);
-    ~RayBiasParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class ResolutionParser : public OptionParser {
-public:
-    ResolutionParser(RendererConfig*);
-    ~ResolutionParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class RayDepthParser : public OptionParser {
-public:
-    RayDepthParser(RendererConfig*);
-    ~RayDepthParser() override = default;
-
-    void parse(char*) override;
-};
-
-
-class ThreadsParser : public OptionParser {
-public:
-    ThreadsParser(RendererConfig*);
-    ~ThreadsParser() override = default;
-
-    void parse(char*) override;
-};
+std::shared_ptr<OptionParser> get_option_parser(int, RendererConfig*);
 
 
 }

@@ -28,22 +28,6 @@ Example:
 }
 
 
-std::shared_ptr<mrtp::OptionParser> get_parser(int c, mrtp::RendererConfig* renderer_config) {
-    if (c == 'd')
-        return std::shared_ptr<mrtp::OptionParser>(new mrtp::MaxDistanceParser(renderer_config));
-    if (c == 'f')
-        return std::shared_ptr<mrtp::OptionParser>(new mrtp::FieldOfVisionParser(renderer_config));
-    if (c == 'r')
-        return std::shared_ptr<mrtp::OptionParser>(new mrtp::ResolutionParser(renderer_config));
-    if (c == 'R')
-        return std::shared_ptr<mrtp::OptionParser>(new mrtp::RayDepthParser(renderer_config));
-    if (c == 's')
-        return std::shared_ptr<mrtp::OptionParser>(new mrtp::ShadowBiasParser(renderer_config));
-    // c == 't'
-    return std::shared_ptr<mrtp::OptionParser>(new mrtp::ThreadsParser(renderer_config));
-}
-
-
 int main(int argc, char** argv) {
     int c;
     bool quiet_flag = false;
@@ -74,7 +58,8 @@ int main(int argc, char** argv) {
             return 1;
         }
         else {
-            std::shared_ptr<mrtp::OptionParser> parser_ptr = get_parser(c, &renderer_config);
+            std::shared_ptr<mrtp::OptionParser> parser_ptr =
+                    mrtp::get_option_parser(c, &renderer_config);
             parser_ptr->parse(optarg);
             if (!parser_ptr->is_parsed) {
                 std::cerr << "error parsing option" << std::endl;
