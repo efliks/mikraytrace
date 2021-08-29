@@ -18,10 +18,10 @@ SceneRendererBase::SceneRendererBase(SceneWorld* scene_world,
     scene_world_(scene_world),
     config_(config) {
 
-    ratio_ = static_cast<double>(config_.width) / static_cast<double>(config_.height);
+    ratio_ = static_cast<double>(config_.buffer_width) / static_cast<double>(config_.buffer_height);
     perspective_ = ratio_ / (2 * std::tan(M_PI / 180 * config_.field_of_vision / 2));
 
-    framebuffer_.reserve(config_.width * config_.height);
+    framebuffer_.reserve(config_.buffer_width * config_.buffer_height);
 }
 
 
@@ -126,10 +126,10 @@ void SceneRendererBase::render_block(unsigned int block_index,
                                      unsigned int num_lines) {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    Pixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
+    Pixel* pixel = &framebuffer_[block_index * num_lines * config_.buffer_width];
 
     for (unsigned int j = 0; j < num_lines; j++) {
-        for (unsigned int i = 0; i < config_.width; i++, pixel++) {
+        for (unsigned int i = 0; i < config_.buffer_width; i++, pixel++) {
             Vector3d origin = my_camera->calculate_origin(i, j + block_index * num_lines);
             Vector3d direction = my_camera->calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
@@ -150,18 +150,18 @@ ParallelSceneRenderer::ParallelSceneRenderer(SceneWorld* scene_world,
 void ParallelSceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    my_camera->calculate_window(config_.width, config_.height, perspective_);
+    my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
 
 #ifdef _OPENMP
     if (num_threads_ == 1) {
         // Serial execution
-        render_block(0, config_.height);
+        render_block(0, config_.buffer_height);
     } else {
         // Parallel execution
         if (num_threads_ != 0) {
             omp_set_num_threads(num_threads_);
         }
-        unsigned int num_lines = config_.height / num_threads_;
+        unsigned int num_lines = config_.buffer_height / num_threads_;
         unsigned int block_index;
 
 #pragma omp parallel for
@@ -169,14 +169,14 @@ void ParallelSceneRenderer::do_render() {
             render_block(block_index, num_lines);
         }
 
-        unsigned int num_fill = config_.height % num_threads_;
+        unsigned int num_fill = config_.buffer_height % num_threads_;
         if (num_fill) {
             render_block(block_index + 1, num_fill);
         }
     }
 #else
     // No OpenMP compiled in, always do serial execution
-    render_block(0, config_.height);
+    render_block(0, config_.buffer_height);
 
 #endif  // !_OPENMP
 }
@@ -191,9 +191,9 @@ SceneRenderer::SceneRenderer(SceneWorld* scene_world,
 
 void SceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
-    my_camera->calculate_window(config_.width, config_.height, perspective_);
+    my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
 
-    render_block(0, config_.height);
+    render_block(0, config_.buffer_height);
 }
 
 
@@ -205,13 +205,13 @@ ScenePNGWriter::ScenePNGWriter(SceneRendererBase* scene_renderer) :
 
 void ScenePNGWriter::write_to_file(const std::string& png_filename) {
     png::image<png::rgb_pixel> image(
-                scene_renderer_->config_.width, scene_renderer_->config_.height);
+                scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height);
 
     Pixel* in = &scene_renderer_->framebuffer_[0];
 
-    for (unsigned int i = 0; i < scene_renderer_->config_.height; i++) {
+    for (unsigned int i = 0; i < scene_renderer_->config_.buffer_height; i++) {
         png::rgb_pixel* out = &image[i][0];
-        for (unsigned int j = 0; j < scene_renderer_->config_.width; j++, in++, out++) {
+        for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, in++, out++) {
             Pixel bytes = 255 * (*in);
             out->red = static_cast<unsigned char>(bytes[0]);
             out->green = static_cast<unsigned char>(bytes[1]);

@@ -14,8 +14,8 @@ public:
     double shadow_bias;
     double ray_bias;
 
-    unsigned int width;
-    unsigned int height;
+    unsigned int buffer_width;
+    unsigned int buffer_height;
 
     unsigned int max_ray_depth;
     unsigned int num_threads;

@@ -38,8 +38,8 @@ RendererConfig::RendererConfig() {
     shadow_bias = kDefaultShadow;
     ray_bias = kDefaultBias;
 
-    width = kDefaultWidth;
-    height = kDefaultHeight;
+    buffer_width = kDefaultWidth;
+    buffer_height = kDefaultHeight;
 
     max_ray_depth = kDefaultRecursionLevels;
     num_threads = kDefaultThreads;
@@ -144,25 +144,25 @@ void ResolutionParser::parse(char* s) {
     }
     std::string left(str.substr(0, p));
     std::stringstream convert(left);
-    convert >> renderer_config_->width;
+    convert >> renderer_config_->buffer_width;
     if (!convert) {
         // unable to convert width
         return;
     }
-    if (renderer_config_->width < kMinWidth ||
-            renderer_config_->width > kMaxWidth) {
+    if (renderer_config_->buffer_width < kMinWidth ||
+            renderer_config_->buffer_width > kMaxWidth) {
         // width is out of range
         return;
     }
     std::string right(str.substr(p+1, str.length()-p-1));
     std::stringstream convert_other(right);
-    convert_other >> renderer_config_->height;
+    convert_other >> renderer_config_->buffer_height;
     if (!convert_other) {
         // unable to convert heigth
         return;
     }
-    if (renderer_config_->height < kMinHeight ||
-            renderer_config_->height > kMaxHeight) {
+    if (renderer_config_->buffer_height < kMinHeight ||
+            renderer_config_->buffer_height > kMaxHeight) {
         // height is out of range
         return;
     }
