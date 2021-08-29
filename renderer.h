@@ -3,11 +3,13 @@
 
 #include <Eigen/Core>
 #include <vector>
+
 #include "actors.h"
 #include "camera.h"
 #include "light.h"
 #include "pixel.h"
 #include "world.h"
+#include "config.h"
 
 
 namespace mrtp {
@@ -15,31 +17,6 @@ namespace mrtp {
 using Vector3d = Eigen::Vector3d;
 
 class ScenePNGWriter;
-
-
-class RendererConfig {
-public:
-    RendererConfig();
-    ~RendererConfig() = default;
-
-    bool set_field_of_vision(char*);
-    bool set_max_distance(char*);
-    bool set_shadow_bias(char*);
-    bool set_ray_bias(char*);
-    bool set_resolution(char*);
-    bool set_max_ray_depth(char*);
-    bool set_num_threads(char*);
-
-    double field_of_vision;
-    double max_distance;
-    double shadow_bias;
-    double ray_bias;
-
-    unsigned int width;
-    unsigned int height;
-    unsigned int max_ray_depth;
-    unsigned int num_threads;
-};
 
 
 class SceneRendererBase {
