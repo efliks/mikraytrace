@@ -3,8 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include <list>
-#include "cpptoml.h"
 
 #include "actors.h"
 #include "camera.h"
@@ -13,12 +11,6 @@
 
 
 namespace mrtp {
-
-class SceneWorld;
-class WorldBuilder;
-
-class ActorIterator;
-
 
 class ActorIterator {
 public:
@@ -38,11 +30,13 @@ private:
 
 
 class SceneWorld {
-    friend class WorldBuilder;
-
 public:
     SceneWorld() = default;
     ~SceneWorld() = default;
+
+    void add_light(std::shared_ptr<Light>);
+    void add_camera(std::shared_ptr<Camera>);
+    void add_actor(std::shared_ptr<ActorBase>);
 
     Light* get_light_ptr();
     Camera* get_camera_ptr();
@@ -50,32 +44,14 @@ public:
     ActorIterator get_actor_iterator();
 
 private:
-    std::list<Light> lights_;
-    std::list<Camera> cameras_;
+    std::shared_ptr<Light> light_;
+    std::shared_ptr<Camera> camera_;
 
     std::vector<std::shared_ptr<ActorBase>> actor_ptrs_;
 };
 
 
-class WorldBuilder {
-public:
-    WorldBuilder(const std::string&, TextureFactory*);
-    WorldBuilder() = delete;
-    ~WorldBuilder() = default;
-
-    std::shared_ptr<SceneWorld> build() const;
-
-    Light make_light(std::shared_ptr<cpptoml::table>) const;
-    Camera make_camera(std::shared_ptr<cpptoml::table>) const;
-
-private:
-    std::string world_filename_;
-    TextureFactory* texture_factory_;
-};
-
-
-std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
-                                        TextureFactory* texture_factory);
+std::shared_ptr<SceneWorld> build_world(const std::string&, TextureFactory*);
 
 
 } //namespace mrtp
