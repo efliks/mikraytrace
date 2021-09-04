@@ -31,7 +31,7 @@ bool SceneRendererBase::solve_shadows(const Vector3d& O,
     ActorIterator actor_iterator = scene_world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        ActorBase* actor = *actor_iterator.current();
+        std::shared_ptr<ActorBase> actor = *actor_iterator.current();
         if (actor->has_shadow()) {
             double distance = actor->solve_light_ray(O, D, 0, max_dist);
             if (distance > 0) {
@@ -51,11 +51,11 @@ ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
     ActorIterator actor_iterator = scene_world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        ActorBase* actor = *actor_iterator.current();
+        std::shared_ptr<ActorBase> actor = *actor_iterator.current();
         double distance = actor->solve_light_ray(O, D, 0, config_.max_distance);
         if (distance > 0 && distance < *curr_dist) {
             *curr_dist = distance;
-            hit_actor = actor;
+            hit_actor = actor.get();
         }
     }
     return hit_actor;

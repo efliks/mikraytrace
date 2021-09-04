@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <Eigen/Core>
+#include "cpptoml.h"
 #include "pixel.h"
 #include "texture.h"
 
@@ -43,55 +44,18 @@ protected:
 };
 
 
-class TexturedPlane : public ActorBase {
+class TomlActorFactory {
 public:
-    TexturedPlane(const StandardBasis&, MyTexture*);  // texture has scale and reflection
-    ~TexturedPlane() override = default;
+    TomlActorFactory(TextureFactory*);
+    TomlActorFactory() = delete;
+    ~TomlActorFactory() = default;
 
-    double solve_light_ray(const Vector3d&, const Vector3d&, double,
-                           double) const override;
-    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
-    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
-    bool has_shadow() const override;
+    std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table>);
+    std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table>);
+    std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table>);
 
 private:
-    MyTexture* texture_;
-};
-
-
-class TexturedSphere : public ActorBase {
-public:
-    TexturedSphere(const StandardBasis&, double, MyTexture*);
-    ~TexturedSphere() override = default;
-
-    double solve_light_ray(const Vector3d&, const Vector3d&, double,
-                           double) const override;
-    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
-    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
-    bool has_shadow() const override;
-
-private:
-    MyTexture* texture_;
-
-    double radius_;
-};
-
-
-class TexturedCylinder : public ActorBase {
-public:
-    TexturedCylinder(const StandardBasis&, double, double, MyTexture*);
-    ~TexturedCylinder() override = default;
-
-    double solve_light_ray(const Vector3d&, const Vector3d&, double,
-                           double) const override;
-    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const override;
-    Vector3d calculate_normal_at_hit(const Vector3d&) const override;
-    bool has_shadow() const override;
-
-private:
-    MyTexture* texture_;
-
-    double radius_, length_;
+    TextureFactory* texture_factory_;
 };
 
 
