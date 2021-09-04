@@ -3,7 +3,7 @@ FLAGS=-W -Wall -pedantic -fPIC -O2
 
 all: mrtp_cli
 
-mrtp_cli: main.o actors.o texture.o light.o camera.o world.o renderer.o config.o
+mrtp_cli: main.o actors.o texture.o light.o camera.o world.o renderer.o
 	g++ $^ -o $@ -fopenmp -lm -lpng
 
 main.o: main.cpp
@@ -26,9 +26,6 @@ world.o: world.cpp
 
 renderer.o: renderer.cpp
 	g++ $(FLAGS) -fopenmp $(INCLUDE) -o renderer.o -c renderer.cpp
-
-config.o: config.cpp
-	g++ $(FLAGS) $(INCLUDE) -o config.o -c config.cpp
 
 .PHONY: clean
 clean:

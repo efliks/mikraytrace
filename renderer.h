@@ -9,7 +9,6 @@
 #include "light.h"
 #include "pixel.h"
 #include "world.h"
-#include "config.h"
 
 
 namespace mrtp {
@@ -17,6 +16,24 @@ namespace mrtp {
 using Vector3d = Eigen::Vector3d;
 
 class ScenePNGWriter;
+
+
+class RendererConfig {
+public:
+    RendererConfig();
+    ~RendererConfig() = default;
+
+    double field_of_vision;
+    double max_distance;
+    double shadow_bias;
+    double ray_bias;
+
+    unsigned int buffer_width;
+    unsigned int buffer_height;
+
+    unsigned int max_ray_depth;
+    unsigned int num_threads;
+};
 
 
 class SceneRendererBase {
