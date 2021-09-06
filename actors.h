@@ -27,10 +27,20 @@ public:
 };
 
 
+class TextureMapper {
+public:
+    TextureMapper() = default;
+    virtual ~TextureMapper() = default;
+
+    virtual MyPixel pick_pixel(
+            const Vector3d&, const Vector3d&, const StandardBasis&) const = 0;
+};
+
+
 class ActorBase {
 public:
-    ActorBase(const StandardBasis&);
-    ActorBase() = default;
+    ActorBase(const StandardBasis&, std::shared_ptr<TextureMapper>);
+    ActorBase() = delete;
     virtual ~ActorBase() = default;
 
     virtual double solve_light_ray(const Vector3d&, const Vector3d&, double,
@@ -41,6 +51,7 @@ public:
 
 protected:
     StandardBasis local_basis_;
+    std::shared_ptr<TextureMapper> texture_mapper_;
 };
 
 

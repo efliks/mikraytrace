@@ -72,19 +72,124 @@ StandardBasis::StandardBasis() {
 }
 
 
-ActorBase::ActorBase(const StandardBasis& local_basis) :
-    local_basis_(local_basis) {
+class DummyTextureMapper : public TextureMapper {
+public:
+    DummyTextureMapper(TexturePixel color, double reflection_coef) :
+        color_(color),
+        reflection_coef_(reflection_coef) {
+    }
+
+    ~DummyTextureMapper() override = default;
+
+    MyPixel pick_pixel(const Vector3d& hit,
+                       const Vector3d& normal_at_hit,
+                       const StandardBasis& local_basis) const override {
+        return MyPixel{color_, reflection_coef_};
+    }
+
+private:
+    TexturePixel color_;
+    double reflection_coef_;
+};
+
+
+class PlaneTextureMapper : public TextureMapper {
+public:
+    PlaneTextureMapper(MyTexture* texture) :
+        texture_(texture) {
+    }
+
+    ~PlaneTextureMapper() override = default;
+
+    MyPixel pick_pixel(const Vector3d& hit,
+                       const Vector3d& normal_at_hit,
+                       const StandardBasis& local_basis) const override {
+        Vector3d v = hit - local_basis.o;
+        double tx_i = v.dot(local_basis.vi);
+        double tx_j = v.dot(local_basis.vj);
+
+        return texture_->pick_pixel(tx_i, tx_j);
+    }
+
+private:
+    MyTexture* texture_;
+};
+
+
+class SphereTextureMapper : public TextureMapper {
+public:
+    SphereTextureMapper(MyTexture* texture) :
+        texture_(texture) {
+    }
+
+    ~SphereTextureMapper() override = default;
+
+    MyPixel pick_pixel(const Vector3d& hit,
+                       const Vector3d& normal_at_hit,
+                       const StandardBasis& local_basis) const override {
+        // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
+        double dot_vj = normal_at_hit.dot(local_basis.vj);
+        double phi = std::acos(-dot_vj);
+        double fracy = phi / M_PI;
+
+        double dot_vi = normal_at_hit.dot(local_basis.vi);
+        double theta = std::acos(dot_vi / std::sin(phi)) / (2 * M_PI);
+
+        double dot_vk = normal_at_hit.dot(local_basis.vk);
+        double fracx = (dot_vk > 0) ? theta : (1 - theta);
+
+        return texture_->pick_pixel(fracx, fracy);
+    }
+
+private:
+    MyTexture* texture_;
+};
+
+
+class CylinderTextureMapper : public TextureMapper {
+public:
+    CylinderTextureMapper(MyTexture* texture, double radius) :
+        texture_(texture),
+        radius_(radius) {
+    }
+
+    ~CylinderTextureMapper() override = default;
+
+    MyPixel pick_pixel(const Vector3d& hit,
+                       const Vector3d& normal_at_hit,
+                       const StandardBasis& local_basis) const override {
+        Vector3d t = hit - local_basis.o;
+
+        double alpha = t.dot(local_basis.vk);
+        double dot = normal_at_hit.dot(local_basis.vi);
+        double frac_x = acos(dot) / M_PI;
+        double frac_y = alpha / (2 * M_PI * radius_);
+
+        return texture_->pick_pixel(frac_x, frac_y);
+    }
+
+private:
+    MyTexture* texture_;
+    double radius_;
+};
+
+
+ActorBase::ActorBase(const StandardBasis& local_basis,
+                     std::shared_ptr<TextureMapper> texture_mapper_ptr) :
+    local_basis_(local_basis),
+    texture_mapper_(texture_mapper_ptr) {
 
 }
 
 
-class TexturedPlane : public ActorBase {
+class SimplePlane : public ActorBase {
 public:
-    TexturedPlane(const StandardBasis& local_basis, MyTexture* texture) :
-        ActorBase(local_basis), texture_(texture) {
+    SimplePlane(const StandardBasis& local_basis,
+                std::shared_ptr<TextureMapper> texture_mapper_ptr) :
+        ActorBase(local_basis, texture_mapper_ptr) {
     }
 
-    ~TexturedPlane() override = default;
+    ~SimplePlane() override = default;
 
     bool has_shadow() const override {
         return false;
@@ -105,32 +210,25 @@ public:
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit) const override {
-        Vector3d v = hit - local_basis_.o;
-        double tx_i = v.dot(local_basis_.vi);
-        double tx_j = v.dot(local_basis_.vj);
-
-        return texture_->pick_pixel(tx_i, tx_j);
+        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
         return local_basis_.vk;
     }
-
-private:
-    MyTexture* texture_;
 };
 
 
-class TexturedSphere : public ActorBase {
+class SimpleSphere : public ActorBase {
 public:
-    TexturedSphere(const StandardBasis& local_basis, double radius,
-                   MyTexture* texture) :
-        ActorBase(local_basis),
-        radius_(radius),
-        texture_(texture) {
+    SimpleSphere(const StandardBasis& local_basis,
+                 double radius,
+                 std::shared_ptr<TextureMapper> texture_mapper_ptr) :
+        ActorBase(local_basis, texture_mapper_ptr),
+        radius_(radius) {
     }
 
-    ~TexturedSphere() override = default;
+    ~SimpleSphere() override = default;
 
     bool has_shadow() const override {
         return true;
@@ -153,17 +251,7 @@ public:
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit) const override {
-        // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
-        double dot_vi = normal_at_hit.dot(local_basis_.vi);
-        double dot_vj = normal_at_hit.dot(local_basis_.vj);
-        double dot_vk = normal_at_hit.dot(local_basis_.vk);
-
-        double phi = std::acos(-dot_vj);
-        double fracy = phi / M_PI;
-        double theta = std::acos(dot_vi / std::sin(phi)) / (2 * M_PI);
-        double fracx = (dot_vk > 0) ? theta : (1 - theta);
-
-        return texture_->pick_pixel(fracx, fracy);
+        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
@@ -173,21 +261,20 @@ public:
 
 private:
     double radius_;
-    MyTexture* texture_;
 };
 
 
-class TexturedCylinder : public ActorBase {
+class SimpleCylinder : public ActorBase {
 public:
-    TexturedCylinder(const StandardBasis& local_basis, double radius,
-                     double length, MyTexture* texture) :
-        ActorBase(local_basis),
+    SimpleCylinder(const StandardBasis& local_basis,
+                   double radius, double length,
+                   std::shared_ptr<TextureMapper> texture_mapper_ptr) :
+        ActorBase(local_basis, texture_mapper_ptr),
         radius_(radius),
-        length_(length),
-        texture_(texture) {
+        length_(length) {
     }
 
-    ~TexturedCylinder() override = default;
+    ~SimpleCylinder() override = default;
 
     bool has_shadow() const override {
         return true;
@@ -252,14 +339,7 @@ public:
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit) const override {
-        Vector3d t = hit - local_basis_.o;
-
-        double alpha = t.dot(local_basis_.vk);
-        double dot = normal_at_hit.dot(local_basis_.vi);
-        double frac_x = acos(dot) / M_PI;
-        double frac_y = alpha / (2 * M_PI * radius_);
-
-        return texture_->pick_pixel(frac_x, frac_y);
+        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
@@ -275,7 +355,6 @@ public:
 private:
     double radius_;
     double length_;
-    MyTexture* texture_;
 };
 
 
@@ -329,10 +408,11 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
         plane_normal_vec
     );
 
-    auto plane_ptr = std::shared_ptr<ActorBase>(new TexturedPlane(
-        plane_basis,
-        plane_texture_ptr
-    ));
+    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
+                    new PlaneTextureMapper(plane_texture_ptr));
+
+    auto plane_ptr = std::shared_ptr<ActorBase>(
+                new SimplePlane(plane_basis, texture_mapper_ptr));
 
     return plane_ptr;
 }
@@ -383,10 +463,13 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
         sphere_axis_vec
     );
 
-    auto sphere_ptr = std::shared_ptr<ActorBase>(new TexturedSphere(
+    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
+                    new SphereTextureMapper(sphere_texture_ptr));
+
+    auto sphere_ptr = std::shared_ptr<ActorBase>(new SimpleSphere(
         sphere_basis,
         sphere_radius,
-        sphere_texture_ptr
+        texture_mapper_ptr
     ));
 
     return sphere_ptr;
@@ -438,11 +521,14 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
         cylinder_direction_vec
     );
 
-    auto cylinder_ptr = std::shared_ptr<ActorBase>(new TexturedCylinder(
+    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
+                new CylinderTextureMapper(cylinder_texture_ptr, cylinder_radius));
+
+    auto cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
         cylinder_basis,
         cylinder_radius,
         cylinder_span,
-        cylinder_texture_ptr
+        texture_mapper_ptr
     ));
 
     return cylinder_ptr;
@@ -450,4 +536,3 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
 
 
 }  // namespace mrtp
-
