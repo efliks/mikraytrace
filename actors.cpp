@@ -49,23 +49,6 @@ static Vector3d fill_vector(const Vector3d& vec) {
 }
 
 
-StandardBasis::StandardBasis(const Vector3d& o,
-                             const Vector3d& i,
-                             const Vector3d& j,
-                             const Vector3d& k) :
-    o(o), vi(i), vj(j), vk(k) {
-
-}
-
-
-StandardBasis::StandardBasis() {
-    o << 0, 0, 0;
-    vi << 1, 0, 0;
-    vj << 0, 1, 0;
-    vk << 0, 0, 1;
-}
-
-
 class DummyTextureMapper : public TextureMapper {
 public:
     DummyTextureMapper(TexturePixel color, double reflection_coef) :
@@ -450,12 +433,12 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
     plane_vec_j *= (1 / plane_vec_j.norm());
     plane_normal_vec *= (1 / plane_normal_vec.norm());
 
-    StandardBasis plane_basis(
+    StandardBasis plane_basis{
         plane_center_vec,
         plane_vec_i,
         plane_vec_j,
         plane_normal_vec
-    );
+    };
 
     auto texture_mapper_ptr = create_texture_mapper(
                 plane_items, ActorType::Plane, texture_factory_);
@@ -492,12 +475,12 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
     sphere_vec_j *= (1 / sphere_vec_j.norm());
     sphere_axis_vec *= (1 / sphere_axis_vec.norm());
 
-    StandardBasis sphere_basis(
+    StandardBasis sphere_basis{
         sphere_center_vec,
         sphere_vec_i,
         sphere_vec_j,
         sphere_axis_vec
-    );
+    };
 
     auto texture_mapper_ptr = create_texture_mapper(
                 sphere_items, ActorType::Sphere, texture_factory_);
@@ -537,12 +520,12 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
     cylinder_vec_j *= (1 / cylinder_vec_j.norm());
     cylinder_direction_vec *= (1 / cylinder_direction_vec.norm());
 
-    StandardBasis cylinder_basis(
+    StandardBasis cylinder_basis{
         cylinder_center_vec,
         cylinder_vec_i,
         cylinder_vec_j,
         cylinder_direction_vec
-    );
+    };
 
     auto texture_mapper_ptr = create_texture_mapper(
                 cylinder_items, ActorType::Cylinder, texture_factory_);

@@ -18,21 +18,17 @@ using Vector3d = Eigen::Vector3d;
 class ScenePNGWriter;
 
 
-class RendererConfig {
-public:
-    RendererConfig();
-    ~RendererConfig() = default;
+struct RendererConfig {
+    double field_of_vision = 93;
+    double max_distance = 60;
+    double shadow_bias = 0.25;
+    double ray_bias = 0.001;
 
-    double field_of_vision;
-    double max_distance;
-    double shadow_bias;
-    double ray_bias;
+    unsigned int buffer_width = 640;
+    unsigned int buffer_height = 480;
 
-    unsigned int buffer_width;
-    unsigned int buffer_height;
-
-    unsigned int max_ray_depth;
-    unsigned int num_threads;
+    unsigned int max_ray_depth = 3;
+    unsigned int num_threads = 1;
 };
 
 

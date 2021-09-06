@@ -223,18 +223,4 @@ void ScenePNGWriter::write_to_file(const std::string& png_filename) {
 }
 
 
-RendererConfig::RendererConfig() {
-    field_of_vision = 93;
-    max_distance = 60;
-    shadow_bias = 0.25;
-    ray_bias = 0.001;
-
-    buffer_width = 640;
-    buffer_height = 480;
-
-    max_ray_depth = 3;
-    num_threads = 1;
-}
-
-
 }  //namespace mrtp
