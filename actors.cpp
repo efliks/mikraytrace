@@ -10,12 +10,6 @@ using Vector3d = Eigen::Vector3d;
 const double kMyZero = 0.0001;
 
 
-static bool file_exists(const std::string& filename) {
-    std::fstream check(filename.c_str());
-    return check.good();
-}
-
-
 static double solve_quadratic(double a, double b, double c) {
     double delta = b * b - 4 * a * c;
     if (delta < 0) {
@@ -364,6 +358,76 @@ TomlActorFactory::TomlActorFactory(TextureFactory* texture_factory) :
 }
 
 
+enum class ActorType {
+    Plane,
+    Sphere,
+    Cylinder
+};
+
+static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::table> actor_items,
+                                                            ActorType actor_type,
+                                                            TextureFactory* texture_factory) {
+    double reflect_coef = actor_items->get_as<double>("reflect").value_or(0);
+    auto actor_texture = actor_items->get_as<std::string>("texture");
+
+    if (actor_texture) {
+        auto actor_color = actor_items->get_array_of<double>("color");
+        if (actor_color) {
+            //Both color and texture are set
+        }
+
+        std::string texture_str(actor_texture->data());
+        std::fstream check(texture_str.c_str());
+        if (!check.good()) {
+            //Texture file cannot be opened
+        }
+
+        double scale_coef = actor_items->get_as<double>("scale").value_or(0.15);
+        if (actor_type == ActorType::Sphere) {
+            scale_coef = actor_items->get_as<double>("scale").value_or(1);
+        }
+
+        MyTexture* texture_ptr = texture_factory->create_texture(
+                                    texture_str, reflect_coef, scale_coef);
+
+        if (actor_type == ActorType::Plane) {
+            auto plane_mapper_ptr = std::shared_ptr<TextureMapper>(
+                        new PlaneTextureMapper(texture_ptr));
+            return plane_mapper_ptr;
+        }
+        else if (actor_type == ActorType::Sphere) {
+            auto sphere_mapper_ptr = std::shared_ptr<TextureMapper>(
+                        new SphereTextureMapper(texture_ptr));
+            return sphere_mapper_ptr;
+        }
+        else {
+            double cylinder_radius = actor_items->get_as<double>("radius").value_or(1);
+            auto cylinder_mapper_ptr = std::shared_ptr<TextureMapper>(
+                        new CylinderTextureMapper(texture_ptr, cylinder_radius));
+            return cylinder_mapper_ptr;
+        }
+    }
+
+    auto actor_color = actor_items->get_array_of<double>("color");
+    if (actor_color) {
+        Vector3d actor_color_vec(actor_color->data());
+        actor_color_vec *= 255;
+
+        TexturePixel pixel_color{
+            static_cast<unsigned char>(actor_color_vec[0]),
+            static_cast<unsigned char>(actor_color_vec[1]),
+            static_cast<unsigned char>(actor_color_vec[2])
+        };
+
+        auto dummy_mapper_ptr = std::shared_ptr<TextureMapper>(
+                    new DummyTextureMapper(pixel_color, reflect_coef));
+        return dummy_mapper_ptr;
+    }
+
+    //Neither texture nor color are set
+}
+
+
 std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptoml::table> plane_items) {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
@@ -376,21 +440,6 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
         //TODO
     }
     Vector3d plane_normal_vec(plane_normal->data());
-
-    auto plane_texture = plane_items->get_as<std::string>("texture");
-    if (!plane_texture) {
-        //TODO
-    }
-    std::string plane_texture_str(plane_texture->data());
-    if (!file_exists(plane_texture_str)) {
-        //TODO
-    }
-
-    double scale_coef = plane_items->get_as<double>("scale").value_or(0.15);
-    double reflect_coef = plane_items->get_as<double>("reflect").value_or(0);
-
-    MyTexture* plane_texture_ptr = texture_factory_->create_texture(
-                plane_texture_str, reflect_coef, scale_coef);
 
     Vector3d fill_vec = fill_vector(plane_normal_vec);
 
@@ -408,8 +457,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
         plane_normal_vec
     );
 
-    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
-                    new PlaneTextureMapper(plane_texture_ptr));
+    auto texture_mapper_ptr = create_texture_mapper(
+                plane_items, ActorType::Plane, texture_factory_);
 
     auto plane_ptr = std::shared_ptr<ActorBase>(
                 new SimplePlane(plane_basis, texture_mapper_ptr));
@@ -432,20 +481,7 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
         sphere_axis_vec = tmp_vec;
     }
 
-    auto sphere_texture = sphere_items->get_as<std::string>("texture");
-    if (!sphere_texture) {
-        //TODO
-    }
-    std::string sphere_texture_str(sphere_texture->data());
-    if (!file_exists(sphere_texture_str)) {
-        //TODO
-    }
-
     double sphere_radius = sphere_items->get_as<double>("radius").value_or(1);
-    double reflect_coef = sphere_items->get_as<double>("reflect").value_or(0);
-
-    MyTexture* sphere_texture_ptr = texture_factory_->create_texture(
-                sphere_texture_str, reflect_coef, 1);
 
     Vector3d fill_vec = fill_vector(sphere_axis_vec);
 
@@ -463,8 +499,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
         sphere_axis_vec
     );
 
-    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
-                    new SphereTextureMapper(sphere_texture_ptr));
+    auto texture_mapper_ptr = create_texture_mapper(
+                sphere_items, ActorType::Sphere, texture_factory_);
 
     auto sphere_ptr = std::shared_ptr<ActorBase>(new SimpleSphere(
         sphere_basis,
@@ -489,21 +525,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
     }
     Vector3d cylinder_direction_vec(cylinder_direction->data());
 
-    auto cylinder_texture = cylinder_items->get_as<std::string>("texture");
-    if (!cylinder_texture) {
-        //TODO
-    }
-    std::string cylinder_texture_str(cylinder_texture->data());
-    if (!file_exists(cylinder_texture_str)) {
-        //TODO
-    }
-
     double cylinder_span = cylinder_items->get_as<double>("span").value_or(-1);
     double cylinder_radius = cylinder_items->get_as<double>("radius").value_or(1);
-    double cylinder_reflect = cylinder_items->get_as<double>("reflect").value_or(0);
-
-    MyTexture* cylinder_texture_ptr = texture_factory_->create_texture(
-                cylinder_texture_str, cylinder_reflect, 1);
 
     Vector3d fill_vec = fill_vector(cylinder_direction_vec);
 
@@ -521,8 +544,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
         cylinder_direction_vec
     );
 
-    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
-                new CylinderTextureMapper(cylinder_texture_ptr, cylinder_radius));
+    auto texture_mapper_ptr = create_texture_mapper(
+                cylinder_items, ActorType::Cylinder, texture_factory_);
 
     auto cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
         cylinder_basis,
