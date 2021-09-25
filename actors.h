@@ -38,9 +38,9 @@ public:
 
     virtual double solve_light_ray(const Vector3d&, const Vector3d&, double,
                                    double) const = 0;
-    virtual MyPixel pick_pixel(const Vector3d&, const Vector3d&) const = 0;
     virtual Vector3d calculate_normal_at_hit(const Vector3d&) const = 0;
     virtual bool has_shadow() const = 0;
+    MyPixel pick_pixel(const Vector3d&, const Vector3d&) const;
 
 protected:
     StandardBasis local_basis_;

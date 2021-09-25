@@ -159,6 +159,11 @@ ActorBase::ActorBase(const StandardBasis& local_basis,
 }
 
 
+MyPixel ActorBase::pick_pixel(const Vector3d& X, const Vector3d& N) const {
+    return texture_mapper_->pick_pixel(X, N, local_basis_);
+}
+
+
 class SimplePlane : public ActorBase {
 public:
     SimplePlane(const StandardBasis& local_basis,
@@ -183,11 +188,6 @@ public:
             }
         }
         return -1;
-    }
-
-    MyPixel pick_pixel(const Vector3d& hit,
-                       const Vector3d& normal_at_hit) const override {
-        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
@@ -230,11 +230,6 @@ public:
         return -1;
     }
 
-    MyPixel pick_pixel(const Vector3d& hit,
-                       const Vector3d& normal_at_hit) const override {
-        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
-    }
-
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
         return local_basis_.vk;
     }
@@ -271,17 +266,12 @@ public:
         double a = D.dot(D);
         double b = 2 * D.dot(t);
         double c = t.dot(t) - radius_ * radius_;
-        double dist = solve_quadratic(a, b, c);
+        double d = solve_quadratic(a, b, c);
 
-        if (dist > min_dist && dist < max_dist) {
-            return dist;
+        if (d > min_dist && d < max_dist) {
+            return d;
         }
         return -1;
-    }
-
-    MyPixel pick_pixel(const Vector3d& hit,
-                       const Vector3d& normal_at_hit) const override {
-        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
@@ -365,11 +355,6 @@ public:
             }
         }
         return t;
-    }
-
-    MyPixel pick_pixel(const Vector3d& hit,
-                       const Vector3d& normal_at_hit) const override {
-        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
     }
 
     Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
