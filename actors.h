@@ -4,7 +4,6 @@
 #include <memory>
 #include <Eigen/Core>
 #include "cpptoml.h"
-#include "pixel.h"
 #include "texture.h"
 
 

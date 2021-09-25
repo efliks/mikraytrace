@@ -6,6 +6,38 @@
 
 namespace mrtp {
 
+using Vector3d = Eigen::Vector3d;
+
+
+TexturePixel::TexturePixel() :
+    red(0), green(0), blue(0) {
+}
+
+
+TexturePixel::TexturePixel(unsigned char r,
+                           unsigned char g,
+                           unsigned char b) :
+    red(r), green(g), blue(b) {
+}
+
+
+TexturePixel::TexturePixel(const Vector3d& color_vec) {
+    Vector3d v = 255 * color_vec;
+    red = static_cast<unsigned char>(v[0]);
+    green = static_cast<unsigned char>(v[1]);
+    blue = static_cast<unsigned char>(v[2]);
+}
+
+
+Vector3d TexturePixel::to_vec() const {
+    return Vector3d{
+        static_cast<double>(red),
+        static_cast<double>(green),
+        static_cast<double>(blue)
+    } / 255;
+}
+
+
 TextureSharedState::TextureSharedState(const std::string& texture_filename) {
     png::image<png::rgb_pixel> image(texture_filename.c_str());
 

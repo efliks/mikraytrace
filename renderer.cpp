@@ -99,12 +99,7 @@ Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
 
             // TODO Clean up!
             MyPixel my_pick = hit_actor->pick_pixel(inter, normal);
-            Pixel pick(
-                static_cast<double>(my_pick.pixel.red),
-                static_cast<double>(my_pick.pixel.green),
-                static_cast<double>(my_pick.pixel.blue)
-            );
-            pick /= 255;
+            Vector3d pick = my_pick.pixel.to_vec();
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If hit actor is reflective, trace reflected ray

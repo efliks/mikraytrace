@@ -374,37 +374,22 @@ static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cppt
                                     texture_str, reflect_coef, scale_coef);
 
         if (actor_type == ActorType::Plane) {
-            auto plane_mapper_ptr = std::shared_ptr<TextureMapper>(
-                        new PlaneTextureMapper(texture_ptr));
-            return plane_mapper_ptr;
+            return std::shared_ptr<TextureMapper>(new PlaneTextureMapper(texture_ptr));
         }
         else if (actor_type == ActorType::Sphere) {
-            auto sphere_mapper_ptr = std::shared_ptr<TextureMapper>(
-                        new SphereTextureMapper(texture_ptr));
-            return sphere_mapper_ptr;
+            return std::shared_ptr<TextureMapper>(new SphereTextureMapper(texture_ptr));
         }
         else {
             double cylinder_radius = actor_items->get_as<double>("radius").value_or(1);
-            auto cylinder_mapper_ptr = std::shared_ptr<TextureMapper>(
-                        new CylinderTextureMapper(texture_ptr, cylinder_radius));
-            return cylinder_mapper_ptr;
+            return std::shared_ptr<TextureMapper>(new CylinderTextureMapper(texture_ptr, cylinder_radius));
         }
     }
 
     auto actor_color = actor_items->get_array_of<double>("color");
     if (actor_color) {
-        Vector3d actor_color_vec(actor_color->data());
-        actor_color_vec *= 255;
-
-        TexturePixel pixel_color{
-            static_cast<unsigned char>(actor_color_vec[0]),
-            static_cast<unsigned char>(actor_color_vec[1]),
-            static_cast<unsigned char>(actor_color_vec[2])
-        };
-
-        auto dummy_mapper_ptr = std::shared_ptr<TextureMapper>(
-                    new DummyTextureMapper(pixel_color, reflect_coef));
-        return dummy_mapper_ptr;
+        Vector3d color_vec(actor_color->data());
+        TexturePixel color(color_vec);
+        return std::shared_ptr<TextureMapper>(new DummyTextureMapper(color, reflect_coef));
     }
 
     //Neither texture nor color are set

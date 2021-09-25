@@ -1,6 +1,7 @@
 #ifndef _TEXTURE_H
 #define _TEXTURE_H
 
+#include <Eigen/Core>
 #include <list>
 #include <vector>
 #include <string>
@@ -8,7 +9,14 @@
 
 namespace mrtp {
 
-struct TexturePixel {
+class TexturePixel {
+public:
+    TexturePixel();
+    TexturePixel(const Eigen::Vector3d&);
+    TexturePixel(unsigned char, unsigned char, unsigned char);
+    ~TexturePixel() = default;
+    Eigen::Vector3d to_vec() const;
+
     unsigned char red;
     unsigned char green;
     unsigned char blue;
