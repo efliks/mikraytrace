@@ -57,6 +57,7 @@ public:
     std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table>);
     std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table>);
     std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table>);
+    std::shared_ptr<ActorBase> create_triangle(std::shared_ptr<cpptoml::table>);
 
 private:
     TextureFactory* texture_factory_;

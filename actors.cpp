@@ -196,6 +196,59 @@ public:
 };
 
 
+class SimpleTriangle : public ActorBase {
+public:
+    SimpleTriangle(const StandardBasis& local_basis,
+                   const Vector3d& A, const Vector3d& B, const Vector3d& C,
+                   std::shared_ptr<TextureMapper> texture_mapper_ptr) :
+        ActorBase(local_basis, texture_mapper_ptr),
+        A_(A), B_(B), C_(C) {
+
+        TA_ = local_basis_.vk.cross(A - C);
+        TB_ = local_basis_.vk.cross(B - A);
+        TC_ = local_basis_.vk.cross(C - B);
+    }
+
+    ~SimpleTriangle() override = default;
+
+    bool has_shadow() const override {
+        return true;
+    }
+
+    double solve_light_ray(const Vector3d& O, const Vector3d& D,
+                           double min_dist, double max_dist) const override {
+        SimplePlane plane(local_basis_, texture_mapper_);
+        double t = plane.solve_light_ray(O, D, min_dist, max_dist);
+        if (t > 0) {
+            Vector3d X = O + t * D;
+            if ((X - A_).dot(TA_) > 0 &&
+                (X - B_).dot(TB_) > 0 &&
+                (X - C_).dot(TC_) > 0) {
+                return t;
+            }
+        }
+        return -1;
+    }
+
+    MyPixel pick_pixel(const Vector3d& hit,
+                       const Vector3d& normal_at_hit) const override {
+        return texture_mapper_->pick_pixel(hit, normal_at_hit, local_basis_);
+    }
+
+    Vector3d calculate_normal_at_hit(const Vector3d& hit) const override {
+        return local_basis_.vk;
+    }
+
+private:
+    Vector3d A_;
+    Vector3d B_;
+    Vector3d C_;
+    Vector3d TA_;
+    Vector3d TB_;
+    Vector3d TC_;
+};
+
+
 class SimpleSphere : public ActorBase {
 public:
     SimpleSphere(const StandardBasis& local_basis,
@@ -344,7 +397,8 @@ TomlActorFactory::TomlActorFactory(TextureFactory* texture_factory) :
 enum class ActorType {
     Plane,
     Sphere,
-    Cylinder
+    Cylinder,
+    Triangle
 };
 
 static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::table> actor_items,
@@ -393,6 +447,52 @@ static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cppt
     }
 
     //Neither texture nor color are set
+}
+
+
+std::shared_ptr<ActorBase> TomlActorFactory::create_triangle(std::shared_ptr<cpptoml::table> items) {
+    auto vertex_a = items->get_array_of<double>("A");
+    if (!vertex_a) {
+        //TODO
+    }
+    Vector3d A(vertex_a->data());
+
+    auto vertex_b = items->get_array_of<double>("B");
+    if (!vertex_b) {
+        //TODO
+    }
+    Vector3d B(vertex_b->data());
+
+    auto vertex_c = items->get_array_of<double>("C");
+    if (!vertex_c) {
+        //TODO
+    }
+    Vector3d C(vertex_c->data());
+
+    auto tmp_color = items->get_array_of<double>("color");
+    if (!tmp_color) {
+        //TODO
+    }
+    Vector3d vec_color(tmp_color->data());
+    TexturePixel triangle_color(vec_color);
+
+    Vector3d vec_o = (A + B + C) / 3;
+    Vector3d vec_i = B - A;
+    Vector3d vec_k = vec_i.cross(C - B);
+    Vector3d vec_j = vec_k.cross(vec_i);
+
+    vec_i *= (1 / vec_i.norm());
+    vec_j *= (1 / vec_j.norm());
+    vec_k *= (1 / vec_k.norm());
+
+    StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
+    double reflect_coef = items->get_as<double>("reflect").value_or(0);
+
+    auto texture_mapper_ptr = std::shared_ptr<TextureMapper>(
+                new DummyTextureMapper(triangle_color, reflect_coef));
+
+    return std::shared_ptr<ActorBase>(
+                new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));
 }
 
 

@@ -96,6 +96,7 @@ public:
         auto planes_array = world_config->get_table_array("planes");
         auto spheres_array = world_config->get_table_array("spheres");
         auto cylinders_array = world_config->get_table_array("cylinders");
+        auto triangles_array = world_config->get_table_array("triangles");
 
         TomlActorFactory actor_factory(texture_factory_);
 
@@ -112,6 +113,11 @@ public:
         if (cylinders_array) {
             for (const auto& cylinder_items : *cylinders_array) {
                 world_ptr->add_actor(actor_factory.create_cylinder(cylinder_items));
+            }
+        }
+        if (triangles_array) {
+            for (const auto& triangle_items : *triangles_array) {
+                world_ptr->add_actor(actor_factory.create_triangle(triangle_items));
             }
         }
 
