@@ -98,26 +98,24 @@ public:
         auto cylinders_array = world_config->get_table_array("cylinders");
         auto triangles_array = world_config->get_table_array("triangles");
 
-        TomlActorFactory actor_factory(texture_factory_);
-
         if (planes_array) {
             for (const auto& plane_items : *planes_array) {
-                world_ptr->add_actor(actor_factory.create_plane(plane_items));
+                world_ptr->add_actor(create_actor(ActorType::Plane, texture_factory_, plane_items));
             }
         }
         if (spheres_array) {
             for (const auto& sphere_items : *spheres_array) {
-                world_ptr->add_actor(actor_factory.create_sphere(sphere_items));
+                world_ptr->add_actor(create_actor(ActorType::Sphere, texture_factory_, sphere_items));
             }
         }
         if (cylinders_array) {
             for (const auto& cylinder_items : *cylinders_array) {
-                world_ptr->add_actor(actor_factory.create_cylinder(cylinder_items));
+                world_ptr->add_actor(create_actor(ActorType::Cylinder, texture_factory_, cylinder_items));
             }
         }
         if (triangles_array) {
             for (const auto& triangle_items : *triangles_array) {
-                world_ptr->add_actor(actor_factory.create_triangle(triangle_items));
+                world_ptr->add_actor(create_actor(ActorType::Triangle, texture_factory_, triangle_items));
             }
         }
 

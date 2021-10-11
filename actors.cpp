@@ -373,19 +373,6 @@ private:
 };
 
 
-TomlActorFactory::TomlActorFactory(TextureFactory* texture_factory) :
-    texture_factory_(texture_factory) {
-
-}
-
-
-enum class ActorType {
-    Plane,
-    Sphere,
-    Cylinder,
-    Triangle
-};
-
 static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::table> actor_items,
                                                             ActorType actor_type,
                                                             TextureFactory* texture_factory) {
@@ -435,7 +422,8 @@ static std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cppt
 }
 
 
-std::shared_ptr<ActorBase> TomlActorFactory::create_triangle(std::shared_ptr<cpptoml::table> items) {
+static std::shared_ptr<ActorBase> create_triangle(std::shared_ptr<cpptoml::table> items,
+                                                  TextureFactory* texture_factory) {
     auto vertex_a = items->get_array_of<double>("A");
     if (!vertex_a) {
         //TODO
@@ -481,7 +469,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_triangle(std::shared_ptr<cpp
 }
 
 
-std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptoml::table> plane_items) {
+static std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table> plane_items,
+                                               TextureFactory* texture_factory) {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
         //TODO
@@ -511,7 +500,7 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
     };
 
     auto texture_mapper_ptr = create_texture_mapper(
-                plane_items, ActorType::Plane, texture_factory_);
+                plane_items, ActorType::Plane, texture_factory);
 
     auto plane_ptr = std::shared_ptr<ActorBase>(
                 new SimplePlane(plane_basis, texture_mapper_ptr));
@@ -520,7 +509,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_plane(std::shared_ptr<cpptom
 }
 
 
-std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cpptoml::table> sphere_items) {
+static std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table> sphere_items,
+                                                TextureFactory* texture_factory) {
     auto sphere_center = sphere_items->get_array_of<double>("center");
     if (!sphere_center) {
         //TODO
@@ -553,7 +543,7 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
     };
 
     auto texture_mapper_ptr = create_texture_mapper(
-                sphere_items, ActorType::Sphere, texture_factory_);
+                sphere_items, ActorType::Sphere, texture_factory);
 
     auto sphere_ptr = std::shared_ptr<ActorBase>(new SimpleSphere(
         sphere_basis,
@@ -565,7 +555,8 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_sphere(std::shared_ptr<cppto
 }
 
 
-std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpptoml::table> cylinder_items) {
+static std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table> cylinder_items,
+                                                  TextureFactory* texture_factory) {
     auto cylinder_center = cylinder_items->get_array_of<double>("center");
     if (!cylinder_center) {
         //TODO
@@ -598,7 +589,7 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
     };
 
     auto texture_mapper_ptr = create_texture_mapper(
-                cylinder_items, ActorType::Cylinder, texture_factory_);
+                cylinder_items, ActorType::Cylinder, texture_factory);
 
     auto cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
         cylinder_basis,
@@ -608,6 +599,20 @@ std::shared_ptr<ActorBase> TomlActorFactory::create_cylinder(std::shared_ptr<cpp
     ));
 
     return cylinder_ptr;
+}
+
+
+std::shared_ptr<ActorBase> create_actor(ActorType actor_type,
+                                        TextureFactory* texture_factory,
+                                        std::shared_ptr<cpptoml::table> actor_items) {
+    if (actor_type == ActorType::Plane)
+        return create_plane(actor_items, texture_factory);
+    if (actor_type == ActorType::Sphere)
+        return create_sphere(actor_items, texture_factory);
+    if (actor_type == ActorType::Cylinder)
+        return create_cylinder(actor_items, texture_factory);
+
+    return create_triangle(actor_items, texture_factory);
 }
 
 

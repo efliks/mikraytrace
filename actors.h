@@ -48,21 +48,17 @@ protected:
 };
 
 
-class TomlActorFactory {
-public:
-    TomlActorFactory(TextureFactory*);
-    TomlActorFactory() = delete;
-    ~TomlActorFactory() = default;
-
-    std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table>);
-    std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table>);
-    std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table>);
-    std::shared_ptr<ActorBase> create_triangle(std::shared_ptr<cpptoml::table>);
-
-private:
-    TextureFactory* texture_factory_;
+enum class ActorType {
+    Plane,
+    Sphere,
+    Cylinder,
+    Triangle
 };
 
+
+std::shared_ptr<ActorBase> create_actor(ActorType,
+                                        TextureFactory*,
+                                        std::shared_ptr<cpptoml::table>);
 
 }
 
