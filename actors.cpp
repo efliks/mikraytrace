@@ -602,17 +602,19 @@ static std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table
 }
 
 
-std::shared_ptr<ActorBase> create_actor(ActorType actor_type,
-                                        TextureFactory* texture_factory,
-                                        std::shared_ptr<cpptoml::table> actor_items) {
+void create_actors(ActorType actor_type,
+                   TextureFactory* texture_factory,
+                   std::shared_ptr<cpptoml::table> actor_items,
+                   std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
+{
     if (actor_type == ActorType::Plane)
-        return create_plane(actor_items, texture_factory);
-    if (actor_type == ActorType::Sphere)
-        return create_sphere(actor_items, texture_factory);
-    if (actor_type == ActorType::Cylinder)
-        return create_cylinder(actor_items, texture_factory);
-
-    return create_triangle(actor_items, texture_factory);
+        actor_ptrs->push_back(create_plane(actor_items, texture_factory));
+    else if (actor_type == ActorType::Sphere)
+        actor_ptrs->push_back(create_sphere(actor_items, texture_factory));
+    else if (actor_type == ActorType::Cylinder)
+        actor_ptrs->push_back(create_cylinder(actor_items, texture_factory));
+    else if (actor_type == ActorType::Triangle)
+        actor_ptrs->push_back(create_triangle(actor_items, texture_factory));
 }
 
 

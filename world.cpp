@@ -78,6 +78,16 @@ public:
     WorldBuilder() = delete;
     ~WorldBuilder() = default;
 
+    void process_actor_array(ActorType actor_type,
+                             std::shared_ptr<cpptoml::table_array> actor_array,
+                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const {
+        if (actor_array) {
+            for (const auto& actor_items : *actor_array) {
+                create_actors(actor_type, texture_factory_, actor_items, actor_ptrs);
+            }
+        }
+    }
+
     std::shared_ptr<SceneWorld> build() const {
         std::fstream check(world_filename_.c_str());
         if (!check.good()) {
@@ -91,32 +101,23 @@ public:
             //TODO
         }
 
-        auto world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
+        std::vector<std::shared_ptr<ActorBase>> new_actors;
 
         auto planes_array = world_config->get_table_array("planes");
-        auto spheres_array = world_config->get_table_array("spheres");
-        auto cylinders_array = world_config->get_table_array("cylinders");
-        auto triangles_array = world_config->get_table_array("triangles");
+        process_actor_array(ActorType::Plane, planes_array, &new_actors);
 
-        if (planes_array) {
-            for (const auto& plane_items : *planes_array) {
-                world_ptr->add_actor(create_actor(ActorType::Plane, texture_factory_, plane_items));
-            }
-        }
-        if (spheres_array) {
-            for (const auto& sphere_items : *spheres_array) {
-                world_ptr->add_actor(create_actor(ActorType::Sphere, texture_factory_, sphere_items));
-            }
-        }
-        if (cylinders_array) {
-            for (const auto& cylinder_items : *cylinders_array) {
-                world_ptr->add_actor(create_actor(ActorType::Cylinder, texture_factory_, cylinder_items));
-            }
-        }
-        if (triangles_array) {
-            for (const auto& triangle_items : *triangles_array) {
-                world_ptr->add_actor(create_actor(ActorType::Triangle, texture_factory_, triangle_items));
-            }
+        auto spheres_array = world_config->get_table_array("spheres");
+        process_actor_array(ActorType::Sphere, spheres_array, &new_actors);
+
+        auto cylinders_array = world_config->get_table_array("cylinders");
+        process_actor_array(ActorType::Cylinder, cylinders_array, &new_actors);
+
+        auto triangles_array = world_config->get_table_array("triangles");
+        process_actor_array(ActorType::Triangle, triangles_array, &new_actors);
+
+        auto world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
+        for (const auto& actor : new_actors) {
+            world_ptr->add_actor(actor);
         }
 
         auto tab_camera = world_config->get_table("camera");

@@ -56,9 +56,9 @@ enum class ActorType {
 };
 
 
-std::shared_ptr<ActorBase> create_actor(ActorType,
-                                        TextureFactory*,
-                                        std::shared_ptr<cpptoml::table>);
+void create_actors(ActorType, TextureFactory*, std::shared_ptr<cpptoml::table>,
+                   std::vector<std::shared_ptr<ActorBase>>*);
+
 
 }
 
