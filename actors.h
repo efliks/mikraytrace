@@ -52,7 +52,8 @@ enum class ActorType {
     Plane,
     Sphere,
     Cylinder,
-    Triangle
+    Triangle,
+    Cube
 };
 
 
