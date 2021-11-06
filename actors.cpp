@@ -500,6 +500,22 @@ static void create_cube(TextureFactory* texture_factory,
     cube_vec_j *= (1 / cube_vec_j.norm());
     cube_vec_k *= (1 / cube_vec_k.norm());
 
+    double angle_x = cube_items->get_as<double>("angle_x").value_or(0);
+    Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());
+
+    double angle_y = cube_items->get_as<double>("angle_y").value_or(0);
+    Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * M_PI / 180, Vector3d::UnitY());
+
+    double angle_z = cube_items->get_as<double>("angle_z").value_or(0);
+    Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * M_PI / 180, Vector3d::UnitZ());
+
+    Eigen::Matrix3d m_rot;
+    m_rot = m_x * m_y * m_z;
+
+    cube_vec_i = m_rot * cube_vec_i;
+    cube_vec_j = m_rot * cube_vec_j;
+    cube_vec_k = m_rot * cube_vec_k;
+
     Vector3d face_a_o = cube_vec_k * cube_scale + cube_vec_o;
     Vector3d face_b_o = -cube_vec_i * cube_scale + cube_vec_o;
     Vector3d face_c_o = -cube_vec_k * cube_scale + cube_vec_o;
