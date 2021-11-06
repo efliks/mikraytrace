@@ -3,7 +3,7 @@ FLAGS=-W -Wall -pedantic -fPIC -O2
 
 all: mrtp_cli
 
-mrtp_cli: main.o actors.o texture.o light.o camera.o world.o renderer.o
+mrtp_cli: main.o actors.o mappers.o texture.o light.o camera.o world.o renderer.o
 	g++ $^ -o $@ -fopenmp -lm -lpng
 
 main.o: main.cpp
@@ -11,6 +11,9 @@ main.o: main.cpp
 
 actors.o: actors.cpp
 	g++ $(FLAGS) $(INCLUDE) -o actors.o -c actors.cpp
+
+mappers.o: mappers.cpp
+	g++ $(FLAGS) $(INCLUDE) -o mappers.o -c mappers.cpp
 
 texture.o: texture.cpp
 	g++ $(FLAGS) $(INCLUDE) -o texture.o -c texture.cpp

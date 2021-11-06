@@ -3,31 +3,14 @@
 
 #include <memory>
 #include <Eigen/Core>
+#include "common.h"
 #include "cpptoml.h"
-#include "texture.h"
+#include "mappers.h"
 
 
 namespace mrtp {
 
 using Vector3d = Eigen::Vector3d;
-
-
-struct StandardBasis {
-    Vector3d o{0, 0, 0};
-    Vector3d vi{1, 0, 0};
-    Vector3d vj{0, 1, 0};
-    Vector3d vk{0, 0, 1};
-};
-
-
-class TextureMapper {
-public:
-    TextureMapper() = default;
-    virtual ~TextureMapper() = default;
-
-    virtual MyPixel pick_pixel(
-            const Vector3d&, const Vector3d&, const StandardBasis&) const = 0;
-};
 
 
 class ActorBase {
@@ -45,15 +28,6 @@ public:
 protected:
     StandardBasis local_basis_;
     std::shared_ptr<TextureMapper> texture_mapper_;
-};
-
-
-enum class ActorType {
-    Plane,
-    Sphere,
-    Cylinder,
-    Triangle,
-    Cube
 };
 
 
