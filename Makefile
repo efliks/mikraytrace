@@ -1,10 +1,10 @@
-INCLUDE=-I/usr/include/eigen3 -I/usr/include/png++ -I. -I./cpptoml/include
+INCLUDE=-I/usr/include/eigen3 -I/usr/include/png++ -I/usr/include/openbabel-2.0 -I. -I./cpptoml/include
 FLAGS=-W -Wall -pedantic -fPIC -O2
 
 all: mrtp_cli
 
-mrtp_cli: main.o actors.o mappers.o texture.o light.o camera.o world.o renderer.o
-	g++ $^ -o $@ -fopenmp -lm -lpng
+mrtp_cli: main.o actors.o mappers.o babel.o texture.o light.o camera.o world.o renderer.o
+	g++ $^ -o $@ -fopenmp -lm -lpng -lopenbabel
 
 main.o: main.cpp
 	g++ $(FLAGS) $(INCLUDE) -o main.o -c main.cpp
@@ -14,6 +14,9 @@ actors.o: actors.cpp
 
 mappers.o: mappers.cpp
 	g++ $(FLAGS) $(INCLUDE) -o mappers.o -c mappers.cpp
+
+babel.o: babel.cpp
+	g++ $(FLAGS) $(INCLUDE) -o babel.o -c babel.cpp
 
 texture.o: texture.cpp
 	g++ $(FLAGS) $(INCLUDE) -o texture.o -c texture.cpp

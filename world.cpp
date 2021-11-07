@@ -118,6 +118,9 @@ public:
         auto cubes_array = world_config->get_table_array("cubes");
         process_actor_array(ActorType::Cube, cubes_array, &new_actors);
 
+        auto molecules_array = world_config->get_table_array("molecules");
+        process_actor_array(ActorType::Cube, molecules_array, &new_actors);
+
         auto world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
         for (const auto& actor : new_actors) {
             world_ptr->add_actor(actor);

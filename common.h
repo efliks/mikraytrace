@@ -20,7 +20,8 @@ enum class ActorType {
     Sphere,
     Cylinder,
     Triangle,
-    Cube
+    Cube,
+    Molecule
 };
 
 
