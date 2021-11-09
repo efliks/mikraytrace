@@ -1,6 +1,8 @@
+#include <iostream>
 #include <Eigen/Geometry>
 #include <cmath>
 #include "actors.h"
+#include "babel.h"
 
 
 namespace mrtp {
@@ -451,6 +453,23 @@ static std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table
 }
 
 
+static Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<cpptoml::table> items) {
+    double angle_x = items->get_as<double>("angle_x").value_or(0);
+    Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());
+
+    double angle_y = items->get_as<double>("angle_y").value_or(0);
+    Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * M_PI / 180, Vector3d::UnitY());
+
+    double angle_z = items->get_as<double>("angle_z").value_or(0);
+    Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * M_PI / 180, Vector3d::UnitZ());
+
+    Eigen::Matrix3d m_rot;
+    m_rot = m_x * m_y * m_z;
+
+    return m_rot;
+}
+
+
 static void create_cube_triangles(double s,
                                   const StandardBasis& face_basis,
                                   std::shared_ptr<TextureMapper> texture_mapper_ptr,
@@ -500,17 +519,7 @@ static void create_cube(TextureFactory* texture_factory,
     cube_vec_j *= (1 / cube_vec_j.norm());
     cube_vec_k *= (1 / cube_vec_k.norm());
 
-    double angle_x = cube_items->get_as<double>("angle_x").value_or(0);
-    Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());
-
-    double angle_y = cube_items->get_as<double>("angle_y").value_or(0);
-    Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * M_PI / 180, Vector3d::UnitY());
-
-    double angle_z = cube_items->get_as<double>("angle_z").value_or(0);
-    Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * M_PI / 180, Vector3d::UnitZ());
-
-    Eigen::Matrix3d m_rot;
-    m_rot = m_x * m_y * m_z;
+    Eigen::Matrix3d m_rot = create_rotation_matrix(cube_items);
 
     cube_vec_i = m_rot * cube_vec_i;
     cube_vec_j = m_rot * cube_vec_j;
@@ -539,6 +548,87 @@ static void create_cube(TextureFactory* texture_factory,
 }
 
 
+void create_molecule(TextureFactory* texture_factory,
+                     std::shared_ptr<cpptoml::table> items,
+                     std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
+    auto smiles = items->get_as<std::string>("smiles");
+    if (!smiles) {
+        // TODO
+    }
+    std::string smiles_str(smiles->data());
+
+    std::vector<unsigned int> atomic_nums;
+    std::vector<Vector3d> positions;
+    std::vector<std::pair<unsigned int, unsigned int>> bonds;
+
+    create_molecule_from_smiles(smiles_str, &atomic_nums, &positions, &bonds);
+
+    auto mol_center = items->get_array_of<double>("center");
+    if (!mol_center) {
+        // TODO
+    }
+    Vector3d mol_vec_o(mol_center->data());
+
+    double mol_scale = items->get_as<double>("scale").value_or(1.0);
+    double sphere_scale = items->get_as<double>("atom_scale").value_or(1.0);
+    double cylinder_scale = items->get_as<double>("bond_scale").value_or(0.5);
+
+    Eigen::Matrix3d m_rot = create_rotation_matrix(items);
+
+    Vector3d center_vec{0, 0, 0};
+    for (auto& atom_vec : positions) {
+        center_vec += atom_vec;
+    }
+    center_vec *= (1 / positions.size());
+
+    std::vector<Vector3d> transl_positions;
+    for (auto& atom_vec : positions) {
+        Vector3d transl_atom_vec = (m_rot * (atom_vec - center_vec)) * mol_scale + mol_vec_o;
+        transl_positions.push_back(transl_atom_vec);
+    }
+
+    for (auto& atom_vec : positions) {
+        StandardBasis sphere_basis;
+        sphere_basis.o = atom_vec;
+
+        auto texture_mapper_ptr = create_dummy_mapper(items);
+
+        actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                new SimpleSphere(sphere_basis, sphere_scale, texture_mapper_ptr)));
+    }
+
+    for (auto& bond : bonds) {
+        Vector3d cylinder_begin_vec = positions[bond.first];
+        Vector3d cylinder_end_vec = positions[bond.second];
+
+        Vector3d cylinder_center_vec = (cylinder_begin_vec + cylinder_end_vec) / 2;
+        Vector3d cylinder_k_vec = cylinder_end_vec - cylinder_begin_vec;
+        double cylinder_span = cylinder_k_vec.norm() / 2;
+
+        Vector3d fill_vec = fill_vector(cylinder_k_vec);
+
+        Vector3d cylinder_i_vec = fill_vec.cross(cylinder_k_vec);
+        Vector3d cylinder_j_vec = cylinder_k_vec.cross(cylinder_i_vec);
+
+        cylinder_i_vec *= (1 / cylinder_i_vec.norm());
+        cylinder_j_vec *= (1 / cylinder_j_vec.norm());
+        cylinder_k_vec *= (1 / cylinder_k_vec.norm());
+
+        StandardBasis cylinder_basis{
+            cylinder_center_vec,
+            cylinder_i_vec,
+            cylinder_j_vec,
+            cylinder_k_vec
+        };
+
+        auto texture_mapper_ptr = create_dummy_mapper(items);
+
+        actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                new SimpleCylinder(cylinder_basis, cylinder_scale, cylinder_span, texture_mapper_ptr)));
+    }
+}
+
+
 void create_actors(ActorType actor_type,
                    TextureFactory* texture_factory,
                    std::shared_ptr<cpptoml::table> actor_items,
@@ -554,6 +644,8 @@ void create_actors(ActorType actor_type,
         actor_ptrs->push_back(create_triangle(actor_items, texture_factory));
     else if (actor_type == ActorType::Cube)
         create_cube(texture_factory, actor_items, actor_ptrs);
+    else if (actor_type == ActorType::Molecule)
+        create_molecule(texture_factory, actor_items, actor_ptrs);
 }
 
 

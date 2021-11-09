@@ -155,4 +155,19 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::ta
 }
 
 
+std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<cpptoml::table> items) {
+    auto actor_color = items->get_array_of<double>("color");
+
+    if (actor_color) {
+        double reflect_coef = items->get_as<double>("reflect").value_or(0);
+        Vector3d color_vec(actor_color->data());
+        TexturePixel color(color_vec);
+
+        return std::shared_ptr<TextureMapper>(new DummyTextureMapper(color, reflect_coef));
+    }
+
+    //TODO No color set
+}
+
+
 }

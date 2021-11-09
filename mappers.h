@@ -28,6 +28,9 @@ public:
 std::shared_ptr<TextureMapper> create_texture_mapper(
         std::shared_ptr<cpptoml::table>, ActorType, TextureFactory*);
 
+std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<cpptoml::table>);
+
+
 }
 
 #endif // MAPPERS_H

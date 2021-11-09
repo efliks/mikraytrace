@@ -33,7 +33,7 @@ void create_molecule_from_smiles(const std::string& smiles,
     OpenBabel::OBBond b;
     FOR_BONDS_OF_MOL(b, mol) {
         bonds->push_back(std::pair<unsigned int, unsigned int>{
-                    b->GetBeginAtomIdx(), b->GetEndAtomIdx()});
+                    b->GetBeginAtomIdx() - 1, b->GetEndAtomIdx() - 1});
     }
 }
 
