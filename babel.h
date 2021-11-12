@@ -8,7 +8,7 @@
 
 namespace mrtp {
 
-void create_molecule_from_mol2file(
+void create_molecule_tables(
         const std::string&,
         std::vector<unsigned int>*,
         std::vector<Eigen::Vector3d>*,

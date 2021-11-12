@@ -561,7 +561,7 @@ void create_molecule(TextureFactory* texture_factory,
     std::vector<Vector3d> positions;
     std::vector<std::pair<unsigned int, unsigned int>> bonds;
 
-    create_molecule_from_mol2file(mol2file_str, &atomic_nums, &positions, &bonds);
+    create_molecule_tables(mol2file_str, &atomic_nums, &positions, &bonds);
 
     auto mol_center = items->get_array_of<double>("center");
     if (!mol_center) {
@@ -581,25 +581,25 @@ void create_molecule(TextureFactory* texture_factory,
     }
     center_vec *= (1. / positions.size());
 
-    std::vector<Vector3d> transl_positions;
+    std::vector<Vector3d> transl_pos;
     for (auto& atom_vec : positions) {
         Vector3d transl_atom_vec = (m_rot * (atom_vec - center_vec)) * mol_scale + mol_vec_o;
-        transl_positions.push_back(transl_atom_vec);
+        transl_pos.push_back(transl_atom_vec);
     }
 
-    for (auto& atom_vec : transl_positions) {
+    for (auto& atom_vec : transl_pos) {
         StandardBasis sphere_basis;
         sphere_basis.o = atom_vec;
 
-        auto texture_mapper_ptr = create_dummy_mapper(items);
+        auto texture_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
 
-        actor_ptrs->push_back(std::shared_ptr<ActorBase>(
-                new SimpleSphere(sphere_basis, sphere_scale, texture_mapper_ptr)));
+        actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleSphere(
+                sphere_basis, sphere_scale, texture_mapper_ptr)));
     }
 
     for (auto& bond : bonds) {
-        Vector3d cylinder_begin_vec = transl_positions[bond.first];
-        Vector3d cylinder_end_vec = transl_positions[bond.second];
+        Vector3d cylinder_begin_vec = transl_pos[bond.first];
+        Vector3d cylinder_end_vec = transl_pos[bond.second];
 
         Vector3d cylinder_center_vec = (cylinder_begin_vec + cylinder_end_vec) / 2;
         Vector3d cylinder_k_vec = cylinder_end_vec - cylinder_begin_vec;
@@ -621,10 +621,10 @@ void create_molecule(TextureFactory* texture_factory,
             cylinder_k_vec
         };
 
-        auto texture_mapper_ptr = create_dummy_mapper(items);
+        auto texture_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
 
-        actor_ptrs->push_back(std::shared_ptr<ActorBase>(
-                new SimpleCylinder(cylinder_basis, cylinder_scale, cylinder_span, texture_mapper_ptr)));
+        actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleCylinder(
+                cylinder_basis, cylinder_scale, cylinder_span, texture_mapper_ptr)));
     }
 }
 

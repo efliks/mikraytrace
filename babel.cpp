@@ -3,17 +3,16 @@
 #include <openbabel/mol.h>
 #include <openbabel/atom.h>
 #include <openbabel/bond.h>
-#include <openbabel/builder.h>
 #include <openbabel/obiter.h>
 #include <openbabel/obconversion.h>
 
 
 namespace mrtp {
 
-void create_molecule_from_mol2file(const std::string& mol2file,
-                                   std::vector<unsigned int>* atomic_nums,
-                                   std::vector<Eigen::Vector3d>* positions,
-                                   std::vector<std::pair<unsigned int, unsigned int>>* bonds) {
+void create_molecule_tables(const std::string& mol2file,
+                            std::vector<unsigned int>* atomic_nums,
+                            std::vector<Eigen::Vector3d>* positions,
+                            std::vector<std::pair<unsigned int, unsigned int>>* bonds) {
     OpenBabel::OBMol mol;
     OpenBabel::OBConversion conv;
     if(!conv.SetInFormat("mol2") || !conv.ReadFile(&mol, mol2file))
