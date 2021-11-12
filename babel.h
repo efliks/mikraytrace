@@ -8,8 +8,8 @@
 
 namespace mrtp {
 
-void create_molecule_from_smiles(
-        const std::string& smiles,
+void create_molecule_from_mol2file(
+        const std::string&,
         std::vector<unsigned int>*,
         std::vector<Eigen::Vector3d>*,
         std::vector<std::pair<unsigned int, unsigned int>>*

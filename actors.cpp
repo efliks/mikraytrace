@@ -551,17 +551,17 @@ static void create_cube(TextureFactory* texture_factory,
 void create_molecule(TextureFactory* texture_factory,
                      std::shared_ptr<cpptoml::table> items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
-    auto smiles = items->get_as<std::string>("smiles");
-    if (!smiles) {
+    auto filename = items->get_as<std::string>("mol2file");
+    if (!filename) {
         // TODO
     }
-    std::string smiles_str(smiles->data());
+    std::string mol2file_str(filename->data());
 
     std::vector<unsigned int> atomic_nums;
     std::vector<Vector3d> positions;
     std::vector<std::pair<unsigned int, unsigned int>> bonds;
 
-    create_molecule_from_smiles(smiles_str, &atomic_nums, &positions, &bonds);
+    create_molecule_from_mol2file(mol2file_str, &atomic_nums, &positions, &bonds);
 
     auto mol_center = items->get_array_of<double>("center");
     if (!mol_center) {
@@ -579,7 +579,7 @@ void create_molecule(TextureFactory* texture_factory,
     for (auto& atom_vec : positions) {
         center_vec += atom_vec;
     }
-    center_vec *= (1 / positions.size());
+    center_vec *= (1. / positions.size());
 
     std::vector<Vector3d> transl_positions;
     for (auto& atom_vec : positions) {
@@ -587,7 +587,7 @@ void create_molecule(TextureFactory* texture_factory,
         transl_positions.push_back(transl_atom_vec);
     }
 
-    for (auto& atom_vec : positions) {
+    for (auto& atom_vec : transl_positions) {
         StandardBasis sphere_basis;
         sphere_basis.o = atom_vec;
 
@@ -598,8 +598,8 @@ void create_molecule(TextureFactory* texture_factory,
     }
 
     for (auto& bond : bonds) {
-        Vector3d cylinder_begin_vec = positions[bond.first];
-        Vector3d cylinder_end_vec = positions[bond.second];
+        Vector3d cylinder_begin_vec = transl_positions[bond.first];
+        Vector3d cylinder_end_vec = transl_positions[bond.second];
 
         Vector3d cylinder_center_vec = (cylinder_begin_vec + cylinder_end_vec) / 2;
         Vector3d cylinder_k_vec = cylinder_end_vec - cylinder_begin_vec;
