@@ -273,8 +273,9 @@ private:
 };
 
 
-static std::shared_ptr<ActorBase> create_triangle(std::shared_ptr<cpptoml::table> items,
-                                                  TextureFactory* texture_factory) {
+static void create_triangle(TextureFactory* texture_factory,
+                            std::shared_ptr<cpptoml::table> items,
+                            std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto vertex_a = items->get_array_of<double>("A");
     if (!vertex_a) {
         //TODO
@@ -310,18 +311,20 @@ static std::shared_ptr<ActorBase> create_triangle(std::shared_ptr<cpptoml::table
     vec_k *= (1 / vec_k.norm());
 
     StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
-    double reflect_coef = items->get_as<double>("reflect").value_or(0);
 
     auto texture_mapper_ptr = create_texture_mapper(
                 items, ActorType::Triangle, texture_factory);
 
-    return std::shared_ptr<ActorBase>(
+    auto new_triangle_ptr = std::shared_ptr<ActorBase>(
                 new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));
+
+    actor_ptrs->push_back(new_triangle_ptr);
 }
 
 
-static std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table> plane_items,
-                                               TextureFactory* texture_factory) {
+static void create_plane(TextureFactory* texture_factory,
+                         std::shared_ptr<cpptoml::table> plane_items,
+                         std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
         //TODO
@@ -356,12 +359,13 @@ static std::shared_ptr<ActorBase> create_plane(std::shared_ptr<cpptoml::table> p
     auto plane_ptr = std::shared_ptr<ActorBase>(
                 new SimplePlane(plane_basis, texture_mapper_ptr));
 
-    return plane_ptr;
+    actor_ptrs->push_back(plane_ptr);
 }
 
 
-static std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table> sphere_items,
-                                                TextureFactory* texture_factory) {
+static void create_sphere(TextureFactory* texture_factory,
+                          std::shared_ptr<cpptoml::table> sphere_items,
+                          std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto sphere_center = sphere_items->get_array_of<double>("center");
     if (!sphere_center) {
         //TODO
@@ -402,12 +406,13 @@ static std::shared_ptr<ActorBase> create_sphere(std::shared_ptr<cpptoml::table> 
         texture_mapper_ptr
     ));
 
-    return sphere_ptr;
+    actor_ptrs->push_back(sphere_ptr);
 }
 
 
-static std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table> cylinder_items,
-                                                  TextureFactory* texture_factory) {
+static void create_cylinder(TextureFactory* texture_factory,
+                            std::shared_ptr<cpptoml::table> cylinder_items,
+                            std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto cylinder_center = cylinder_items->get_array_of<double>("center");
     if (!cylinder_center) {
         //TODO
@@ -449,7 +454,7 @@ static std::shared_ptr<ActorBase> create_cylinder(std::shared_ptr<cpptoml::table
         texture_mapper_ptr
     ));
 
-    return cylinder_ptr;
+    actor_ptrs->push_back(cylinder_ptr);
 }
 
 
@@ -548,9 +553,9 @@ static void create_cube(TextureFactory* texture_factory,
 }
 
 
-void create_molecule(TextureFactory* texture_factory,
-                     std::shared_ptr<cpptoml::table> items,
-                     std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
+static void create_molecule(TextureFactory* texture_factory,
+                            std::shared_ptr<cpptoml::table> items,
+                            std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto filename = items->get_as<std::string>("mol2file");
     if (!filename) {
         // TODO
@@ -635,13 +640,13 @@ void create_actors(ActorType actor_type,
                    std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
 {
     if (actor_type == ActorType::Plane)
-        actor_ptrs->push_back(create_plane(actor_items, texture_factory));
+        create_plane(texture_factory, actor_items, actor_ptrs);
     else if (actor_type == ActorType::Sphere)
-        actor_ptrs->push_back(create_sphere(actor_items, texture_factory));
+        create_sphere(texture_factory, actor_items, actor_ptrs);
     else if (actor_type == ActorType::Cylinder)
-        actor_ptrs->push_back(create_cylinder(actor_items, texture_factory));
+        create_cylinder(texture_factory, actor_items, actor_ptrs);
     else if (actor_type == ActorType::Triangle)
-        actor_ptrs->push_back(create_triangle(actor_items, texture_factory));
+        create_triangle(texture_factory, actor_items, actor_ptrs);
     else if (actor_type == ActorType::Cube)
         create_cube(texture_factory, actor_items, actor_ptrs);
     else if (actor_type == ActorType::Molecule)
