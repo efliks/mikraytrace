@@ -1,3 +1,4 @@
+#include <easylogging++.h>
 #include "mappers.h"
 
 
@@ -111,17 +112,16 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::ta
     double reflect_coef = actor_items->get_as<double>("reflect").value_or(0);
     auto actor_texture = actor_items->get_as<std::string>("texture");
 
-    // TODO Do texture mapping for triangles - currently only one color
-    if (actor_texture && actor_type != ActorType::Triangle) {
+    if (actor_texture) {
         auto actor_color = actor_items->get_array_of<double>("color");
-        if (actor_color) {
-            //Both color and texture are set
-        }
+        if (actor_color)
+            LOG(WARNING) << "Ignoring color and using texture file";
 
         std::string texture_str(actor_texture->data());
         std::fstream check(texture_str.c_str());
         if (!check.good()) {
-            //Texture file cannot be opened
+            LOG(ERROR) << "Cannot open texture file " << texture_str;
+            return std::shared_ptr<TextureMapper>();
         }
 
         double scale_coef = actor_items->get_as<double>("scale").value_or(0.15);
@@ -151,7 +151,8 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<cpptoml::ta
         return std::shared_ptr<TextureMapper>(new DummyTextureMapper(color, reflect_coef));
     }
 
-    //Neither texture nor color are set
+    LOG(ERROR) << "Cannot parse texture file and color for texture mapper";
+    return std::shared_ptr<TextureMapper>();
 }
 
 
@@ -168,7 +169,8 @@ std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<cpptoml::tabl
         return std::shared_ptr<TextureMapper>(new DummyTextureMapper(color, reflect_coef));
     }
 
-    //TODO No color set
+    LOG(ERROR) << "Color for texture mapper not found";
+    return std::shared_ptr<TextureMapper>();
 }
 
 

@@ -1,6 +1,8 @@
+#include <cmath>
 #include <iostream>
 #include <Eigen/Geometry>
-#include <cmath>
+#include <easylogging++.h>
+
 #include "actors.h"
 #include "babel.h"
 
@@ -278,28 +280,24 @@ static void create_triangle(TextureFactory* texture_factory,
                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto vertex_a = items->get_array_of<double>("A");
     if (!vertex_a) {
-        //TODO
+        LOG(ERROR) << "Error parsing vertex A in triangle";
+        return;
     }
     Vector3d A(vertex_a->data());
 
     auto vertex_b = items->get_array_of<double>("B");
     if (!vertex_b) {
-        //TODO
+        LOG(ERROR) << "Error parsing vertex B in triangle";
+        return;
     }
     Vector3d B(vertex_b->data());
 
     auto vertex_c = items->get_array_of<double>("C");
     if (!vertex_c) {
-        //TODO
+        LOG(ERROR) << "Error parsing vertex C in triangle";
+        return;
     }
     Vector3d C(vertex_c->data());
-
-    auto tmp_color = items->get_array_of<double>("color");
-    if (!tmp_color) {
-        //TODO
-    }
-    Vector3d vec_color(tmp_color->data());
-    TexturePixel triangle_color(vec_color);
 
     Vector3d vec_o = (A + B + C) / 3;
     Vector3d vec_i = B - A;
@@ -312,8 +310,9 @@ static void create_triangle(TextureFactory* texture_factory,
 
     StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
 
-    auto texture_mapper_ptr = create_texture_mapper(
-                items, ActorType::Triangle, texture_factory);
+    auto texture_mapper_ptr = create_dummy_mapper(items, "color", "reflect");
+    if (!texture_mapper_ptr)
+        return;
 
     auto new_triangle_ptr = std::shared_ptr<ActorBase>(
                 new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));
@@ -327,13 +326,15 @@ static void create_plane(TextureFactory* texture_factory,
                          std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto plane_center = plane_items->get_array_of<double>("center");
     if (!plane_center) {
-        //TODO
+        LOG(ERROR) << "Error parsing plane center";
+        return;
     }
     Vector3d plane_center_vec(plane_center->data());
 
     auto plane_normal = plane_items->get_array_of<double>("normal");
     if (!plane_normal) {
-        //TODO
+        LOG(ERROR) << "Error parsing plane normal";
+        return;
     }
     Vector3d plane_normal_vec(plane_normal->data());
 
@@ -355,11 +356,11 @@ static void create_plane(TextureFactory* texture_factory,
 
     auto texture_mapper_ptr = create_texture_mapper(
                 plane_items, ActorType::Plane, texture_factory);
+    if (!texture_mapper_ptr)
+        return;
 
-    auto plane_ptr = std::shared_ptr<ActorBase>(
-                new SimplePlane(plane_basis, texture_mapper_ptr));
-
-    actor_ptrs->push_back(plane_ptr);
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePlane(plane_basis, texture_mapper_ptr)));
 }
 
 
@@ -368,7 +369,8 @@ static void create_sphere(TextureFactory* texture_factory,
                           std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto sphere_center = sphere_items->get_array_of<double>("center");
     if (!sphere_center) {
-        //TODO
+        LOG(ERROR) << "Error parsing sphere center";
+        return;
     }
     Vector3d sphere_center_vec(sphere_center->data());
 
@@ -399,6 +401,8 @@ static void create_sphere(TextureFactory* texture_factory,
 
     auto texture_mapper_ptr = create_texture_mapper(
                 sphere_items, ActorType::Sphere, texture_factory);
+    if (!texture_mapper_ptr)
+        return;
 
     auto sphere_ptr = std::shared_ptr<ActorBase>(new SimpleSphere(
         sphere_basis,
@@ -415,13 +419,15 @@ static void create_cylinder(TextureFactory* texture_factory,
                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto cylinder_center = cylinder_items->get_array_of<double>("center");
     if (!cylinder_center) {
-        //TODO
+        LOG(ERROR) << "Error parsing cylinder center";
+        return;
     }
     Vector3d cylinder_center_vec(cylinder_center->data());
 
     auto cylinder_direction = cylinder_items->get_array_of<double>("direction");
     if (!cylinder_direction) {
-        //TODO
+        LOG(ERROR) << "Error parsing cylinder direction";
+        return;
     }
     Vector3d cylinder_direction_vec(cylinder_direction->data());
 
@@ -446,6 +452,8 @@ static void create_cylinder(TextureFactory* texture_factory,
 
     auto texture_mapper_ptr = create_texture_mapper(
                 cylinder_items, ActorType::Cylinder, texture_factory);
+    if (!texture_mapper_ptr)
+        return;
 
     auto cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
         cylinder_basis,
@@ -503,16 +511,19 @@ static void create_cube(TextureFactory* texture_factory,
 
     double cube_scale = cube_items->get_as<double>("scale").value_or(1) / 2;
 
-    auto texture_mapper_ptr = create_texture_mapper(
-                cube_items, ActorType::Cube, texture_factory);  // for now only dummy textures
+    auto texture_mapper_ptr = create_dummy_mapper(cube_items, "color", "reflect");
+    if (!texture_mapper_ptr)
+        return;
 
     if (!cube_center) {
-        //TODO
+        LOG(ERROR) << "Error parsing cube center";
+        return;
     }
     Vector3d cube_vec_o(cube_center->data());
 
     if (!cube_direction) {
-        //TODO
+        LOG(ERROR) << "Error parsing cube direction";
+        return;
     }
     Vector3d cube_vec_k(cube_direction->data());
 
@@ -558,9 +569,16 @@ static void create_molecule(TextureFactory* texture_factory,
                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) {
     auto filename = items->get_as<std::string>("mol2file");
     if (!filename) {
-        // TODO
+        LOG(ERROR) << "Undefined mol2 file";
+        return;
     }
     std::string mol2file_str(filename->data());
+
+    std::fstream check(mol2file_str.c_str());
+    if (!check.good()) {
+        LOG(ERROR) << "Cannot open mol2 file " << mol2file_str;
+        return;
+    }
 
     std::vector<unsigned int> atomic_nums;
     std::vector<Vector3d> positions;
@@ -568,9 +586,15 @@ static void create_molecule(TextureFactory* texture_factory,
 
     create_molecule_tables(mol2file_str, &atomic_nums, &positions, &bonds);
 
+    if (atomic_nums.empty() || positions.empty() || bonds.empty()) {
+        LOG(ERROR) << "Cannot create molecule";
+        return;
+    }
+
     auto mol_center = items->get_array_of<double>("center");
     if (!mol_center) {
-        // TODO
+        LOG(ERROR) << "Error parsing molecule center";
+        return;
     }
     Vector3d mol_vec_o(mol_center->data());
 
@@ -579,6 +603,14 @@ static void create_molecule(TextureFactory* texture_factory,
     double cylinder_scale = items->get_as<double>("bond_scale").value_or(0.5);
 
     Eigen::Matrix3d m_rot = create_rotation_matrix(items);
+
+    auto sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
+    if (!sphere_mapper_ptr)
+        return;
+
+    auto cylinder_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
+    if (!cylinder_mapper_ptr)
+        return;
 
     Vector3d center_vec{0, 0, 0};
     for (auto& atom_vec : positions) {
@@ -596,10 +628,8 @@ static void create_molecule(TextureFactory* texture_factory,
         StandardBasis sphere_basis;
         sphere_basis.o = atom_vec;
 
-        auto texture_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
-
         actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleSphere(
-                sphere_basis, sphere_scale, texture_mapper_ptr)));
+                sphere_basis, sphere_scale, sphere_mapper_ptr)));
     }
 
     for (auto& bond : bonds) {
@@ -626,10 +656,8 @@ static void create_molecule(TextureFactory* texture_factory,
             cylinder_k_vec
         };
 
-        auto texture_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
-
         actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleCylinder(
-                cylinder_basis, cylinder_scale, cylinder_span, texture_mapper_ptr)));
+                cylinder_basis, cylinder_scale, cylinder_span, cylinder_mapper_ptr)));
     }
 }
 

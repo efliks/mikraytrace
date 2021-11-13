@@ -255,24 +255,28 @@ int main(int argc, char** argv) {
     for (auto toml_file : toml_files) {
         LOG(INFO) << "Processing " << toml_file << " ...";
 
-        auto my_world_ptr = mrtp::build_world(toml_file, &texture_factory);
+        auto world_ptr = mrtp::build_world(toml_file, &texture_factory);
+        if (!world_ptr)
+            return 2;
 
         if (use_auto_name) {
             std::string foo(toml_file);
             size_t pos = toml_file.rfind(".toml");
-            if (pos != std::string::npos) { foo = toml_file.substr(0, pos); }
+            if (pos != std::string::npos) {
+                foo = toml_file.substr(0, pos);
+            }
             png_file = foo + ".png";
         }
 
         if (renderer_config.num_threads == 1) {
-            mrtp::SceneRenderer scene_renderer(my_world_ptr.get(), renderer_config);
+            mrtp::SceneRenderer scene_renderer(world_ptr.get(), renderer_config);
             mrtp::ScenePNGWriter scene_writer(&scene_renderer);
 
             scene_renderer.do_render();
             scene_writer.write_to_file(png_file);
         }
         else {
-            mrtp::ParallelSceneRenderer scene_renderer(my_world_ptr.get(), renderer_config, renderer_config.num_threads);
+            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), renderer_config, renderer_config.num_threads);
             mrtp::ScenePNGWriter scene_writer(&scene_renderer);
 
             scene_renderer.do_render();

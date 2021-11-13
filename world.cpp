@@ -1,6 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <Eigen/Geometry>
+#include <easylogging++.h>
+
 #include "cpptoml.h"
 #include "world.h"
 
@@ -91,14 +93,16 @@ public:
     std::shared_ptr<SceneWorld> build() const {
         std::fstream check(world_filename_.c_str());
         if (!check.good()) {
-            //TODO
+            LOG(ERROR) << "Cannot open world file";
+            return std::shared_ptr<SceneWorld>();
         }
 
         std::shared_ptr<cpptoml::table> world_config;
         try {
             world_config = cpptoml::parse_file(world_filename_.c_str());
         } catch (...) {
-            //TODO
+            LOG(ERROR) << "Error parsing world file";
+            return std::shared_ptr<SceneWorld>();
         }
 
         std::vector<std::shared_ptr<ActorBase>> new_actors;
@@ -121,6 +125,11 @@ public:
         auto molecules_array = world_config->get_table_array("molecules");
         process_actor_array(ActorType::Molecule, molecules_array, &new_actors);
 
+        if (new_actors.size() < 1) {
+            LOG(ERROR) << "No actors found";
+            return std::shared_ptr<SceneWorld>();
+        }
+
         auto world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
         for (const auto& actor : new_actors) {
             world_ptr->add_actor(actor);
@@ -128,15 +137,18 @@ public:
 
         auto tab_camera = world_config->get_table("camera");
         if (!tab_camera) {
-            //TODO
+            LOG(ERROR) << "No camera found";
+            return std::shared_ptr<SceneWorld>();
         }
         auto raw_eye = tab_camera->get_array_of<double>("center");
         if (!raw_eye) {
-            //TODO
+            LOG(ERROR) << "Error parsing camera center";
+            return std::shared_ptr<SceneWorld>();
         }
         auto raw_lookat = tab_camera->get_array_of<double>("target");
         if (!raw_lookat) {
-            //TODO
+            LOG(ERROR) << "Error parsing camera target";
+            return std::shared_ptr<SceneWorld>();
         }
 
         double camera_roll = tab_camera->get_as<double>("roll").value_or(0);
@@ -148,11 +160,13 @@ public:
 
         auto tab_light = world_config->get_table("light");
         if (!tab_light) {
-            //TODO
+            LOG(ERROR) << "No light found";
+            return std::shared_ptr<SceneWorld>();
         }
         auto raw_center = tab_light->get_array_of<double>("center");
         if (!raw_center) {
-            //TODO
+            LOG(ERROR) << "Error parsing light center";
+            return std::shared_ptr<SceneWorld>();
         }
 
         Vector3d temp_center(raw_center->data());
