@@ -5,88 +5,139 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <easylogging++.h>
 
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
 
+INITIALIZE_EASYLOGGINGPP
+
 
 using RendererConfig = mrtp::RendererConfig;
 
 
-bool parse_field_of_vision(const std::string& str, RendererConfig* renderer_config) {
-    std::stringstream convert(str);
-    convert >> renderer_config->field_of_vision;
-    return (!convert.bad() &&
-            renderer_config->field_of_vision >= 50 &&
-            renderer_config->field_of_vision <= 170);
+bool parse_field_of_vision(const std::string& s,
+                           RendererConfig* config) {
+    std::stringstream convert(s);
+    convert >> config->field_of_vision;
+
+    bool is_parsed;
+    if (!(is_parsed = !convert.bad())) {
+        LOG(ERROR) << "Error parsing field of vision";
+        return is_parsed;
+    }
+    if (!(is_parsed = config->field_of_vision >= 50 &&
+          config->field_of_vision <= 170)) {
+        LOG(ERROR) << "Field of vision is out of range";
+    }
+
+    return is_parsed;
 }
 
 
-bool parse_max_distance(const std::string& str, RendererConfig* renderer_config) {
-    std::stringstream convert(str);
-    convert >> renderer_config->max_distance;
-    return !convert.bad();
+bool parse_max_distance(const std::string& s,
+                        RendererConfig* config) {
+    std::stringstream convert(s);
+    convert >> config->max_distance;
+
+    bool is_parsed;
+    if (!(is_parsed = !convert.bad()))
+        LOG(ERROR) << "Error parsing maximum distance";
+
+    return is_parsed;
 }
 
 
-bool parse_shadow_bias(const std::string& str, RendererConfig* renderer_config) {
-    std::stringstream convert(str);
-    convert >> renderer_config->shadow_bias;
-    return !convert.bad();
+bool parse_shadow_bias(const std::string& s,
+                       RendererConfig* config) {
+    std::stringstream convert(s);
+    convert >> config->shadow_bias;
+
+    bool is_parsed;
+    if (!(is_parsed = !convert.bad()))
+        LOG(ERROR) << "Error parsing shadow bias";
+
+    return is_parsed;
 }
 
 
-bool parse_ray_depth(const std::string& str, RendererConfig* renderer_config) {
-    std::stringstream convert(str);
-    convert >> renderer_config->max_ray_depth;
-    return !convert.bad();
+bool parse_ray_depth(const std::string& s,
+                     RendererConfig* config) {
+    std::stringstream convert(s);
+    convert >> config->max_ray_depth;
+
+    bool is_parsed;
+    if (!(is_parsed = !convert.bad()))
+        LOG(ERROR) << "Error parsing maximum ray depth";
+
+    return is_parsed;
 }
 
 
-bool parse_threads(const std::string& str, RendererConfig* renderer_config) {
-    std::stringstream convert(str);
-    convert >> renderer_config->num_threads;
-    return (!convert.bad() &&
-            renderer_config->num_threads >= 0 &&
-            renderer_config->num_threads <= 64);
+bool parse_threads(const std::string& s,
+                   RendererConfig* config) {
+    std::stringstream convert(s);
+    convert >> config->num_threads;
+
+    bool is_parsed;
+    if (!(is_parsed = !convert.bad())) {
+        LOG(ERROR) << "Error parsing number of threads";
+        return is_parsed;
+    }
+    if (!(is_parsed = config->num_threads >= 0 &&
+          config->num_threads <= 64)) {
+        LOG(ERROR) << "Number of threads is out of range";
+    }
+
+    return is_parsed;
 }
 
 
-bool parse_resolution(const std::string& str, RendererConfig* renderer_config) {
+bool parse_resolution(const std::string& str,
+                      RendererConfig* config) {
+    bool is_parsed = true;
+
     size_t p = str.find('x');
     if (p == std::string::npos) {
         p = str.find('X');
         if (p == std::string::npos) {
-            // invalid format of resolution
-            return false;
+            is_parsed = false;
         }
     }
+    if (!is_parsed) {
+        LOG(ERROR) << "Invalid resolution format";
+        return is_parsed;
+    }
+
     std::string left(str.substr(0, p));
     std::stringstream convert(left);
-    convert >> renderer_config->buffer_width;
-    if (!convert) {
-        // unable to convert width
-        return false;
+    convert >> config->buffer_width;
+
+    if (!(is_parsed = !convert.bad())) {
+        LOG(ERROR) << "Unable to convert resolution width";
+        return is_parsed;
     }
-    if (renderer_config->buffer_width < 320 ||
-            renderer_config->buffer_width > 3200) {
-        // width is out of range
-        return false;
+    if (!(is_parsed = config->buffer_width >= 320 &&
+          config->buffer_width <= 3200)) {
+        LOG(ERROR) << "Resolution width is out of range";
+        return is_parsed;
     }
+
     std::string right(str.substr(p+1, str.length()-p-1));
     std::stringstream convert_other(right);
-    convert_other >> renderer_config->buffer_height;
-    if (!convert_other) {
-        // unable to convert heigth
-        return false;
+    convert_other >> config->buffer_height;
+
+    if (!(is_parsed = !convert_other.bad())) {
+        LOG(ERROR) << "Unable to convert resolution height";
+        return is_parsed;
     }
-    if (renderer_config->buffer_height < 240 ||
-            renderer_config->buffer_height > 2400) {
-        // height is out of range
-        return false;
+    if (!(is_parsed = config->buffer_height >= 240 &&
+          config->buffer_height <= 2400)) {
+        LOG(ERROR) << "Resolution height is out of range";
     }
-    return true;
+
+    return is_parsed;
 }
 
 
@@ -156,7 +207,6 @@ bool process_command_line(int argc,
         }
         else {
             if (!apply_option_parser(c, std::string(optarg), renderer_config)) {
-                std::cerr << "error parsing option" << std::endl;
                 return false;
             }
         }
@@ -166,7 +216,7 @@ bool process_command_line(int argc,
         input_files->push_back(std::string(argv[i]));
     }
     if (input_files->empty()) {
-        std::cerr << "missing toml file" << std::endl;
+        LOG(ERROR) << "Missing toml file";
         return false;
     }
     return true;
@@ -193,7 +243,7 @@ int main(int argc, char** argv) {
     bool use_auto_name = (toml_files.size() > 1) || (png_file == "");
     if (use_auto_name) {
         if (png_file != "") {
-            std::cerr << "multiple toml files: do not use -o" << std::endl;
+            LOG(ERROR) << "Option -o not allowed with multiple toml files";
             return 1;
         }
     }
@@ -203,9 +253,7 @@ int main(int argc, char** argv) {
 
     // Iterate over all input files
     for (auto toml_file : toml_files) {
-        if (!quiet_flag) {
-            std::cout << "processing " << toml_file << std::flush;
-        }
+        LOG(INFO) << "Processing " << toml_file << " ...";
 
         auto my_world_ptr = mrtp::build_world(toml_file, &texture_factory);
 
@@ -230,8 +278,6 @@ int main(int argc, char** argv) {
             scene_renderer.do_render();
             scene_writer.write_to_file(png_file);
         }
-
-        std::cout << " OK" << std::endl;
     }
     
     return 0;  // All done

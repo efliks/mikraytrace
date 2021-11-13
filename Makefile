@@ -3,7 +3,8 @@ FLAGS=-W -Wall -pedantic -fPIC -O2
 
 all: mrtp_cli
 
-mrtp_cli: main.o actors.o mappers.o babel.o texture.o light.o camera.o world.o renderer.o
+mrtp_cli: main.o actors.o mappers.o babel.o texture.o light.o camera.o \
+		world.o renderer.o easylogging.o
 	g++ $^ -o $@ -fopenmp -lm -lpng -lopenbabel
 
 main.o: main.cpp
@@ -32,6 +33,9 @@ world.o: world.cpp
 
 renderer.o: renderer.cpp
 	g++ $(FLAGS) -fopenmp $(INCLUDE) -o renderer.o -c renderer.cpp
+
+easylogging.o: /usr/include/easylogging++.cc
+	g++ $(FLAGS) $(INCLUDE) -o easylogging.o -c /usr/include/easylogging++.cc
 
 .PHONY: clean
 clean:
