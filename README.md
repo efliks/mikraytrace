@@ -1,39 +1,50 @@
-# Mrtp
+# mikraytrace
 
 A weekend project to build a simple raytracer in C++. 
 
-Textures are from: https://opengameart.org/content/100-seamless-textures
+<img src="./sample.png" alt="Sample image" width="300" />
 
-Mrtp depends on the following libraries:
- * libpng-dev
- * libpng++-dev
- * libeigen3-dev
- * cpptoml
 
-### Installation
+### Installation instructions
 
-Make sure you have the necessary libraries installed. Otherwise, try (in Debian):
+Firstly, install the required libraries and tools. In Debian, or in 
+a Debian-like Linux, this can be done like so:
 
 ```
-apt-get install libpng-dev libpng++-dev libeigen3-dev
+apt-get install build-essential libpng-dev libpng++-dev libeigen3-dev \
+    libeasyloggingpp-dev libopenbabel-dev
 ```
 
-You may want to review the makefile. Run make in the main directory. The executable 
-should appear in bin/mrtp\_cli. 
+Secondly, you need the cpptoml library from Git. Install it by updating 
+the submodules in the main directory:
 
 ```
+cd mikraytrace/
 git submodule update --init --recursive
-mkdir bin build
+```
+
+Thirdly, you may need some textures. Enter the textures directory 
+and download them automatically from OpenGameArt.org website. Note that some
+downloaded textures are in formats other than PNG and have to be converted
+before they can be used. This is done automatically too, but make sure that
+you have ImageMagick installed. Otherwise, convert them to PNG format manually.
+
+```
+cd mikrayrace/textures/
+bash gettex.sh
+```
+
+Now you may want to review the Makefile. If everything looks okay, run make in 
+the main directory. This should generate the executable file mrtp\_cli. 
+
+```
+cd mikraytrace/
 make
 ```
 
-In order to test the program:
+In order to test the program, render the example scene:
 
 ```
-cd examples
-../bin/mrtp_cli scene*toml
+./mrtp_cli bluemol.toml
 ```
 
-### Gallery
-
-<img src="./sample.png" alt="Sample image" width="400" />
