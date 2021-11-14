@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#include <iomanip>
 #include <easylogging++.h>
 
 #include "world.h"
@@ -268,20 +269,22 @@ int main(int argc, char** argv) {
             png_file = foo + ".png";
         }
 
+        float render_t = 0;
         if (renderer_config.num_threads == 1) {
             mrtp::SceneRenderer scene_renderer(world_ptr.get(), renderer_config);
             mrtp::ScenePNGWriter scene_writer(&scene_renderer);
 
-            scene_renderer.do_render();
+            render_t = scene_renderer.do_render();
             scene_writer.write_to_file(png_file);
         }
         else {
             mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), renderer_config, renderer_config.num_threads);
             mrtp::ScenePNGWriter scene_writer(&scene_renderer);
 
-            scene_renderer.do_render();
+            render_t = scene_renderer.do_render();
             scene_writer.write_to_file(png_file);
         }
+        LOG(INFO) << "Done in " << std::setprecision(2) << render_t << "s";
     }
     
     return 0;  // All done

@@ -1,6 +1,6 @@
 #include <Eigen/Geometry>
-#include <cmath>
 #include <cstdlib>
+#include <cmath>
 #include <ctime>
 
 #include "png.hpp"
@@ -142,10 +142,12 @@ ParallelSceneRenderer::ParallelSceneRenderer(SceneWorld* scene_world,
 }
 
 
-void ParallelSceneRenderer::do_render() {
+float ParallelSceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
     my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
+    
+    long time_start = clock();
 
 #ifdef _OPENMP
     if (num_threads_ == 1) {
@@ -174,6 +176,11 @@ void ParallelSceneRenderer::do_render() {
     render_block(0, config_.buffer_height);
 
 #endif  // !_OPENMP
+
+    long time_elapsed = std::clock() - time_start;
+    float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / num_threads_;
+
+    return time_used;
 }
 
 
@@ -184,11 +191,15 @@ SceneRenderer::SceneRenderer(SceneWorld* scene_world,
 }
 
 
-void SceneRenderer::do_render() {
+float SceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
     my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
 
+    long time_start = clock();
+
     render_block(0, config_.buffer_height);
+
+    return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
 }
 
 

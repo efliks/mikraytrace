@@ -40,7 +40,7 @@ public:
     SceneRendererBase() = delete;
     virtual ~SceneRendererBase() = default;
 
-    virtual void do_render() = 0;
+    virtual float do_render() = 0;
 
 protected:
     double ratio_;
@@ -63,7 +63,7 @@ public:
     ParallelSceneRenderer() = delete;
     ~ParallelSceneRenderer() override = default;
 
-    void do_render() override;
+    float do_render() override;
 
 private:
     unsigned int num_threads_;
@@ -76,7 +76,7 @@ public:
     SceneRenderer() = delete;
     ~SceneRenderer() override = default;
 
-    void do_render() override;
+    float do_render() override;
 };
 
 
