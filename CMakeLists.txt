@@ -20,7 +20,7 @@ add_executable(mrtp_cli ${SOURCES})
 target_include_directories(mrtp_cli
     PRIVATE 
         ${PROJECT_SOURCE_DIR}/src
-        ${PROJECT_SOURCE_DIR}/cpptoml/include
+        ${PROJECT_SOURCE_DIR}/thirdparty/cpptoml/include
         /usr/include/eigen3
         /usr/include/png++
         /usr/include/openbabel-2.0
