@@ -1,16 +1,44 @@
 #include <Eigen/Geometry>
 #include <easylogging++.h>
 
+#include <openbabel/mol.h>
+#include <openbabel/atom.h>
+#include <openbabel/bond.h>
+#include <openbabel/obiter.h>
+#include <openbabel/obconversion.h>
+
 #include "actors/molecule.h"
 
 #include "actors/cylinder.h"
 #include "actors/sphere.h"
 #include "actors/tools.h"
 
-#include "babel.h"
-
 
 namespace mrtp {
+
+static void create_tables(const std::string& mol2file,
+                          std::vector<unsigned int>* atomic_nums,
+                          std::vector<Eigen::Vector3d>* positions,
+                          std::vector<std::pair<unsigned int, unsigned int>>* bonds)
+{
+    OpenBabel::OBMol mol;
+    OpenBabel::OBConversion conv;
+
+    if(!conv.SetInFormat("mol2") || !conv.ReadFile(&mol, mol2file)) {
+        return;
+    }
+
+    FOR_ATOMS_OF_MOL(a, mol) {
+        atomic_nums->push_back(a->GetAtomicNum());
+        positions->push_back(Eigen::Vector3d{a->GetX(), a->GetY(), a->GetZ()});
+    }
+
+    FOR_BONDS_OF_MOL(b, mol) {
+        bonds->push_back(std::pair<unsigned int, unsigned int>{
+                    b->GetBeginAtomIdx() - 1, b->GetEndAtomIdx() - 1});
+    }
+}
+
 
 void create_molecule(TextureFactory* texture_factory,
                      std::shared_ptr<cpptoml::table> items,
@@ -33,7 +61,7 @@ void create_molecule(TextureFactory* texture_factory,
     std::vector<Vector3d> positions;
     std::vector<std::pair<unsigned int, unsigned int>> bonds;
 
-    create_molecule_tables(mol2file_str, &atomic_nums, &positions, &bonds);
+    create_tables(mol2file_str, &atomic_nums, &positions, &bonds);
 
     if (atomic_nums.empty() || positions.empty() || bonds.empty()) {
         LOG(ERROR) << "Cannot create molecule";

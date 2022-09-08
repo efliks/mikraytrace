@@ -4,7 +4,6 @@ project (mrtp_cli)
 
 set(SOURCES
     src/actors.cpp
-    src/babel.cpp
     src/camera.cpp
     src/factory.cpp
     src/light.cpp
