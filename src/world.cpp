@@ -5,6 +5,7 @@
 
 #include "cpptoml.h"
 #include "world.h"
+#include "factory.h"
 
 
 namespace mrtp {

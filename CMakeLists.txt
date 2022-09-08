@@ -6,12 +6,20 @@ set(SOURCES
     src/actors.cpp
     src/babel.cpp
     src/camera.cpp
+    src/factory.cpp
     src/light.cpp
     src/main.cpp
     src/mappers.cpp
     src/renderer.cpp
     src/texture.cpp
     src/world.cpp
+    src/actors/cube.cpp
+    src/actors/cylinder.cpp
+    src/actors/molecule.cpp
+    src/actors/plane.cpp
+    src/actors/sphere.cpp
+    src/actors/tools.cpp
+    src/actors/triangle.cpp
     /usr/include/easylogging++.cc
 )
 
