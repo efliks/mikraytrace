@@ -5,7 +5,13 @@
 
 #include "cpptoml.h"
 #include "world.h"
-#include "factory.h"
+
+#include "actors/cube.h"
+#include "actors/cylinder.h"
+#include "actors/molecule.h"
+#include "actors/plane.h"
+#include "actors/sphere.h"
+#include "actors/triangle.h"
 
 
 namespace mrtp {
@@ -80,16 +86,6 @@ public:
 
     WorldBuilder() = delete;
     ~WorldBuilder() = default;
-
-    void process_actor_array(ActorType actor_type,
-                             std::shared_ptr<cpptoml::table_array> actor_array,
-                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const {
-        if (actor_array) {
-            for (const auto& actor_items : *actor_array) {
-                create_actors(actor_type, texture_factory_, actor_items, actor_ptrs);
-            }
-        }
-    }
 
     std::shared_ptr<SceneWorld> build() const {
         std::fstream check(world_filename_.c_str());
@@ -179,6 +175,30 @@ public:
         world_ptr->add_light(std::shared_ptr<Light>(new Light(light_center)));
 
         return world_ptr;
+    }
+
+    void process_actor_array(ActorType actor_type,
+                             std::shared_ptr<cpptoml::table_array> actor_array,
+                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const
+    {
+        if (actor_array) {
+            for (const auto& actor_items : *actor_array) {
+                if (actor_type == ActorType::Plane)
+                    create_plane(texture_factory_, actor_items, actor_ptrs);
+                else if (actor_type == ActorType::Sphere)
+                    create_sphere(texture_factory_, actor_items, actor_ptrs);
+                else if (actor_type == ActorType::Cylinder)
+                    create_cylinder(texture_factory_, actor_items, actor_ptrs);
+                else if (actor_type == ActorType::Triangle)
+                    create_triangle(texture_factory_, actor_items, actor_ptrs);
+                else if (actor_type == ActorType::Cube)
+                    create_cube(texture_factory_, actor_items, actor_ptrs);
+                else if (actor_type == ActorType::Molecule)
+                    create_molecule(texture_factory_, actor_items, actor_ptrs);
+
+                // Ignore when unknown type
+            }
+        }
     }
 
 private:
