@@ -106,7 +106,7 @@ private:
 };
 
 
-std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<BaseTable> actor_items,
+std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable> actor_items,
                                                      ActorType actor_type,
                                                      TextureFactory* texture_factory)
 {
@@ -158,7 +158,7 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<BaseTable> 
 }
 
 
-std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<BaseTable> items,
+std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<ConfigTable> items,
                                                    const std::string& color_str,
                                                    const std::string& reflect_str)
 {

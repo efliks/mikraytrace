@@ -41,7 +41,7 @@ static void create_tables(const std::string& mol2file,
 
 
 void create_molecule(TextureFactory* texture_factory,
-                     std::shared_ptr<BaseTable> items,
+                     std::shared_ptr<ConfigTable> items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     std::string mol2file_str = items->get_text("mol2file");

@@ -40,7 +40,7 @@ double SimplePlane::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_plane(TextureFactory* texture_factory,
-                  std::shared_ptr<BaseTable> plane_items,
+                  std::shared_ptr<ConfigTable> plane_items,
                   std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     Vector3d plane_center_vec = plane_items->get_vector("center");

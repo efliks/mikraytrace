@@ -11,11 +11,11 @@ using Vector3d = Eigen::Vector3d;
 
 namespace mrtp {
 
-class BaseTable
+class ConfigTable
 {
 public:
-    BaseTable() = default;
-    virtual ~BaseTable() = default;
+    ConfigTable() = default;
+    virtual ~ConfigTable() = default;
 
     virtual double get_value(const std::string&, double) = 0;
 
@@ -23,36 +23,35 @@ public:
     virtual std::string get_text(const std::string&) = 0;
 
     virtual Vector3d get_vector(const std::string&, const Vector3d&) = 0;
-    virtual std::string get_text(const std::string&, const std::string&) = 0;
 };
 
 
-class BaseTableIterator
+class ConfigTableIterator
 {
 public:
-    BaseTableIterator() = default;
-    virtual ~BaseTableIterator() = default;
+    ConfigTableIterator() = default;
+    virtual ~ConfigTableIterator() = default;
 
     virtual void first() = 0;
     virtual void next() = 0;
     virtual bool is_done() = 0;
-    virtual std::shared_ptr<BaseTable> current() = 0;
+    virtual std::shared_ptr<ConfigTable> current() = 0;
 };
 
 
-class BaseConfig
+class ConfigReader
 {
 public:
-    BaseConfig() = default;
-    virtual ~BaseConfig() = default;
+    ConfigReader() = default;
+    virtual ~ConfigReader() = default;
 
-    virtual std::shared_ptr<BaseTableIterator> get_tables(const std::string&) = 0;
+    virtual std::shared_ptr<ConfigTableIterator> get_tables(const std::string&) = 0;
 
-    virtual std::shared_ptr<BaseTable> get_table(const std::string&) = 0;
+    virtual std::shared_ptr<ConfigTable> get_table(const std::string&) = 0;
 };
 
 
-std::shared_ptr<BaseConfig> open_config(const std::string&);
+std::shared_ptr<ConfigReader> open_config(const std::string&);
 
 
 }

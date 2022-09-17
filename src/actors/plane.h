@@ -23,7 +23,7 @@ public:
 };
 
 
-void create_plane(TextureFactory*, std::shared_ptr<BaseTable>, 
+void create_plane(TextureFactory*, std::shared_ptr<ConfigTable>, 
         std::vector<std::shared_ptr<ActorBase>>*);
 
 }

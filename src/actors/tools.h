@@ -17,7 +17,7 @@ double solve_quadratic(double, double, double);
 
 Vector3d fill_vector(const Vector3d&);
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<BaseTable>);
+Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable>);
 
 }
 

@@ -44,7 +44,7 @@ double SimpleSphere::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_sphere(TextureFactory* texture_factory,
-                   std::shared_ptr<BaseTable> sphere_items,
+                   std::shared_ptr<ConfigTable> sphere_items,
                    std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     Vector3d sphere_center_vec = sphere_items->get_vector("center");

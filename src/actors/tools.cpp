@@ -51,7 +51,7 @@ Vector3d fill_vector(const Vector3d& vec)
 }
 
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<BaseTable> items) 
+Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items) 
 {
     double angle_x = items->get_value("angle_x", 0);
     Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());

@@ -87,7 +87,7 @@ public:
 
     std::shared_ptr<SceneWorld> build() const
     {
-        std::shared_ptr<BaseConfig> world_config = open_config(world_filename_);
+        std::shared_ptr<ConfigReader> world_config = open_config(world_filename_);
 
         std::vector<std::shared_ptr<ActorBase>> new_actors;
 
@@ -119,7 +119,7 @@ public:
             world_ptr->add_actor(actor);
         }
 
-        std::shared_ptr<BaseTable> camera_table = world_config->get_table("camera");
+        std::shared_ptr<ConfigTable> camera_table = world_config->get_table("camera");
         if (!camera_table) {
             LOG(ERROR) << "No camera found";
             return std::shared_ptr<SceneWorld>();
@@ -139,7 +139,7 @@ public:
 
         double camera_roll = camera_table->get_value("roll", 0);
 
-        std::shared_ptr<BaseTable> light_table = world_config->get_table("light");
+        std::shared_ptr<ConfigTable> light_table = world_config->get_table("light");
         if (!light_table) {
             LOG(ERROR) << "No light found";
             return std::shared_ptr<SceneWorld>();
@@ -160,7 +160,7 @@ public:
     }
 
     void process_actor_array(ActorType actor_type,
-                             std::shared_ptr<BaseTableIterator> it,
+                             std::shared_ptr<ConfigTableIterator> it,
                              std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const
     {
         if (it)

@@ -26,7 +26,7 @@ private:
 };
 
 
-void create_sphere(TextureFactory*, std::shared_ptr<BaseTable>, 
+void create_sphere(TextureFactory*, std::shared_ptr<ConfigTable>, 
         std::vector<std::shared_ptr<ActorBase>>*); 
 
 }

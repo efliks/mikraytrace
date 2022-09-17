@@ -7,7 +7,7 @@
 
 namespace mrtp {
 
-class TomlTable : public BaseTable
+class TomlTable : public ConfigTable
 {
 public:
     TomlTable(std::shared_ptr<cpptoml::table> table)
@@ -30,16 +30,6 @@ public:
         }
 
         return Vector3d{x->data()};
-    }
-
-    std::string get_text(const std::string& key, const std::string& text_default) override
-    {
-        auto x = t_->get_as<std::string>(key);
-        if (!x) {
-            return text_default;
-        }
-
-        return std::string{x->data()};
     }
 
     Vector3d get_vector(const std::string& key) override
@@ -67,7 +57,7 @@ private:
 };
 
 
-class TomlTableIterator : public BaseTableIterator
+class TomlTableIterator : public ConfigTableIterator
 {
 public:
     TomlTableIterator(std::shared_ptr<cpptoml::table_array> ta)
@@ -92,9 +82,9 @@ public:
         return iter_ == ta_->end();
     }
 
-    std::shared_ptr<BaseTable> current() override
+    std::shared_ptr<ConfigTable> current() override
     {
-        return std::shared_ptr<BaseTable>(new TomlTable(*iter_));
+        return std::shared_ptr<ConfigTable>(new TomlTable(*iter_));
     }
 
 private:
@@ -103,34 +93,34 @@ private:
 };
 
 
-class TomlConfig : public BaseConfig
+class TomlReader : public ConfigReader
 {
 public:
-    TomlConfig(std::shared_ptr<cpptoml::table> toml_config)
+    TomlReader(std::shared_ptr<cpptoml::table> toml_config)
         : c_(toml_config)
     {
     }
 
-    ~TomlConfig() override = default;
+    ~TomlReader() override = default;
 
-    std::shared_ptr<BaseTableIterator> get_tables(const std::string& array_name) override
+    std::shared_ptr<ConfigTableIterator> get_tables(const std::string& array_name) override
     {
         std::shared_ptr<cpptoml::table_array> table_array = c_->get_table_array(array_name);
         if (!table_array) {
-            return std::shared_ptr<BaseTableIterator>();
+            return std::shared_ptr<ConfigTableIterator>();
         }
 
-        return std::shared_ptr<BaseTableIterator>(new TomlTableIterator(table_array));
+        return std::shared_ptr<ConfigTableIterator>(new TomlTableIterator(table_array));
     }
 
-    std::shared_ptr<BaseTable> get_table(const std::string& table_name) override
+    std::shared_ptr<ConfigTable> get_table(const std::string& table_name) override
     {
         auto raw_table = c_->get_table(table_name);
         if (!raw_table) {
-            return std::shared_ptr<BaseTable>();
+            return std::shared_ptr<ConfigTable>();
         }
 
-        return std::shared_ptr<BaseTable>(new TomlTable(raw_table));
+        return std::shared_ptr<ConfigTable>(new TomlTable(raw_table));
     }
 
 private:
@@ -138,12 +128,12 @@ private:
 };
 
 
-std::shared_ptr<BaseConfig> open_config(const std::string& filename)
+std::shared_ptr<ConfigReader> open_config(const std::string& filename)
 {
     std::fstream check(filename.c_str());
     if (!check.good()) {
         LOG(ERROR) << "Cannot open world file";
-        return std::shared_ptr<BaseConfig>();
+        return std::shared_ptr<ConfigReader>();
     }
 
     std::shared_ptr<cpptoml::table> config;
@@ -151,10 +141,10 @@ std::shared_ptr<BaseConfig> open_config(const std::string& filename)
         config = cpptoml::parse_file(filename.c_str());
     } catch (...) {
         LOG(ERROR) << "Error parsing world file";
-        return std::shared_ptr<BaseConfig>();
+        return std::shared_ptr<ConfigReader>();
     }
 
-    return std::shared_ptr<BaseConfig>(new TomlConfig(config));
+    return std::shared_ptr<ConfigReader>(new TomlReader(config));
 }
 
 

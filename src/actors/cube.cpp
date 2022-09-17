@@ -30,7 +30,7 @@ static void create_cube_triangles(double s,
 
 
 void create_cube(TextureFactory* texture_factory,
-                 std::shared_ptr<BaseTable> cube_items,
+                 std::shared_ptr<ConfigTable> cube_items,
                  std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     Vector3d cube_vec_o = cube_items->get_vector("center");

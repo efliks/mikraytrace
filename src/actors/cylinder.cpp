@@ -96,7 +96,7 @@ Vector3d SimpleCylinder::calculate_normal_at_hit(const Vector3d& hit) const
 
 
 void create_cylinder(TextureFactory* texture_factory,
-                     std::shared_ptr<BaseTable> cylinder_items,
+                     std::shared_ptr<ConfigTable> cylinder_items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     Vector3d cylinder_center_vec = cylinder_items->get_vector("center");

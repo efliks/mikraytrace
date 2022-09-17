@@ -49,7 +49,7 @@ double SimpleTriangle::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_triangle(TextureFactory* texture_factory,
-                     std::shared_ptr<BaseTable> items,
+                     std::shared_ptr<ConfigTable> items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
     Vector3d A = items->get_vector("A");

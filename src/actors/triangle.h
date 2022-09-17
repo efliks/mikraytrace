@@ -32,7 +32,7 @@ private:
 };
 
 
-void create_triangle(TextureFactory*, std::shared_ptr<BaseTable>, 
+void create_triangle(TextureFactory*, std::shared_ptr<ConfigTable>, 
         std::vector<std::shared_ptr<ActorBase>>*);
 
 }

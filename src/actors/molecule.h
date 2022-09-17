@@ -11,7 +11,7 @@
 
 namespace mrtp {
 
-void create_molecule(TextureFactory*, std::shared_ptr<BaseTable>, 
+void create_molecule(TextureFactory*, std::shared_ptr<ConfigTable>, 
         std::vector<std::shared_ptr<ActorBase>>*);
 
 
