@@ -1,6 +1,7 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "config.h"
 #include "actors.h"
 
 
@@ -25,7 +26,7 @@ private:
 };
 
 
-void create_sphere(TextureFactory*, std::shared_ptr<cpptoml::table>, 
+void create_sphere(TextureFactory*, std::shared_ptr<BaseTable>, 
         std::vector<std::shared_ptr<ActorBase>>*); 
 
 }

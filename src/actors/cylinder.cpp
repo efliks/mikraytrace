@@ -96,25 +96,23 @@ Vector3d SimpleCylinder::calculate_normal_at_hit(const Vector3d& hit) const
 
 
 void create_cylinder(TextureFactory* texture_factory,
-                     std::shared_ptr<cpptoml::table> cylinder_items,
+                     std::shared_ptr<BaseTable> cylinder_items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto cylinder_center = cylinder_items->get_array_of<double>("center");
-    if (!cylinder_center) {
+    Vector3d cylinder_center_vec = cylinder_items->get_vector("center");
+    if (!cylinder_center_vec.size()) {
         LOG(ERROR) << "Error parsing cylinder center";
         return;
     }
-    Vector3d cylinder_center_vec(cylinder_center->data());
 
-    auto cylinder_direction = cylinder_items->get_array_of<double>("direction");
-    if (!cylinder_direction) {
+    Vector3d cylinder_direction_vec = cylinder_items->get_vector("direction");
+    if (!cylinder_direction_vec.size()) {
         LOG(ERROR) << "Error parsing cylinder direction";
         return;
     }
-    Vector3d cylinder_direction_vec(cylinder_direction->data());
 
-    double cylinder_span = cylinder_items->get_as<double>("span").value_or(-1);
-    double cylinder_radius = cylinder_items->get_as<double>("radius").value_or(1);
+    double cylinder_span = cylinder_items->get_value("span", -1);
+    double cylinder_radius = cylinder_items->get_value("radius", 1);
 
     Vector3d fill_vec = fill_vector(cylinder_direction_vec);
 

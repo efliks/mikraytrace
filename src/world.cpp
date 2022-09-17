@@ -1,9 +1,7 @@
-#include <fstream>
-#include <iostream>
-#include <Eigen/Geometry>
+#include <Eigen/Core>
 #include <easylogging++.h>
 
-#include "cpptoml.h"
+#include "config.h"
 #include "world.h"
 
 #include "actors/cube.h"
@@ -87,39 +85,28 @@ public:
     WorldBuilder() = delete;
     ~WorldBuilder() = default;
 
-    std::shared_ptr<SceneWorld> build() const {
-        std::fstream check(world_filename_.c_str());
-        if (!check.good()) {
-            LOG(ERROR) << "Cannot open world file";
-            return std::shared_ptr<SceneWorld>();
-        }
-
-        std::shared_ptr<cpptoml::table> world_config;
-        try {
-            world_config = cpptoml::parse_file(world_filename_.c_str());
-        } catch (...) {
-            LOG(ERROR) << "Error parsing world file";
-            return std::shared_ptr<SceneWorld>();
-        }
+    std::shared_ptr<SceneWorld> build() const
+    {
+        std::shared_ptr<BaseConfig> world_config = open_config(world_filename_);
 
         std::vector<std::shared_ptr<ActorBase>> new_actors;
 
-        auto planes_array = world_config->get_table_array("planes");
+        auto planes_array = world_config->get_tables("planes");
         process_actor_array(ActorType::Plane, planes_array, &new_actors);
 
-        auto spheres_array = world_config->get_table_array("spheres");
+        auto spheres_array = world_config->get_tables("spheres");
         process_actor_array(ActorType::Sphere, spheres_array, &new_actors);
 
-        auto cylinders_array = world_config->get_table_array("cylinders");
+        auto cylinders_array = world_config->get_tables("cylinders");
         process_actor_array(ActorType::Cylinder, cylinders_array, &new_actors);
 
-        auto triangles_array = world_config->get_table_array("triangles");
+        auto triangles_array = world_config->get_tables("triangles");
         process_actor_array(ActorType::Triangle, triangles_array, &new_actors);
 
-        auto cubes_array = world_config->get_table_array("cubes");
+        auto cubes_array = world_config->get_tables("cubes");
         process_actor_array(ActorType::Cube, cubes_array, &new_actors);
 
-        auto molecules_array = world_config->get_table_array("molecules");
+        auto molecules_array = world_config->get_tables("molecules");
         process_actor_array(ActorType::Molecule, molecules_array, &new_actors);
 
         if (new_actors.size() < 1) {
@@ -132,42 +119,37 @@ public:
             world_ptr->add_actor(actor);
         }
 
-        auto tab_camera = world_config->get_table("camera");
-        if (!tab_camera) {
+        std::shared_ptr<BaseTable> camera_table = world_config->get_table("camera");
+        if (!camera_table) {
             LOG(ERROR) << "No camera found";
             return std::shared_ptr<SceneWorld>();
         }
-        auto raw_eye = tab_camera->get_array_of<double>("center");
-        if (!raw_eye) {
+
+        Vector3d camera_eye = camera_table->get_vector("center");
+        if (!camera_eye.size()) {
             LOG(ERROR) << "Error parsing camera center";
             return std::shared_ptr<SceneWorld>();
         }
-        auto raw_lookat = tab_camera->get_array_of<double>("target");
-        if (!raw_lookat) {
+
+        Vector3d camera_lookat = camera_table->get_vector("target");
+        if (!camera_lookat.size()) {
             LOG(ERROR) << "Error parsing camera target";
             return std::shared_ptr<SceneWorld>();
         }
 
-        double camera_roll = tab_camera->get_as<double>("roll").value_or(0);
+        double camera_roll = camera_table->get_value("roll", 0);
 
-        Vector3d temp_eye(raw_eye->data());
-        Vector3d camera_eye = temp_eye.cast<double>();
-        Vector3d temp_lookat(raw_lookat->data());
-        Vector3d camera_lookat = temp_lookat.cast<double>();
-
-        auto tab_light = world_config->get_table("light");
-        if (!tab_light) {
+        std::shared_ptr<BaseTable> light_table = world_config->get_table("light");
+        if (!light_table) {
             LOG(ERROR) << "No light found";
             return std::shared_ptr<SceneWorld>();
         }
-        auto raw_center = tab_light->get_array_of<double>("center");
-        if (!raw_center) {
+
+        Vector3d light_center = light_table->get_vector("center");
+        if (!light_center.size()) {
             LOG(ERROR) << "Error parsing light center";
             return std::shared_ptr<SceneWorld>();
         }
-
-        Vector3d temp_center(raw_center->data());
-        Vector3d light_center = temp_center.cast<double>();
 
         world_ptr->add_camera(std::shared_ptr<Camera>(
                                  new Camera(camera_eye, camera_lookat, camera_roll)));
@@ -178,23 +160,25 @@ public:
     }
 
     void process_actor_array(ActorType actor_type,
-                             std::shared_ptr<cpptoml::table_array> actor_array,
+                             std::shared_ptr<BaseTableIterator> it,
                              std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const
     {
-        if (actor_array) {
-            for (const auto& actor_items : *actor_array) {
+        if (it)
+        {
+            for (it->first(); !it->is_done(); it->next())
+            {
                 if (actor_type == ActorType::Plane)
-                    create_plane(texture_factory_, actor_items, actor_ptrs);
+                    create_plane(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Sphere)
-                    create_sphere(texture_factory_, actor_items, actor_ptrs);
+                    create_sphere(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Cylinder)
-                    create_cylinder(texture_factory_, actor_items, actor_ptrs);
+                    create_cylinder(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Triangle)
-                    create_triangle(texture_factory_, actor_items, actor_ptrs);
+                    create_triangle(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Cube)
-                    create_cube(texture_factory_, actor_items, actor_ptrs);
+                    create_cube(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Molecule)
-                    create_molecule(texture_factory_, actor_items, actor_ptrs);
+                    create_molecule(texture_factory_, it->current(), actor_ptrs);
 
                 // Ignore when unknown type
             }

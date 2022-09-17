@@ -30,30 +30,27 @@ static void create_cube_triangles(double s,
 
 
 void create_cube(TextureFactory* texture_factory,
-                 std::shared_ptr<cpptoml::table> cube_items,
+                 std::shared_ptr<BaseTable> cube_items,
                  std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto cube_center = cube_items->get_array_of<double>("center");
-    auto cube_direction = cube_items->get_array_of<double>("direction");
+    Vector3d cube_vec_o = cube_items->get_vector("center");
+    if (!cube_vec_o.size()) {
+        LOG(ERROR) << "Error parsing cube center";
+        return;
+    }
 
-    double cube_scale = cube_items->get_as<double>("scale").value_or(1) / 2;
+    Vector3d cube_vec_k = cube_items->get_vector("direction");
+    if (!cube_vec_k.size()) {
+        LOG(ERROR) << "Error parsing cube direction";
+        return;
+    }
+
+    double cube_scale = cube_items->get_value("scale", 1) / 2;
 
     auto texture_mapper_ptr = create_dummy_mapper(cube_items, "color", "reflect");
     if (!texture_mapper_ptr) {
         return;
     }
-
-    if (!cube_center) {
-        LOG(ERROR) << "Error parsing cube center";
-        return;
-    }
-    Vector3d cube_vec_o(cube_center->data());
-
-    if (!cube_direction) {
-        LOG(ERROR) << "Error parsing cube direction";
-        return;
-    }
-    Vector3d cube_vec_k(cube_direction->data());
 
     Vector3d fill_vec = fill_vector(cube_vec_k);
     Vector3d cube_vec_i = fill_vec.cross(cube_vec_k);

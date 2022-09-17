@@ -1,6 +1,7 @@
 #ifndef PLANE_H
 #define PLANE_H
 
+#include "config.h"
 #include "actors.h"
 
 
@@ -22,7 +23,7 @@ public:
 };
 
 
-void create_plane(TextureFactory*, std::shared_ptr<cpptoml::table>, 
+void create_plane(TextureFactory*, std::shared_ptr<BaseTable>, 
         std::vector<std::shared_ptr<ActorBase>>*);
 
 }

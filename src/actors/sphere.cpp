@@ -44,24 +44,18 @@ double SimpleSphere::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_sphere(TextureFactory* texture_factory,
-                   std::shared_ptr<cpptoml::table> sphere_items,
+                   std::shared_ptr<BaseTable> sphere_items,
                    std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto sphere_center = sphere_items->get_array_of<double>("center");
-    if (!sphere_center) {
+    Vector3d sphere_center_vec = sphere_items->get_vector("center");
+    if (!sphere_center_vec.size()) {
         LOG(ERROR) << "Error parsing sphere center";
         return;
     }
-    Vector3d sphere_center_vec(sphere_center->data());
 
-    Vector3d sphere_axis_vec(0, 0, 1);
-    auto sphere_axis = sphere_items->get_array_of<double>("axis");
-    if (sphere_axis) {
-        Vector3d tmp_vec(sphere_axis->data());
-        sphere_axis_vec = tmp_vec;
-    }
+    Vector3d sphere_axis_vec = sphere_items->get_vector("axis", Vector3d{0, 0, 1});
 
-    double sphere_radius = sphere_items->get_as<double>("radius").value_or(1);
+    double sphere_radius = sphere_items->get_value("radius", 1);
 
     Vector3d fill_vec = fill_vector(sphere_axis_vec);
 

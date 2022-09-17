@@ -4,7 +4,7 @@
 #include <memory>
 #include <Eigen/Core>
 
-#include "cpptoml.h"
+#include "config.h"
 
 using Vector3d = Eigen::Vector3d;
 
@@ -17,7 +17,7 @@ double solve_quadratic(double, double, double);
 
 Vector3d fill_vector(const Vector3d&);
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<cpptoml::table>);
+Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<BaseTable>);
 
 }
 

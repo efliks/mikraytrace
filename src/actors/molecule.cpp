@@ -41,15 +41,14 @@ static void create_tables(const std::string& mol2file,
 
 
 void create_molecule(TextureFactory* texture_factory,
-                     std::shared_ptr<cpptoml::table> items,
+                     std::shared_ptr<BaseTable> items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto filename = items->get_as<std::string>("mol2file");
-    if (!filename) {
+    std::string mol2file_str = items->get_text("mol2file");
+    if (mol2file_str.empty()) {
         LOG(ERROR) << "Undefined mol2 file";
         return;
     }
-    std::string mol2file_str(filename->data());
 
     std::fstream check(mol2file_str.c_str());
     if (!check.good()) {
@@ -68,16 +67,15 @@ void create_molecule(TextureFactory* texture_factory,
         return;
     }
 
-    auto mol_center = items->get_array_of<double>("center");
-    if (!mol_center) {
+    Vector3d mol_vec_o = items->get_vector("center");
+    if (!mol_vec_o.size()) {
         LOG(ERROR) << "Error parsing molecule center";
         return;
     }
-    Vector3d mol_vec_o(mol_center->data());
 
-    double mol_scale = items->get_as<double>("scale").value_or(1.0);
-    double sphere_scale = items->get_as<double>("atom_scale").value_or(1.0);
-    double cylinder_scale = items->get_as<double>("bond_scale").value_or(0.5);
+    double mol_scale = items->get_value("scale", 1);
+    double sphere_scale = items->get_value("atom_scale", 1);
+    double cylinder_scale = items->get_value("bond_scale", 0.5);
 
     Eigen::Matrix3d m_rot = create_rotation_matrix(items);
 

@@ -2,6 +2,7 @@
 #define CYLINDER_H
 
 #include "actors.h"
+#include "config.h"
 
 
 namespace mrtp {
@@ -27,7 +28,7 @@ private:
 };
 
 
-void create_cylinder(TextureFactory*, std::shared_ptr<cpptoml::table>, 
+void create_cylinder(TextureFactory*, std::shared_ptr<BaseTable>, 
         std::vector<std::shared_ptr<ActorBase>>*);
 
 }

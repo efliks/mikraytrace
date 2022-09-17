@@ -49,29 +49,26 @@ double SimpleTriangle::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_triangle(TextureFactory* texture_factory,
-                     std::shared_ptr<cpptoml::table> items,
+                     std::shared_ptr<BaseTable> items,
                      std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto vertex_a = items->get_array_of<double>("A");
-    if (!vertex_a) {
+    Vector3d A = items->get_vector("A");
+    if (!A.size()) {
         LOG(ERROR) << "Error parsing vertex A in triangle";
         return;
     }
-    Vector3d A(vertex_a->data());
 
-    auto vertex_b = items->get_array_of<double>("B");
-    if (!vertex_b) {
+    Vector3d B = items->get_vector("B");
+    if (!B.size()) {
         LOG(ERROR) << "Error parsing vertex B in triangle";
         return;
     }
-    Vector3d B(vertex_b->data());
 
-    auto vertex_c = items->get_array_of<double>("C");
-    if (!vertex_c) {
+    Vector3d C = items->get_vector("C");
+    if (!C.size()) {
         LOG(ERROR) << "Error parsing vertex C in triangle";
         return;
     }
-    Vector3d C(vertex_c->data());
 
     Vector3d vec_o = (A + B + C) / 3;
     Vector3d vec_i = B - A;
@@ -85,8 +82,9 @@ void create_triangle(TextureFactory* texture_factory,
     StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
 
     auto texture_mapper_ptr = create_dummy_mapper(items, "color", "reflect");
-    if (!texture_mapper_ptr)
+    if (!texture_mapper_ptr) {
         return;
+    }
 
     auto new_triangle_ptr = std::shared_ptr<ActorBase>(
                 new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));

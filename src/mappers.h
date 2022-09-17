@@ -3,7 +3,8 @@
 
 #include <memory>
 #include <Eigen/Core>
-#include "cpptoml.h"
+
+#include "config.h"
 #include "common.h"
 #include "texture.h"
 
@@ -26,9 +27,9 @@ public:
 
 
 std::shared_ptr<TextureMapper> create_texture_mapper(
-        std::shared_ptr<cpptoml::table>, ActorType, TextureFactory*);
+        std::shared_ptr<BaseTable>, ActorType, TextureFactory*);
 
-std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<cpptoml::table>,
+std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<BaseTable>,
         const std::string&, const std::string&);
 
 

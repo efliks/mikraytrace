@@ -40,22 +40,20 @@ double SimplePlane::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_plane(TextureFactory* texture_factory,
-                  std::shared_ptr<cpptoml::table> plane_items,
+                  std::shared_ptr<BaseTable> plane_items,
                   std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
 {
-    auto plane_center = plane_items->get_array_of<double>("center");
-    if (!plane_center) {
+    Vector3d plane_center_vec = plane_items->get_vector("center");
+    if (!plane_center_vec.size()) {
         LOG(ERROR) << "Error parsing plane center";
         return;
     }
-    Vector3d plane_center_vec(plane_center->data());
 
-    auto plane_normal = plane_items->get_array_of<double>("normal");
-    if (!plane_normal) {
+    Vector3d plane_normal_vec = plane_items->get_vector("normal");
+    if (!plane_normal_vec.size()) {
         LOG(ERROR) << "Error parsing plane normal";
         return;
     }
-    Vector3d plane_normal_vec(plane_normal->data());
 
     Vector3d fill_vec = fill_vector(plane_normal_vec);
 
