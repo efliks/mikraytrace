@@ -21,7 +21,8 @@ enum class ActorType {
     Cylinder,
     Triangle,
     Cube,
-    Molecule
+    Molecule,
+    Banner
 };
 
 
