@@ -257,8 +257,9 @@ int main(int argc, char** argv) {
         LOG(INFO) << "Processing " << toml_file << " ...";
 
         auto world_ptr = mrtp::build_world(toml_file, &texture_factory);
-        if (!world_ptr)
+        if (!world_ptr) {
             return 2;
+        }
 
         if (use_auto_name) {
             std::string foo(toml_file);

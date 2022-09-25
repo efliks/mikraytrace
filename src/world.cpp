@@ -90,6 +90,9 @@ public:
     std::shared_ptr<SceneWorld> build() const
     {
         std::shared_ptr<ConfigReader> world_config = open_config(world_filename_);
+        if (!world_config) {
+            return std::shared_ptr<SceneWorld>();
+        }
 
         std::vector<std::shared_ptr<ActorBase>> new_actors;
 
