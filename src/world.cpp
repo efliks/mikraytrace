@@ -4,6 +4,7 @@
 #include "config.h"
 #include "world.h"
 
+#include "actors/mesh.h"
 #include "actors/banner.h"
 #include "actors/cube.h"
 #include "actors/cylinder.h"
@@ -113,6 +114,9 @@ public:
         auto banners_array = world_config->get_tables("banners");
         process_actor_array(ActorType::Banner, banners_array, &new_actors);
 
+        auto meshes_array = world_config->get_tables("meshes");
+        process_actor_array(ActorType::Mesh, meshes_array, &new_actors);
+
         if (new_actors.size() < 1) {
             LOG(ERROR) << "No actors found";
             return std::shared_ptr<SceneWorld>();
@@ -185,6 +189,8 @@ public:
                     create_molecule(texture_factory_, it->current(), actor_ptrs);
                 else if (actor_type == ActorType::Banner)
                     create_banner(texture_factory_, it->current(), actor_ptrs);
+                else if (actor_type == ActorType::Mesh)
+                    create_mesh(texture_factory_, it->current(), actor_ptrs);
 
                 // Ignore when unknown type
             }

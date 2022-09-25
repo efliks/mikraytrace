@@ -19,7 +19,7 @@ target_include_directories(mrtp_cli
         /usr/include/openbabel-2.0
 )
 
-target_link_libraries(mrtp_cli PRIVATE png openbabel m)
+target_link_libraries(mrtp_cli PRIVATE png openbabel m 3ds)
 
 set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -fPIC -O2")
 
