@@ -99,6 +99,13 @@ void create_banner(TextureFactory* texture_factory,
     banner_j_vec *= (1 / banner_j_vec.norm());
     banner_k_vec *= (1 / banner_k_vec.norm());
 
+    // Each char can rotate individually
+    Eigen::Matrix3d m_char_rot = create_rotation_matrix(items, "char_");
+
+    Vector3d char_i_vec = m_char_rot * banner_i_vec;
+    Vector3d char_j_vec = m_char_rot * banner_j_vec;
+    Vector3d char_k_vec = m_char_rot * banner_k_vec;
+
     double char_scale = items->get_value("scale", 1);
     int char_idx = 0;
 
@@ -106,7 +113,7 @@ void create_banner(TextureFactory* texture_factory,
         Vector3d char_o_vec = banner_o_vec + (char_scale * char_idx - (banner_text.size() - 1) * char_scale / 2) * banner_j_vec;
         char_idx++;
 
-        StandardBasis char_basis{char_o_vec, banner_i_vec, banner_j_vec, banner_k_vec};
+        StandardBasis char_basis{char_o_vec, char_i_vec, char_j_vec, char_k_vec};
 
         create_char3d(c, char_scale, char_basis, banner_mapper, actor_ptrs);
     }

@@ -51,15 +51,16 @@ Vector3d fill_vector(const Vector3d& vec)
 }
 
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items) 
+Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items,
+                                       const std::string& prefix)
 {
-    double angle_x = items->get_value("angle_x", 0);
+    double angle_x = items->get_value(prefix + "angle_x", 0);
     Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());
 
-    double angle_y = items->get_value("angle_y", 0);
+    double angle_y = items->get_value(prefix + "angle_y", 0);
     Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * M_PI / 180, Vector3d::UnitY());
 
-    double angle_z = items->get_value("angle_z", 0);
+    double angle_z = items->get_value(prefix + "angle_z", 0);
     Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * M_PI / 180, Vector3d::UnitZ());
 
     Eigen::Matrix3d m_rot;

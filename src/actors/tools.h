@@ -2,6 +2,7 @@
 #define TOOLS_H
 
 #include <memory>
+#include <string>
 #include <Eigen/Core>
 
 #include "config.h"
@@ -17,7 +18,7 @@ double solve_quadratic(double, double, double);
 
 Vector3d fill_vector(const Vector3d&);
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable>);
+Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable>, const std::string& = "");
 
 }
 
