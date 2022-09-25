@@ -39,11 +39,7 @@ void create_cube(TextureFactory* texture_factory,
         return;
     }
 
-    Vector3d cube_vec_k = cube_items->get_vector("direction");
-    if (!cube_vec_k.size()) {
-        LOG(ERROR) << "Error parsing cube direction";
-        return;
-    }
+    Vector3d cube_vec_k = cube_items->get_vector("direction", Vector3d{0, 0, 1});
 
     double cube_scale = cube_items->get_value("scale", 1) / 2;
 
