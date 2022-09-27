@@ -1,33 +1,15 @@
 #include <Eigen/Geometry>
 #include <easylogging++.h>
 
-#include "actors/tools.h"
 #include "actors/cube.h"
+
+#include "actors/tools.h"
+#include "actors/plane.h"
+#include "actors/polygon.h"
 #include "actors/triangle.h"
 
 
 namespace mrtp {
-
-static void create_cube_triangles(double s,
-                                  const StandardBasis& face_basis,
-                                  std::shared_ptr<TextureMapper> texture_mapper_ptr,
-                                  std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
-{
-    Vector3d ta_A = face_basis.o + face_basis.vi * s + face_basis.vj * s;
-    Vector3d ta_B = face_basis.o - face_basis.vi * s + face_basis.vj * s;
-    Vector3d ta_C = face_basis.o + face_basis.vi * s - face_basis.vj * s;
-
-    Vector3d tb_A = face_basis.o - face_basis.vi * s - face_basis.vj * s;
-    Vector3d tb_B = face_basis.o + face_basis.vi * s - face_basis.vj * s;
-    Vector3d tb_C = face_basis.o - face_basis.vi * s + face_basis.vj * s;
-
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
-                              new SimpleTriangle(face_basis, ta_A, ta_B, ta_C, texture_mapper_ptr)));
-
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
-                              new SimpleTriangle(face_basis, tb_A, tb_B, tb_C, texture_mapper_ptr)));
-}
-
 
 void create_cube(TextureFactory* texture_factory,
                  std::shared_ptr<ConfigTable> cube_items,
@@ -43,8 +25,8 @@ void create_cube(TextureFactory* texture_factory,
 
     double cube_scale = cube_items->get_value("scale", 1) / 2;
 
-    auto texture_mapper_ptr = create_dummy_mapper(cube_items, "color", "reflect");
-    if (!texture_mapper_ptr) {
+    auto texture_mapper = create_dummy_mapper(cube_items, "color", "reflect");
+    if (!texture_mapper) {
         return;
     }
 
@@ -76,12 +58,18 @@ void create_cube(TextureFactory* texture_factory,
     StandardBasis face_e_basis{face_e_o, -cube_vec_k, -cube_vec_i, cube_vec_j};
     StandardBasis face_f_basis{face_f_o, -cube_vec_k, cube_vec_i, -cube_vec_j};
 
-    create_cube_triangles(cube_scale, face_a_basis, texture_mapper_ptr, actor_ptrs);
-    create_cube_triangles(cube_scale, face_b_basis, texture_mapper_ptr, actor_ptrs);
-    create_cube_triangles(cube_scale, face_c_basis, texture_mapper_ptr, actor_ptrs);
-    create_cube_triangles(cube_scale, face_d_basis, texture_mapper_ptr, actor_ptrs);
-    create_cube_triangles(cube_scale, face_e_basis, texture_mapper_ptr, actor_ptrs);
-    create_cube_triangles(cube_scale, face_f_basis, texture_mapper_ptr, actor_ptrs);
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_a_basis, texture_mapper, cube_scale, cube_scale)));
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_b_basis, texture_mapper, cube_scale, cube_scale)));
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_c_basis, texture_mapper, cube_scale, cube_scale)));
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_d_basis, texture_mapper, cube_scale, cube_scale)));
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_e_basis, texture_mapper, cube_scale, cube_scale)));
+    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+                              new SimplePolygon(face_f_basis, texture_mapper, cube_scale, cube_scale)));
 }
 
 
