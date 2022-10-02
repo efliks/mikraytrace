@@ -3,7 +3,6 @@
 #include <cmath>
 #include <ctime>
 
-#include "png.hpp"
 #include "renderer.h"
 
 #ifdef _OPENMP
@@ -200,32 +199,6 @@ float SceneRenderer::do_render() {
     render_block(0, config_.buffer_height);
 
     return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
-}
-
-
-ScenePNGWriter::ScenePNGWriter(SceneRendererBase* scene_renderer) :
-    scene_renderer_(scene_renderer) {
-
-}
-
-
-void ScenePNGWriter::write_to_file(const std::string& png_filename) {
-    png::image<png::rgb_pixel> image(
-                scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height);
-
-    Pixel* in = &scene_renderer_->framebuffer_[0];
-
-    for (unsigned int i = 0; i < scene_renderer_->config_.buffer_height; i++) {
-        png::rgb_pixel* out = &image[i][0];
-        for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, in++, out++) {
-            Pixel bytes = 255 * (*in);
-            out->red = static_cast<unsigned char>(bytes[0]);
-            out->green = static_cast<unsigned char>(bytes[1]);
-            out->blue = static_cast<unsigned char>(bytes[2]);
-        }
-    }
-
-    image.write(png_filename.c_str());
 }
 
 

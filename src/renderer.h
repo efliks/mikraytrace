@@ -15,8 +15,6 @@ namespace mrtp {
 
 using Vector3d = Eigen::Vector3d;
 
-class ScenePNGWriter;
-
 
 struct RendererConfig {
     double field_of_vision = 93;
@@ -33,7 +31,6 @@ struct RendererConfig {
 
 
 class SceneRendererBase {
-    friend class ScenePNGWriter;
 
 public:
     SceneRendererBase(SceneWorld*, const RendererConfig&);
@@ -42,13 +39,15 @@ public:
 
     virtual float do_render() = 0;
 
+    //FIXME
+    RendererConfig config_;
+    std::vector<Pixel> framebuffer_;
+
 protected:
     double ratio_;
     double perspective_;
 
     SceneWorld* scene_world_;
-    RendererConfig config_;
-    std::vector<Pixel> framebuffer_;
 
     Pixel trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
     ActorBase* solve_hits(const Vector3d&, const Vector3d&, double*) const;
@@ -77,19 +76,6 @@ public:
     ~SceneRenderer() override = default;
 
     float do_render() override;
-};
-
-
-class ScenePNGWriter {
-public:
-    ScenePNGWriter(SceneRendererBase*);
-    ScenePNGWriter() = delete;
-    ~ScenePNGWriter() = default;
-
-    void write_to_file(const std::string&);
-
-private:
-    SceneRendererBase* scene_renderer_;
 };
 
 

@@ -11,6 +11,7 @@
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
+#include "writer.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -273,17 +274,19 @@ int main(int argc, char** argv) {
         float render_t = 0;
         if (renderer_config.num_threads == 1) {
             mrtp::SceneRenderer scene_renderer(world_ptr.get(), renderer_config);
-            mrtp::ScenePNGWriter scene_writer(&scene_renderer);
+            //FIXME
+            auto scene_writer = mrtp::create_writer(&scene_renderer);
 
             render_t = scene_renderer.do_render();
-            scene_writer.write_to_file(png_file);
+            scene_writer->write_to_file(png_file);
         }
         else {
             mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), renderer_config, renderer_config.num_threads);
-            mrtp::ScenePNGWriter scene_writer(&scene_renderer);
+            //FIXME
+            auto scene_writer = mrtp::create_writer(&scene_renderer);
 
             render_t = scene_renderer.do_render();
-            scene_writer.write_to_file(png_file);
+            scene_writer->write_to_file(png_file);
         }
         LOG(INFO) << "Done in " << std::setprecision(2) << render_t << "s";
     }
