@@ -6,6 +6,7 @@ file(GLOB SRC_FILES
     src/*.cpp
     src/actors/*.cpp
     /usr/include/easylogging++.cc
+    ${PROJECT_SOURCE_DIR}/thirdparty/toojpeg/toojpeg.cpp
 )
 
 add_executable(mrtp_cli ${SRC_FILES})
@@ -14,6 +15,7 @@ target_include_directories(mrtp_cli
     PRIVATE 
         ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/thirdparty/cpptoml/include
+        ${PROJECT_SOURCE_DIR}/thirdparty/toojpeg
         /usr/include/eigen3
         /usr/include/png++
         /usr/include/openbabel-2.0
