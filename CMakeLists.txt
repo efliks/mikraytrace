@@ -15,6 +15,7 @@ target_include_directories(mrtp_cli
     PRIVATE 
         ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/thirdparty/cpptoml/include
+        ${PROJECT_SOURCE_DIR}/thirdparty/CLI11/include
         ${PROJECT_SOURCE_DIR}/thirdparty/toojpeg
         /usr/include/eigen3
         /usr/include/png++

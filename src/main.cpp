@@ -1,252 +1,63 @@
-#include <memory>
 #include <vector>
 #include <string>
-#include <sstream>
-#include <iostream>
-#include <cstdlib>
-#include <unistd.h>
 #include <iomanip>
-#include <easylogging++.h>
+#include <iostream>
+
+#include "CLI/App.hpp"
+#include "CLI/Formatter.hpp"
+#include "CLI/Config.hpp"
 
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
 #include "writer.h"
 
+#include <easylogging++.h>
+
 INITIALIZE_EASYLOGGINGPP
 
 
-using RendererConfig = mrtp::RendererConfig;
+int main(int argc, char* argv[])
+{
+    CLI::App app{"A simple raytracer"};
+
+    std::vector<std::string> input_files;
+    app.add_option("input_files", input_files, "Input file(s)")->mandatory();
+
+    std::string output_file;
+    app.add_option("-o,--output", output_file, "Output file");
+
+    std::string output_format;
+    app.add_option("-F,--format", output_format, "Output format")->default_val("png")->check(CLI::IsMember({"png", "jpg"}));
+
+    mrtp::RendererConfig config;
+    app.add_option("-f,--fov", config.field_of_vision, "Field of vision in degrees")->default_val(config.field_of_vision)->check(CLI::Range(50, 170));
+
+    app.add_option("-W,--width", config.buffer_width, "Image width")->default_val(config.buffer_width)->check(CLI::Range(320, 3200));
+    app.add_option("-H,--height", config.buffer_height, "Image height")->default_val(config.buffer_height)->check(CLI::Range(240, 2400));
+
+    app.add_option("-r,--recursion", config.max_ray_depth, "Levels of recursion for reflected rays")->default_val(config.max_ray_depth)->check(CLI::Range(0, 5));
+    app.add_option("-s,--shadow", config.shadow_bias, "Shadow coefficient")->default_val(config.shadow_bias);
+
+    app.add_option("-t,--threads", config.num_threads, "Rendering threads (0 for auto)")->default_val(config.num_threads)->check(CLI::Range(0, 32));
+
+    CLI11_PARSE(app, argc, argv);
 
 
-bool parse_field_of_vision(const std::string& s,
-                           RendererConfig* config) {
-    std::stringstream convert(s);
-    convert >> config->field_of_vision;
-
-    bool is_parsed;
-    if (!(is_parsed = !convert.bad())) {
-        LOG(ERROR) << "Error parsing field of vision";
-        return is_parsed;
-    }
-    if (!(is_parsed = config->field_of_vision >= 50 &&
-          config->field_of_vision <= 170)) {
-        LOG(ERROR) << "Field of vision is out of range";
-    }
-
-    return is_parsed;
-}
-
-
-bool parse_max_distance(const std::string& s,
-                        RendererConfig* config) {
-    std::stringstream convert(s);
-    convert >> config->max_distance;
-
-    bool is_parsed;
-    if (!(is_parsed = !convert.bad()))
-        LOG(ERROR) << "Error parsing maximum distance";
-
-    return is_parsed;
-}
-
-
-bool parse_shadow_bias(const std::string& s,
-                       RendererConfig* config) {
-    std::stringstream convert(s);
-    convert >> config->shadow_bias;
-
-    bool is_parsed;
-    if (!(is_parsed = !convert.bad()))
-        LOG(ERROR) << "Error parsing shadow bias";
-
-    return is_parsed;
-}
-
-
-bool parse_ray_depth(const std::string& s,
-                     RendererConfig* config) {
-    std::stringstream convert(s);
-    convert >> config->max_ray_depth;
-
-    bool is_parsed;
-    if (!(is_parsed = !convert.bad()))
-        LOG(ERROR) << "Error parsing maximum ray depth";
-
-    return is_parsed;
-}
-
-
-bool parse_threads(const std::string& s,
-                   RendererConfig* config) {
-    std::stringstream convert(s);
-    convert >> config->num_threads;
-
-    bool is_parsed;
-    if (!(is_parsed = !convert.bad())) {
-        LOG(ERROR) << "Error parsing number of threads";
-        return is_parsed;
-    }
-    if (!(is_parsed = config->num_threads >= 0 &&
-          config->num_threads <= 64)) {
-        LOG(ERROR) << "Number of threads is out of range";
+    bool auto_name = input_files.size() > 1 || output_file.empty();
+    if (auto_name && !output_file.empty()) {
+        LOG(ERROR) << "Output file not allowed with multiple input files";
+        return EXIT_FAILURE;
     }
 
-    return is_parsed;
-}
-
-
-bool parse_resolution(const std::string& str,
-                      RendererConfig* config) {
-    bool is_parsed = true;
-
-    size_t p = str.find('x');
-    if (p == std::string::npos) {
-        p = str.find('X');
-        if (p == std::string::npos) {
-            is_parsed = false;
-        }
-    }
-    if (!is_parsed) {
-        LOG(ERROR) << "Invalid resolution format";
-        return is_parsed;
-    }
-
-    std::string left(str.substr(0, p));
-    std::stringstream convert(left);
-    convert >> config->buffer_width;
-
-    if (!(is_parsed = !convert.bad())) {
-        LOG(ERROR) << "Unable to convert resolution width";
-        return is_parsed;
-    }
-    if (!(is_parsed = config->buffer_width >= 320 &&
-          config->buffer_width <= 3200)) {
-        LOG(ERROR) << "Resolution width is out of range";
-        return is_parsed;
-    }
-
-    std::string right(str.substr(p+1, str.length()-p-1));
-    std::stringstream convert_other(right);
-    convert_other >> config->buffer_height;
-
-    if (!(is_parsed = !convert_other.bad())) {
-        LOG(ERROR) << "Unable to convert resolution height";
-        return is_parsed;
-    }
-    if (!(is_parsed = config->buffer_height >= 240 &&
-          config->buffer_height <= 2400)) {
-        LOG(ERROR) << "Resolution height is out of range";
-    }
-
-    return is_parsed;
-}
-
-
-bool apply_option_parser(int c,
-                         const std::string& opt_arg,
-                         RendererConfig* renderer_config) {
-    if (c == 'd')
-        return parse_max_distance(opt_arg, renderer_config);
-    if (c == 'f')
-        return parse_field_of_vision(opt_arg, renderer_config);
-    if (c == 'r')
-        return parse_resolution(opt_arg, renderer_config);
-    if (c == 'R')
-        return parse_ray_depth(opt_arg, renderer_config);
-    if (c == 's')
-        return parse_shadow_bias(opt_arg, renderer_config);
-    // c == 't'
-    return parse_threads(opt_arg, renderer_config);
-}
-
-
-void display_help() {
-    std::cout << R"(Usage: mrtp_cli [OPTION]... FILE...
-  Options:
-    -d   distance to darken light
-    -f   field of vision in degrees
-    -h   print this help screen
-    -o   output filename in PNG format
-    -q   suppress messages, except errors
-    -r   resolution, eg. 640x480
-    -R   levels of recursion for reflected rays
-    -s   shadow factor
-    -t   rendering threads: 0 (auto), 1, 2, ...
-
-Example:
-  mrtp_cli -r 1620x1080 -f 110.0 -o scene2.png scene2.toml)" << std::endl;
-}
-
-
-bool process_command_line(int argc,
-                          char** argv,
-                          RendererConfig* renderer_config,
-                          std::vector<std::string>* input_files,
-                          std::string* output_file,
-                          bool* quiet_mode) {
-    if (argc < 2) {
-        display_help();
-        return false;
-    }
-
-    int c;
-    *quiet_mode = false;
-
-    while ((c = getopt(argc, argv, "d:f:ho:qr:R:s:t:")) != -1) {
-        if (c == 'h') {
-            display_help();
-            return false;
-        }
-        else if (c == 'o') {
-            *output_file = std::string(optarg);
-        }
-        else if (c == 'q') {
-            *quiet_mode = true;
-        }
-        else if (c == '?') {
-            return false;
-        }
-        else {
-            if (!apply_option_parser(c, std::string(optarg), renderer_config)) {
-                return false;
+    if (!output_file.empty()) {
+        size_t pos = output_file.rfind(".");
+        if (pos != std::string::npos) {
+            std::string extension = output_file.substr(pos + 1, output_file.size());
+            if (extension != output_format) {
+                LOG(ERROR) << "Output format and output file extension should match";
+                return EXIT_FAILURE;
             }
-        }
-    }
-
-    for (int i = optind; i < argc; i++) {
-        input_files->push_back(std::string(argv[i]));
-    }
-    if (input_files->empty()) {
-        LOG(ERROR) << "Missing toml file";
-        return false;
-    }
-    return true;
-}
-
-
-int main(int argc, char** argv) {
-    bool quiet_flag = false;
-    std::string png_file;
-    std::vector<std::string> toml_files;
-    mrtp::RendererConfig renderer_config;
-
-    if (!(process_command_line(
-              argc,
-              argv,
-              &renderer_config,
-              &toml_files,
-              &png_file,
-              &quiet_flag
-              ))) {
-        return 1;
-    }
-
-    bool use_auto_name = (toml_files.size() > 1) || (png_file == "");
-    if (use_auto_name) {
-        if (png_file != "") {
-            LOG(ERROR) << "Option -o not allowed with multiple toml files";
-            return 1;
         }
     }
 
@@ -254,42 +65,44 @@ int main(int argc, char** argv) {
     mrtp::TextureFactory texture_factory;
 
     // Iterate over all input files
-    for (auto toml_file : toml_files) {
-        LOG(INFO) << "Processing " << toml_file << " ...";
+    for (std::string& input_file : input_files) {
+        LOG(INFO) << "Processing " << input_file << " ...";
 
-        auto world_ptr = mrtp::build_world(toml_file, &texture_factory);
+        auto world_ptr = mrtp::build_world(input_file, &texture_factory);
         if (!world_ptr) {
-            return 2;
+            return EXIT_FAILURE;
         }
 
-        if (use_auto_name) {
-            std::string foo(toml_file);
-            size_t pos = toml_file.rfind(".toml");
+        if (auto_name) {
+            std::string foo(input_file);
+            size_t pos = input_file.rfind(".toml");  //FIXME
             if (pos != std::string::npos) {
-                foo = toml_file.substr(0, pos);
+                foo = input_file.substr(0, pos);
             }
-            png_file = foo + ".png";
+            output_file = foo + "." + output_format;
         }
+
+        mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType::PNG : mrtp::WriterType::JPEG;
 
         float render_t = 0;
-        if (renderer_config.num_threads == 1) {
-            mrtp::SceneRenderer scene_renderer(world_ptr.get(), renderer_config);
+        if (config.num_threads == 1) {
+            mrtp::SceneRenderer scene_renderer(world_ptr.get(), config);
             //FIXME
-            auto scene_writer = mrtp::create_writer(&scene_renderer);
+            auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
 
             render_t = scene_renderer.do_render();
-            scene_writer->write_to_file(png_file);
+            scene_writer->write_to_file(output_file);
         }
         else {
-            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), renderer_config, renderer_config.num_threads);
+            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), config, config.num_threads);
             //FIXME
-            auto scene_writer = mrtp::create_writer(&scene_renderer);
+            auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
 
             render_t = scene_renderer.do_render();
-            scene_writer->write_to_file(png_file);
+            scene_writer->write_to_file(output_file);
         }
         LOG(INFO) << "Done in " << std::setprecision(2) << render_t << "s";
     }
     
-    return 0;  // All done
+    return EXIT_SUCCESS;  // All done
 }
