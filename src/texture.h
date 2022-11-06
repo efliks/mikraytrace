@@ -20,6 +20,7 @@ public:
     unsigned char red;
     unsigned char green;
     unsigned char blue;
+    unsigned char alpha_channel;  // unused
 };
 
 

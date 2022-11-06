@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "png.hpp"
+#include "lodepng.h"
 #include "texture.h"
 
 
@@ -38,21 +38,16 @@ Vector3d TexturePixel::to_vec() const {
 }
 
 
-TextureSharedState::TextureSharedState(const std::string& texture_filename) {
-    png::image<png::rgb_pixel> image(texture_filename.c_str());
+TextureSharedState::TextureSharedState(const std::string& filename)
+{
+    // TODO Stop on errors
+    std::vector<unsigned char> buffer;
+    lodepng::decode(buffer, texture_width_, texture_heigth_, filename);
 
-    texture_width_ = image.get_width();
-    texture_heigth_ = image.get_height();
+    texture_data_.resize(texture_width_ * texture_heigth_);
 
-    texture_data_.reserve(texture_width_ * texture_heigth_);
-
-    for (unsigned int i = 0; i < texture_heigth_; i++) {
-        png::rgb_pixel* in = &image[i][0];
-        for (unsigned j = 0; j < texture_width_; j++, in++) {
-            TexturePixel pixel{in->red, in->green, in->blue};
-            texture_data_.push_back(pixel);
-        }
-    }
+    static_assert(sizeof(TexturePixel) == sizeof(unsigned char) * 4, "Cannot copy temporary buffer into texture data");
+    std::memcpy(static_cast<void *>(texture_data_.data()), static_cast<void *>(buffer.data()), sizeof(TexturePixel) * texture_width_ * texture_heigth_);
 }
 
 

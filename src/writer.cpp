@@ -1,7 +1,8 @@
 #include <vector>
 #include <fstream>
+#include <easylogging++.h>
 
-#include "png.hpp"
+#include "lodepng.h"
 #include "toojpeg.h"
 
 #include "pixel.h"
@@ -75,22 +76,38 @@ public:
 
     void write_to_file(const std::string& filename) override
     {
-        png::image<png::rgb_pixel> image(
-                    scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height);
-
-        Pixel* in = &scene_renderer_->framebuffer_[0];
+        Pixel* pixel_ptr = scene_renderer_->framebuffer_.data();
+        std::vector<unsigned char> image;
 
         for (unsigned int i = 0; i < scene_renderer_->config_.buffer_height; i++) {
-            png::rgb_pixel* out = &image[i][0];
-            for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, in++, out++) {
-                Pixel bytes = 255 * (*in);
-                out->red = static_cast<unsigned char>(bytes[0]);
-                out->green = static_cast<unsigned char>(bytes[1]);
-                out->blue = static_cast<unsigned char>(bytes[2]);
+            for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, pixel_ptr++) {
+                Pixel bytes = 255 * (*pixel_ptr);
+                image.push_back(static_cast<unsigned char>(bytes[0]));
+                image.push_back(static_cast<unsigned char>(bytes[1]));
+                image.push_back(static_cast<unsigned char>(bytes[2]));
             }
         }
 
-        image.write(filename.c_str());
+        lodepng::State state;
+
+        state.info_raw.colortype = LCT_RGB;
+        state.info_raw.bitdepth = 8;
+
+        state.info_png.color.colortype = LCT_RGB;
+        state.info_png.color.bitdepth = 8;
+        state.encoder.auto_convert = 0;
+
+        std::vector<unsigned char> buffer;
+        unsigned int error = lodepng::encode(buffer, image.data(), scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height, state);
+
+        if (!error) {
+            LOG(INFO) << "Writing scene image " << filename << "...";
+            error = lodepng::save_file(buffer, filename);
+        }
+
+        if (error) {
+            LOG(ERROR) << "Error writing scene image: " << lodepng_error_text(error);
+        }
     }
 };
 

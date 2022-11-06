@@ -11,12 +11,14 @@ Firstly, install the required libraries and tools. In Debian, or in
 a Debian-like Linux, this can be done like so:
 
 ```
-apt-get install build-essential cmake libpng++-dev libeigen3-dev libeasyloggingpp-dev libopenbabel-dev lib3ds-dev
+apt-get install build-essential cmake libeigen3-dev libeasyloggingpp-dev libopenbabel-dev lib3ds-dev
 ```
 
-Secondly, you need some third party libraries. These are "CLI11" for 
-command line processing, "cpptoml" for reading configuration files, 
-and "toojpeg" for writing images in JPEG format. 
+Secondly, you need some third party libraries. These are:
+ * CLI11 for command line processing
+ * cpptoml for reading configuration files
+ * toojpeg for writing scenes in JPEG format
+ * lodepng for loading textures and writing scenes in PNG format
 
 Install them by updating the submodules:
 
