@@ -79,6 +79,23 @@ static void load_node_r(Lib3dsFile* libfile,
 }
 
 
+static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
+{
+    File3dsWrapper filewrap(filename);
+    if (filewrap.is_failed()) {
+        return 0;  // Error
+    }
+
+    Lib3dsNode* node = filewrap.libfile->nodes;
+    while (node != nullptr) {
+        load_node_r(filewrap.libfile, node, vertex_list);
+        node = node->next;
+    }
+
+    return 1;  // Success
+}
+
+
 static void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
 {
     struct TriangleFace
@@ -158,18 +175,15 @@ void create_mesh(TextureFactory* texture_factory,
     if (ext == "3d") {
         load_custom_file(filename, &vertex_list);
     }
-    else {  // 3D Studio Max file
-        File3dsWrapper filewrap(filename);
-        if (filewrap.is_failed()) {
-            LOG_ERROR("Cannot read mesh file");
+    else if (ext == "3ds") {
+        if (!load_3ds_file(filename, &vertex_list)) {
+            LOG_ERROR("Error reading mesh file");
             return;
         }
-
-        Lib3dsNode* node = filewrap.libfile->nodes;
-        while (node != nullptr) {
-            load_node_r(filewrap.libfile, node, &vertex_list);
-            node = node->next;
-        }
+    }
+    else {
+        LOG_ERROR(std::string("Unknown file extension " + ext));
+        return;
     }
 
     if (vertex_list.empty()) {
