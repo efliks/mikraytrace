@@ -1,4 +1,5 @@
 #include <string>
+#include <fstream>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -78,6 +79,56 @@ static void load_node_r(Lib3dsFile* libfile,
 }
 
 
+static void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
+{
+    struct TriangleFace
+    {
+        unsigned short a, b, c;
+    };
+
+    std::ifstream f(filename.c_str(), std::ios::binary);
+
+    if (f.is_open()) {
+        char filetag[4];
+        f.read(filetag, 4);
+
+        if (std::strncmp(filetag, "MF3D", 4) == 0) {
+            unsigned short num_vertices;
+            static_assert (sizeof(unsigned short) == 2, "Short is not 2 bytes");
+            f.read(static_cast<char *>(static_cast<void *>(&num_vertices)), sizeof(unsigned short));
+
+            unsigned short num_faces;
+            f.read(static_cast<char *>(static_cast<void *>(&num_faces)), sizeof(unsigned short));
+
+            static_assert(sizeof(Eigen::Vector3f) == 12, "Vector3f is not 12 bytes");
+
+            std::vector<Eigen::Vector3f> tmp_vertex_list;
+            tmp_vertex_list.resize(num_vertices);
+            f.read(static_cast<char *>(static_cast<void *>(tmp_vertex_list.data())), sizeof(Eigen::Vector3f) * num_vertices);
+
+            std::vector<TriangleFace> faces_list;
+            faces_list.resize(num_faces);
+            f.read(static_cast<char *>(static_cast<void *>(faces_list.data())), sizeof(TriangleFace) * num_faces);
+
+            f.close();
+
+            for (const TriangleFace& face : faces_list) {
+                Eigen::Vector3f v;
+
+                v << tmp_vertex_list[face.a];
+                vertex_list->push_back(v.cast<double>());
+
+                v << tmp_vertex_list[face.b];
+                vertex_list->push_back(v.cast<double>());
+
+                v << tmp_vertex_list[face.c];
+                vertex_list->push_back(v.cast<double>());
+            }
+        }
+    }
+}
+
+
 void create_mesh(TextureFactory* texture_factory,
                  std::shared_ptr<ConfigTable> items,
                  std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
@@ -85,12 +136,6 @@ void create_mesh(TextureFactory* texture_factory,
     std::string filename = items->get_text("file3ds");
     if (filename.empty()) {
         LOG_ERROR("Undefined mesh file");
-        return;
-    }
-
-    File3dsWrapper filewrap(filename);
-    if (filewrap.is_failed()) {
-        LOG_ERROR("Cannot read mesh file");
         return;
     }
 
@@ -106,11 +151,25 @@ void create_mesh(TextureFactory* texture_factory,
         return;
     }
 
+    size_t idx = filename.rfind(".");
+    std::string ext = filename.substr(idx + 1, filename.length() - idx - 1);
     std::vector<Vector3d> vertex_list;
-    Lib3dsNode* node = filewrap.libfile->nodes;
-    while (node != nullptr) {
-        load_node_r(filewrap.libfile, node, &vertex_list);
-        node = node->next;
+
+    if (ext == "3d") {
+        load_custom_file(filename, &vertex_list);
+    }
+    else {  // 3D Studio Max file
+        File3dsWrapper filewrap(filename);
+        if (filewrap.is_failed()) {
+            LOG_ERROR("Cannot read mesh file");
+            return;
+        }
+
+        Lib3dsNode* node = filewrap.libfile->nodes;
+        while (node != nullptr) {
+            load_node_r(filewrap.libfile, node, &vertex_list);
+            node = node->next;
+        }
     }
 
     if (vertex_list.empty()) {
