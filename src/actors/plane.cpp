@@ -1,8 +1,9 @@
 #include <Eigen/Geometry>
-#include <easylogging++.h>
 
 #include "actors/plane.h"
 #include "actors/tools.h"
+
+#include "logger.h"
 
 
 namespace mrtp {
@@ -45,13 +46,13 @@ void create_plane(TextureFactory* texture_factory,
 {
     Vector3d plane_center_vec = plane_items->get_vector("center");
     if (!plane_center_vec.size()) {
-        LOG(ERROR) << "Error parsing plane center";
+        LOG_ERROR("Error parsing plane center");
         return;
     }
 
     Vector3d plane_normal_vec = plane_items->get_vector("normal");
     if (!plane_normal_vec.size()) {
-        LOG(ERROR) << "Error parsing plane normal";
+        LOG_ERROR("Error parsing plane normal");
         return;
     }
 

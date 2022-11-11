@@ -1,5 +1,6 @@
 #include <Eigen/Geometry>
-#include <easylogging++.h>
+
+#include "logger.h"
 
 #include "actors/tools.h"
 #include "actors/cylinder.h"
@@ -101,13 +102,13 @@ void create_cylinder(TextureFactory* texture_factory,
 {
     Vector3d cylinder_center_vec = cylinder_items->get_vector("center");
     if (!cylinder_center_vec.size()) {
-        LOG(ERROR) << "Error parsing cylinder center";
+        LOG_ERROR("Error parsing cylinder center");
         return;
     }
 
     Vector3d cylinder_direction_vec = cylinder_items->get_vector("direction");
     if (!cylinder_direction_vec.size()) {
-        LOG(ERROR) << "Error parsing cylinder direction";
+        LOG_ERROR("Error parsing cylinder direction");
         return;
     }
 

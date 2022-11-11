@@ -1,8 +1,9 @@
 #include <Eigen/Geometry>
-#include <easylogging++.h>
 
 #include "actors/triangle.h"
 #include "actors/plane.h"
+
+#include "logger.h"
 
 
 namespace mrtp {
@@ -54,19 +55,19 @@ void create_triangle(TextureFactory* texture_factory,
 {
     Vector3d A = items->get_vector("A");
     if (!A.size()) {
-        LOG(ERROR) << "Error parsing vertex A in triangle";
+        LOG_ERROR("Error parsing vertex A in triangle");
         return;
     }
 
     Vector3d B = items->get_vector("B");
     if (!B.size()) {
-        LOG(ERROR) << "Error parsing vertex B in triangle";
+        LOG_ERROR("Error parsing vertex B in triangle");
         return;
     }
 
     Vector3d C = items->get_vector("C");
     if (!C.size()) {
-        LOG(ERROR) << "Error parsing vertex C in triangle";
+        LOG_ERROR("Error parsing vertex C in triangle");
         return;
     }
 

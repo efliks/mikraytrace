@@ -1,6 +1,6 @@
 #include <Eigen/Core>
-#include <easylogging++.h>
 
+#include "logger.h"
 #include "config.h"
 #include "world.h"
 
@@ -121,7 +121,7 @@ public:
         process_actor_array(ActorType::Mesh, meshes_array, &new_actors);
 
         if (new_actors.size() < 1) {
-            LOG(ERROR) << "No actors found";
+            LOG_ERROR("No actors found");
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -132,19 +132,19 @@ public:
 
         std::shared_ptr<ConfigTable> camera_table = world_config->get_table("camera");
         if (!camera_table) {
-            LOG(ERROR) << "No camera found";
+            LOG_ERROR("No camera found");
             return std::shared_ptr<SceneWorld>();
         }
 
         Vector3d camera_eye = camera_table->get_vector("center");
         if (!camera_eye.size()) {
-            LOG(ERROR) << "Error parsing camera center";
+            LOG_ERROR("Error parsing camera center");
             return std::shared_ptr<SceneWorld>();
         }
 
         Vector3d camera_lookat = camera_table->get_vector("target");
         if (!camera_lookat.size()) {
-            LOG(ERROR) << "Error parsing camera target";
+            LOG_ERROR("Error parsing camera target");
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -152,13 +152,13 @@ public:
 
         std::shared_ptr<ConfigTable> light_table = world_config->get_table("light");
         if (!light_table) {
-            LOG(ERROR) << "No light found";
+            LOG_ERROR("No light found");
             return std::shared_ptr<SceneWorld>();
         }
 
         Vector3d light_center = light_table->get_vector("center");
         if (!light_center.size()) {
-            LOG(ERROR) << "Error parsing light center";
+            LOG_ERROR("Error parsing light center");
             return std::shared_ptr<SceneWorld>();
         }
 

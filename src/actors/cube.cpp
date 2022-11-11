@@ -1,8 +1,8 @@
 #include <Eigen/Geometry>
-#include <easylogging++.h>
+
+#include "logger.h"
 
 #include "actors/cube.h"
-
 #include "actors/tools.h"
 #include "actors/plane.h"
 #include "actors/polygon.h"
@@ -17,7 +17,7 @@ void create_cube(TextureFactory* texture_factory,
 {
     Vector3d cube_vec_o = cube_items->get_vector("center");
     if (!cube_vec_o.size()) {
-        LOG(ERROR) << "Error parsing cube center";
+        LOG_ERROR("Error parsing cube center");
         return;
     }
 

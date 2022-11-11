@@ -1,8 +1,8 @@
 #include <fstream>
-#include <easylogging++.h>
 
 #include "cpptoml.h"
 #include "config.h"
+#include "logger.h"
 
 
 namespace mrtp {
@@ -130,17 +130,17 @@ private:
 
 std::shared_ptr<ConfigReader> open_config(const std::string& filename)
 {
-    std::fstream check(filename.c_str());
+    std::fstream check(filename);
     if (!check.good()) {
-        LOG(ERROR) << "Cannot open world file";
+        LOG_ERROR("Cannot open world file");
         return std::shared_ptr<ConfigReader>();
     }
 
     std::shared_ptr<cpptoml::table> config;
     try {
-        config = cpptoml::parse_file(filename.c_str());
+        config = cpptoml::parse_file(filename);
     } catch (...) {
-        LOG(ERROR) << "Error parsing world file";
+        LOG_ERROR("Error parsing world file");
         return std::shared_ptr<ConfigReader>();
     }
 

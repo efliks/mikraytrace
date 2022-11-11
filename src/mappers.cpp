@@ -1,4 +1,6 @@
-#include <easylogging++.h>
+#include <fstream>
+
+#include "logger.h"
 #include "mappers.h"
 
 
@@ -117,12 +119,12 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable
 
         Vector3d actor_color = actor_items->get_vector("color");
         if (!actor_color.size()) {
-            LOG(WARNING) << "Ignoring color and using texture file";
+            LOG_WARNING("Ignoring color and using texture file");
         }
 
-        std::fstream check(actor_texture.c_str());
+        std::fstream check(actor_texture);
         if (!check.good()) {
-            LOG(ERROR) << "Cannot open texture file " << actor_texture;
+            LOG_ERROR(std::string("Cannot open texture file " + actor_texture));
             return std::shared_ptr<TextureMapper>();
         }
 
@@ -153,7 +155,7 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable
         return std::shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
     }
 
-    LOG(ERROR) << "Cannot parse texture file and color for texture mapper";
+    LOG_ERROR("Cannot parse texture file and color for texture mapper");
     return std::shared_ptr<TextureMapper>();
 }
 
@@ -171,7 +173,7 @@ std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<ConfigTable> 
         return std::shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
     }
 
-    LOG(ERROR) << "Color for texture mapper not found";
+    LOG_ERROR("Color for texture mapper not found");
     return std::shared_ptr<TextureMapper>();
 }
 

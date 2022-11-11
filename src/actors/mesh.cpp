@@ -1,5 +1,4 @@
 #include <string>
-#include <easylogging++.h>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -8,8 +7,9 @@
 #include <lib3ds/node.h>
 #include <lib3ds/mesh.h>
 
-#include "actors/mesh.h"
+#include "logger.h"
 
+#include "actors/mesh.h"
 #include "actors/tools.h"
 #include "actors/triangle.h"
 
@@ -84,19 +84,19 @@ void create_mesh(TextureFactory* texture_factory,
 {
     std::string filename = items->get_text("file3ds");
     if (filename.empty()) {
-        LOG(ERROR) << "Undefined mesh file";
+        LOG_ERROR("Undefined mesh file");
         return;
     }
 
     File3dsWrapper filewrap(filename);
     if (filewrap.is_failed()) {
-        LOG(ERROR) << "Cannot read mesh file";
+        LOG_ERROR("Cannot read mesh file");
         return;
     }
 
     Vector3d mesh_vec_o = items->get_vector("center");
     if (!mesh_vec_o.size()) {
-        LOG(ERROR) << "Error parsing mesh center";
+        LOG_ERROR("Error parsing mesh center");
         return;
     }
 
@@ -114,7 +114,7 @@ void create_mesh(TextureFactory* texture_factory,
     }
 
     if (vertex_list.empty()) {
-        LOG(ERROR) << "No triangles found";
+        LOG_ERROR("No triangles found");
         return;
     }
 

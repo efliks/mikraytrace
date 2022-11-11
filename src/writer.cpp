@@ -1,12 +1,12 @@
 #include <vector>
 #include <fstream>
-#include <easylogging++.h>
 
 #include "lodepng.h"
 #include "toojpeg.h"
 
 #include "pixel.h"
 #include "writer.h"
+#include "logger.h"
 
 
 namespace mrtp {
@@ -101,12 +101,13 @@ public:
         unsigned int error = lodepng::encode(buffer, image.data(), scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height, state);
 
         if (!error) {
-            LOG(INFO) << "Writing scene image " << filename << "...";
+            LOG_INFO(std::string("Writing scene image " + filename + "..."));
             error = lodepng::save_file(buffer, filename);
         }
 
         if (error) {
-            LOG(ERROR) << "Error writing scene image: " << lodepng_error_text(error);
+            std::string lodepng_error(lodepng_error_text(error));
+            LOG_ERROR(std::string("Error writing scene image: " + lodepng_error));
         }
     }
 };

@@ -1,5 +1,4 @@
 #include <Eigen/Geometry>
-#include <easylogging++.h>
 
 #include <openbabel/mol.h>
 #include <openbabel/atom.h>
@@ -8,10 +7,11 @@
 #include <openbabel/obconversion.h>
 
 #include "actors/molecule.h"
-
 #include "actors/cylinder.h"
 #include "actors/sphere.h"
 #include "actors/tools.h"
+
+#include "logger.h"
 
 
 namespace mrtp {
@@ -46,13 +46,13 @@ void create_molecule(TextureFactory* texture_factory,
 {
     std::string mol2file_str = items->get_text("mol2file");
     if (mol2file_str.empty()) {
-        LOG(ERROR) << "Undefined mol2 file";
+        LOG_ERROR("Undefined mol2 file");
         return;
     }
 
     std::fstream check(mol2file_str.c_str());
     if (!check.good()) {
-        LOG(ERROR) << "Cannot open mol2 file " << mol2file_str;
+        LOG_ERROR(std::string("Cannot open mol2 file " + mol2file_str));
         return;
     }
 
@@ -63,13 +63,13 @@ void create_molecule(TextureFactory* texture_factory,
     create_tables(mol2file_str, &atomic_nums, &positions, &bonds);
 
     if (atomic_nums.empty() || positions.empty() || bonds.empty()) {
-        LOG(ERROR) << "Cannot create molecule";
+        LOG_ERROR("Cannot create molecule");
         return;
     }
 
     Vector3d mol_vec_o = items->get_vector("center");
     if (!mol_vec_o.size()) {
-        LOG(ERROR) << "Error parsing molecule center";
+        LOG_ERROR("Error parsing molecule center");
         return;
     }
 

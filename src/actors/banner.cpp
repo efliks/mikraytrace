@@ -1,12 +1,12 @@
 #include <string>
 
 #include <Eigen/Geometry>
-#include <easylogging++.h>
 
 #include "actors/banner.h"
 #include "actors/sphere.h"
 #include "actors/tools.h"
 
+#include "logger.h"
 #include "common.h"
 #include "mappers.h"
 
@@ -73,7 +73,7 @@ void create_banner(TextureFactory* texture_factory,
 {
     std::string banner_text = items->get_text("text");
     if (banner_text.empty()) {
-        LOG(ERROR) << "Error parsing banner text";
+        LOG_ERROR("Error parsing banner text");
         return;
     }
 
@@ -85,7 +85,7 @@ void create_banner(TextureFactory* texture_factory,
 
     Vector3d banner_o_vec = items->get_vector("center");
     if (!banner_o_vec.size()) {
-        LOG(ERROR) << "Error parsing banner center";
+        LOG_ERROR("Error parsing banner center");
         return;
     }
 

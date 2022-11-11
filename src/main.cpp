@@ -11,8 +11,7 @@
 #include "renderer.h"
 #include "texture.h"
 #include "writer.h"
-
-#include <easylogging++.h>
+#include "logger.h"
 
 
 int main(int argc, char* argv[])
@@ -42,9 +41,14 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
 
+    mrtp::Logger::get().set_config(
+                mrtp::LogLevel::DEBUG,
+                mrtp::create_log_formatter(mrtp::LogFormatterType::EASY)
+                );
+
     bool auto_name = input_files.size() > 1 || output_file.empty();
     if (auto_name && !output_file.empty()) {
-        LOG(ERROR) << "Output file not allowed with multiple input files";
+        LOG_ERROR("Output file not allowed with multiple input files");
         return EXIT_FAILURE;
     }
 
@@ -53,7 +57,7 @@ int main(int argc, char* argv[])
         if (pos != std::string::npos) {
             std::string extension = output_file.substr(pos + 1, output_file.size());
             if (extension != output_format) {
-                LOG(ERROR) << "Output format and output file extension should match";
+                LOG_ERROR("Output format and output file extension should match");
                 return EXIT_FAILURE;
             }
         }
@@ -64,7 +68,7 @@ int main(int argc, char* argv[])
 
     // Iterate over all input files
     for (std::string& input_file : input_files) {
-        LOG(INFO) << "Processing " << input_file << " ...";
+        LOG_INFO(std::string("Processing " + input_file + " ..."));
 
         auto world_ptr = mrtp::build_world(input_file, &texture_factory);
         if (!world_ptr) {
@@ -99,7 +103,11 @@ int main(int argc, char* argv[])
             render_t = scene_renderer.do_render();
             scene_writer->write_to_file(output_file);
         }
-        LOG(INFO) << "Done in " << std::setprecision(2) << render_t << "s";
+
+        std::stringstream work_time;
+        work_time << "Done in " << std::setprecision(2) << render_t << "s";
+
+        LOG_INFO(work_time.str());
     }
     
     return EXIT_SUCCESS;  // All done
