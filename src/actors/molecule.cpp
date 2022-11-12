@@ -1,10 +1,16 @@
 #include <Eigen/Geometry>
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+#ifdef USE_OPENBABEL
 #include <openbabel/mol.h>
 #include <openbabel/atom.h>
 #include <openbabel/bond.h>
 #include <openbabel/obiter.h>
 #include <openbabel/obconversion.h>
+#endif
 
 #include "actors/molecule.h"
 #include "actors/cylinder.h"
@@ -16,6 +22,7 @@
 
 namespace mrtp {
 
+#ifdef USE_OPENBABEL
 static void create_tables(const std::string& mol2file,
                           std::vector<unsigned int>* atomic_nums,
                           std::vector<Eigen::Vector3d>* positions,
@@ -38,7 +45,58 @@ static void create_tables(const std::string& mol2file,
                     b->GetBeginAtomIdx() - 1, b->GetEndAtomIdx() - 1});
     }
 }
+#else
+static std::vector<std::string> tokenize_line(const std::string& line)
+{
+    std::vector<std::string> tokens;
 
+    std::istringstream str(line);
+    std::string token("");
+
+    while (str >> token) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
+
+static bool read_line(std::ifstream& f, std::string& buffer, const std::string& pattern)
+{
+    return std::getline(f, buffer) && buffer.find(pattern) == std::string::npos;
+}
+
+
+static void create_tables(const std::string& mol2file,
+                          std::vector<unsigned int>* atomic_nums,
+                          std::vector<Eigen::Vector3d>* positions,
+                          std::vector<std::pair<unsigned int, unsigned int>>* bonds)
+{
+    std::ifstream f(mol2file);
+    std::string buffer;
+
+    if (f.is_open()) {
+        while (read_line(f, buffer, "@<TRIPOS>ATOM"));
+
+        while (read_line(f, buffer, "@<TRIPOS>BOND")) {
+            std::vector<std::string> tokens = tokenize_line(buffer);
+
+            unsigned int atomic_num = static_cast<unsigned int>(std::stoi(tokens[0]));
+            atomic_nums->push_back(atomic_num);
+
+            Vector3d coor(std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+            positions->push_back(coor);
+        }
+
+        while (read_line(f, buffer, "@<TRIPOS>SUBSTRUCTURE")) {
+            std::vector<std::string> tokens = tokenize_line(buffer);
+
+            std::pair<unsigned int, unsigned int> bond(static_cast<unsigned int>(std::stoi(tokens[1])) - 1, static_cast<unsigned int>(std::stoi(tokens[2])) - 1);
+            bonds->push_back(bond);
+        }
+    }
+}
+#endif  // USE_OPENBABEL
 
 void create_molecule(TextureFactory* texture_factory,
                      std::shared_ptr<ConfigTable> items,
