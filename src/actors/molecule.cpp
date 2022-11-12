@@ -24,32 +24,33 @@ namespace mrtp {
 
 #ifdef USE_OPENBABEL
 static void create_tables(const std::string& mol2file,
-                          std::vector<unsigned int>* atomic_nums,
-                          std::vector<Eigen::Vector3d>* positions,
-                          std::vector<std::pair<unsigned int, unsigned int>>* bonds)
+    std::vector<unsigned int>* atomic_nums,
+    std::vector<Eigen::Vector3d>* positions,
+    std::vector<std::pair<unsigned int, unsigned int>>* bonds)
 {
     OpenBabel::OBMol mol;
     OpenBabel::OBConversion conv;
 
-    if(!conv.SetInFormat("mol2") || !conv.ReadFile(&mol, mol2file)) {
+    if (!conv.SetInFormat("mol2") || !conv.ReadFile(&mol, mol2file)) {
         return;
     }
 
-    FOR_ATOMS_OF_MOL(a, mol) {
+    FOR_ATOMS_OF_MOL(a, mol)
+    {
         atomic_nums->push_back(a->GetAtomicNum());
-        positions->push_back(Eigen::Vector3d{a->GetX(), a->GetY(), a->GetZ()});
+        positions->push_back(Eigen::Vector3d { a->GetX(), a->GetY(), a->GetZ() });
     }
 
-    FOR_BONDS_OF_MOL(b, mol) {
-        bonds->push_back(std::pair<unsigned int, unsigned int>{
-                    b->GetBeginAtomIdx() - 1, b->GetEndAtomIdx() - 1});
+    FOR_BONDS_OF_MOL(b, mol)
+    {
+        bonds->push_back(std::pair<unsigned int, unsigned int> {
+            b->GetBeginAtomIdx() - 1, b->GetEndAtomIdx() - 1 });
     }
 }
 #else
 static std::vector<std::string> tokenize_line(const std::string& line)
 {
     std::vector<std::string> tokens;
-
     std::istringstream str(line);
     std::string token("");
 
@@ -60,23 +61,22 @@ static std::vector<std::string> tokenize_line(const std::string& line)
     return tokens;
 }
 
-
 static bool read_line(std::ifstream& f, std::string& buffer, const std::string& pattern)
 {
     return std::getline(f, buffer) && buffer.find(pattern) == std::string::npos;
 }
 
-
 static void create_tables(const std::string& mol2file,
-                          std::vector<unsigned int>* atomic_nums,
-                          std::vector<Eigen::Vector3d>* positions,
-                          std::vector<std::pair<unsigned int, unsigned int>>* bonds)
+    std::vector<unsigned int>* atomic_nums,
+    std::vector<Eigen::Vector3d>* positions,
+    std::vector<std::pair<unsigned int, unsigned int>>* bonds)
 {
     std::ifstream f(mol2file);
     std::string buffer;
 
     if (f.is_open()) {
-        while (read_line(f, buffer, "@<TRIPOS>ATOM"));
+        while (read_line(f, buffer, "@<TRIPOS>ATOM"))
+            ;
 
         while (read_line(f, buffer, "@<TRIPOS>BOND")) {
             std::vector<std::string> tokens = tokenize_line(buffer);
@@ -96,7 +96,7 @@ static void create_tables(const std::string& mol2file,
         }
     }
 }
-#endif  // USE_OPENBABEL
+#endif // USE_OPENBABEL
 
 void create_molecule(TextureFactory* texture_factory,
                      std::shared_ptr<ConfigTable> items,
