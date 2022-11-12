@@ -1,4 +1,5 @@
 #include <fstream>
+#include <limits>  // req. by cpptoml with DJGPP
 
 #include "cpptoml.h"
 #include "config.h"
