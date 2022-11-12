@@ -67,12 +67,9 @@ void create_sphere(TextureFactory* texture_factory,
     sphere_vec_j *= (1 / sphere_vec_j.norm());
     sphere_axis_vec *= (1 / sphere_axis_vec.norm());
 
-    StandardBasis sphere_basis{
-        sphere_center_vec,
-        sphere_vec_i,
-        sphere_vec_j,
-        sphere_axis_vec
-    };
+    StandardBasis sphere_basis;
+    set_basis(&sphere_basis, sphere_center_vec, sphere_vec_i,
+              sphere_vec_j, sphere_axis_vec);
 
     auto texture_mapper_ptr = create_texture_mapper(
                 sphere_items, ActorType::Sphere, texture_factory);

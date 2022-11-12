@@ -1,7 +1,10 @@
 #include <fstream>
+#include <cmath>
 
 #include "logger.h"
 #include "mappers.h"
+
+constexpr double pi() { return std::atan(1) * 4; }
 
 
 namespace mrtp {
@@ -64,10 +67,10 @@ public:
         // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
         double dot_vj = normal_at_hit.dot(local_basis.vj);
         double phi = std::acos(-dot_vj);
-        double fracy = phi / M_PI;
+        double fracy = phi / pi();
 
         double dot_vi = normal_at_hit.dot(local_basis.vi);
-        double theta = std::acos(dot_vi / std::sin(phi)) / (2 * M_PI);
+        double theta = std::acos(dot_vi / std::sin(phi)) / (2 * pi());
 
         double dot_vk = normal_at_hit.dot(local_basis.vk);
         double fracx = (dot_vk > 0) ? theta : (1 - theta);
@@ -96,8 +99,8 @@ public:
 
         double alpha = t.dot(local_basis.vk);
         double dot = normal_at_hit.dot(local_basis.vi);
-        double frac_x = acos(dot) / M_PI;
-        double frac_y = alpha / (2 * M_PI * radius_);
+        double frac_x = acos(dot) / pi();
+        double frac_y = alpha / (2 * pi() * radius_);
 
         return texture_->pick_pixel(frac_x, frac_y);
     }

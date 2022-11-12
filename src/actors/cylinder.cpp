@@ -124,12 +124,9 @@ void create_cylinder(TextureFactory* texture_factory,
     cylinder_vec_j *= (1 / cylinder_vec_j.norm());
     cylinder_direction_vec *= (1 / cylinder_direction_vec.norm());
 
-    StandardBasis cylinder_basis{
-        cylinder_center_vec,
-        cylinder_vec_i,
-        cylinder_vec_j,
-        cylinder_direction_vec
-    };
+    StandardBasis cylinder_basis;
+    set_basis(&cylinder_basis, cylinder_center_vec, cylinder_vec_i,
+              cylinder_vec_j, cylinder_direction_vec);
 
     auto texture_mapper_ptr = create_texture_mapper(
                 cylinder_items, ActorType::Cylinder, texture_factory);

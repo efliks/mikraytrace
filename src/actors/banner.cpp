@@ -113,7 +113,8 @@ void create_banner(TextureFactory* texture_factory,
         Vector3d char_o_vec = banner_o_vec + (char_scale * char_idx - (banner_text.size() - 1) * char_scale / 2) * banner_j_vec;
         char_idx++;
 
-        StandardBasis char_basis{char_o_vec, char_i_vec, char_j_vec, char_k_vec};
+        StandardBasis char_basis;
+        set_basis(&char_basis, char_o_vec, char_i_vec, char_j_vec, char_k_vec);
 
         create_char3d(c, char_scale, char_basis, banner_mapper, actor_ptrs);
     }

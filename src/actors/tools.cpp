@@ -2,6 +2,9 @@
 #include <Eigen/Geometry>
 
 #include "actors/tools.h"
+#include "common.h"
+
+constexpr double pi() { return std::atan(1) * 4; }
 
 
 namespace mrtp 
@@ -55,18 +58,29 @@ Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items,
                                        const std::string& prefix)
 {
     double angle_x = items->get_value(prefix + "angle_x", 0);
-    Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * M_PI / 180, Vector3d::UnitX());
+    Eigen::AngleAxisd m_x = Eigen::AngleAxisd(angle_x * pi() / 180, Vector3d::UnitX());
 
     double angle_y = items->get_value(prefix + "angle_y", 0);
-    Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * M_PI / 180, Vector3d::UnitY());
+    Eigen::AngleAxisd m_y = Eigen::AngleAxisd(angle_y * pi() / 180, Vector3d::UnitY());
 
     double angle_z = items->get_value(prefix + "angle_z", 0);
-    Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * M_PI / 180, Vector3d::UnitZ());
+    Eigen::AngleAxisd m_z = Eigen::AngleAxisd(angle_z * pi() / 180, Vector3d::UnitZ());
 
     Eigen::Matrix3d m_rot;
     m_rot = m_x * m_y * m_z;
 
     return m_rot;
+}
+
+
+// Helper function for DJGPP
+void set_basis(StandardBasis* sb, const Vector3d& o, const Vector3d& i,
+        const Vector3d& j, const Vector3d& k)
+{
+    sb->o = o;
+    sb->vi = i;
+    sb->vj = j;
+    sb->vk = k;
 }
 
 

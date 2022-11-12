@@ -51,12 +51,23 @@ void create_cube(TextureFactory* texture_factory,
     Vector3d face_e_o = cube_vec_j * cube_scale + cube_vec_o;
     Vector3d face_f_o = -cube_vec_j * cube_scale + cube_vec_o;
 
-    StandardBasis face_a_basis{face_a_o, cube_vec_i, cube_vec_j, cube_vec_k};
-    StandardBasis face_b_basis{face_b_o, cube_vec_k, cube_vec_j, -cube_vec_i};
-    StandardBasis face_c_basis{face_c_o, -cube_vec_i, cube_vec_j, -cube_vec_k};
-    StandardBasis face_d_basis{face_d_o, -cube_vec_k, cube_vec_j, cube_vec_i};
-    StandardBasis face_e_basis{face_e_o, -cube_vec_k, -cube_vec_i, cube_vec_j};
-    StandardBasis face_f_basis{face_f_o, -cube_vec_k, cube_vec_i, -cube_vec_j};
+    StandardBasis face_a_basis;
+    set_basis(&face_a_basis, face_a_o, cube_vec_i, cube_vec_j, cube_vec_k);
+
+    StandardBasis face_b_basis;
+    set_basis(&face_b_basis, face_b_o, cube_vec_k, cube_vec_j, -cube_vec_i);
+
+    StandardBasis face_c_basis;
+    set_basis(&face_c_basis, face_c_o, -cube_vec_i, cube_vec_j, -cube_vec_k);
+
+    StandardBasis face_d_basis;
+    set_basis(&face_d_basis, face_d_o, -cube_vec_k, cube_vec_j, cube_vec_i);
+
+    StandardBasis face_e_basis;
+    set_basis(&face_e_basis, face_e_o, -cube_vec_k, -cube_vec_i, cube_vec_j);
+
+    StandardBasis face_f_basis;
+    set_basis(&face_f_basis, face_f_o, -cube_vec_k, cube_vec_i, -cube_vec_j);
 
     actor_ptrs->push_back(std::shared_ptr<ActorBase>(
                               new SimplePolygon(face_a_basis, texture_mapper, cube_scale, cube_scale)));

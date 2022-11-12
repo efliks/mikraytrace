@@ -2,6 +2,8 @@
 #include <cmath>
 #include "camera.h"
 
+constexpr double pi() { return std::atan(1) * 4; }
+
 
 namespace mrtp {
 
@@ -28,7 +30,7 @@ void Camera::calculate_window(unsigned int width,
     k *= (1 / k.norm());
 
     // Rotate camera around the i axis
-    double roll = roll_ * M_PI / 180;
+    double roll = roll_ * pi() / 180;
     double sina = std::sin(roll);
     double cosa = std::cos(roll);
 

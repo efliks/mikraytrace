@@ -126,12 +126,9 @@ void create_molecule(TextureFactory* texture_factory,
         cylinder_j_vec *= (1 / cylinder_j_vec.norm());
         cylinder_k_vec *= (1 / cylinder_k_vec.norm());
 
-        StandardBasis cylinder_basis{
-            cylinder_center_vec,
-            cylinder_i_vec,
-            cylinder_j_vec,
-            cylinder_k_vec
-        };
+        StandardBasis cylinder_basis;
+        set_basis(&cylinder_basis, cylinder_center_vec, cylinder_i_vec,
+                  cylinder_j_vec, cylinder_k_vec);
 
         actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleCylinder(
                 cylinder_basis, cylinder_scale, cylinder_span, cylinder_mapper_ptr)));

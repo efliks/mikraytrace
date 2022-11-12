@@ -241,7 +241,8 @@ void create_mesh(TextureFactory* texture_factory,
         vec_j *= (1 / vec_j.norm());
         vec_k *= (1 / vec_k.norm());
 
-        StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
+        StandardBasis local_basis;
+        set_basis(&local_basis, vec_o, vec_i, vec_j, vec_k);
 
         std::shared_ptr<ActorBase> triangle_ptr = std::shared_ptr<ActorBase>(
                     new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));

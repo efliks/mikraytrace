@@ -9,6 +9,8 @@
 #include <omp.h>
 #endif
 
+constexpr double pi() { return std::atan(1) * 4; }
+
 
 namespace mrtp {
 
@@ -18,7 +20,7 @@ SceneRendererBase::SceneRendererBase(SceneWorld* scene_world,
     config_(config) {
 
     ratio_ = static_cast<double>(config_.buffer_width) / static_cast<double>(config_.buffer_height);
-    perspective_ = ratio_ / (2 * std::tan(M_PI / 180 * config_.field_of_vision / 2));
+    perspective_ = ratio_ / (2 * std::tan(pi() / 180 * config_.field_of_vision / 2));
 
     framebuffer_.reserve(config_.buffer_width * config_.buffer_height);
 }

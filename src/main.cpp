@@ -16,18 +16,21 @@
 
 int main(int argc, char* argv[])
 {
-    CLI::App app{"A simple raytracer"};
-
     std::vector<std::string> input_files;
-    app.add_option("input_files", input_files, "Input file(s)")->mandatory();
 
     std::string output_file;
-    app.add_option("-o,--output", output_file, "Output file");
-
     std::string output_format;
-    app.add_option("-F,--format", output_format, "Output format")->default_val("png")->check(CLI::IsMember({"png", "jpg"}));
 
     mrtp::RendererConfig config;
+   
+ 
+    CLI::App app{"A simple raytracer"};
+
+    app.add_option("input_files", input_files, "Input file(s)")->mandatory();
+
+    app.add_option("-o,--output", output_file, "Output file");
+    app.add_option("-F,--format", output_format, "Output format")->default_val("png")->check(CLI::IsMember({"png", "jpg"}));
+
     app.add_option("-f,--fov", config.field_of_vision, "Field of vision in degrees")->default_val(config.field_of_vision)->check(CLI::Range(50, 170));
 
     app.add_option("-W,--width", config.buffer_width, "Image width")->default_val(config.buffer_width)->check(CLI::Range(320, 3200));

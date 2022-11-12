@@ -4,6 +4,7 @@
 #include "actors/plane.h"
 
 #include "logger.h"
+#include "tools.h"
 
 
 namespace mrtp {
@@ -80,7 +81,8 @@ void create_triangle(TextureFactory* texture_factory,
     vec_j *= (1 / vec_j.norm());
     vec_k *= (1 / vec_k.norm());
 
-    StandardBasis local_basis{vec_o, vec_i, vec_j, vec_k};
+    StandardBasis local_basis;
+    set_basis(&local_basis, vec_o, vec_i, vec_j, vec_k);
 
     auto texture_mapper_ptr = create_dummy_mapper(items, "color", "reflect");
     if (!texture_mapper_ptr) {

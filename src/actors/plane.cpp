@@ -65,12 +65,8 @@ void create_plane(TextureFactory* texture_factory,
     plane_vec_j *= (1 / plane_vec_j.norm());
     plane_normal_vec *= (1 / plane_normal_vec.norm());
 
-    StandardBasis plane_basis{
-        plane_center_vec,
-        plane_vec_i,
-        plane_vec_j,
-        plane_normal_vec
-    };
+    StandardBasis plane_basis;
+    set_basis(&plane_basis, plane_center_vec, plane_vec_i, plane_vec_j, plane_normal_vec);
 
     auto texture_mapper_ptr = create_texture_mapper(
             plane_items, ActorType::Plane, texture_factory);
