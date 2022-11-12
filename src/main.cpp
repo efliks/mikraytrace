@@ -44,11 +44,6 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
 
-    mrtp::Logger::get().set_config(
-                mrtp::LogLevel::DEBUG,
-                mrtp::create_log_formatter(mrtp::LogFormatterType::EASY)
-                );
-
     bool auto_name = input_files.size() > 1 || output_file.empty();
     if (auto_name && !output_file.empty()) {
         LOG_ERROR("Output file not allowed with multiple input files");

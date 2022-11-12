@@ -11,7 +11,12 @@ Firstly, install the required libraries and tools. In Debian, or in
 a Debian-like Linux, this can be done like so:
 
 ```
-apt-get install build-essential cmake libeigen3-dev libeasyloggingpp-dev lib3ds-dev
+apt-get install build-essential cmake libeigen3-dev
+```
+
+Optionally, you may add:
+```
+apt-get install libopenbabel-dev lib3ds-dev libeasyloggingpp-dev
 ```
 
 Secondly, you need some third party libraries. These are:

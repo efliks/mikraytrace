@@ -4,9 +4,11 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#ifdef USE_LIB3DS
 #include <lib3ds/file.h>
 #include <lib3ds/node.h>
 #include <lib3ds/mesh.h>
+#endif
 
 #include "logger.h"
 
@@ -19,6 +21,7 @@ using Vector3d = Eigen::Vector3d;
 
 namespace mrtp {
 
+#ifdef USE_LIB3DS
 class File3dsWrapper
 {
 public:
@@ -94,7 +97,7 @@ static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* ver
 
     return 1;  // Success
 }
-
+#endif  // USE_LIB3DS
 
 static void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
 {
@@ -175,12 +178,14 @@ void create_mesh(TextureFactory* texture_factory,
     if (ext == "3d") {
         load_custom_file(filename, &vertex_list);
     }
+#ifdef USE_LIB3DS
     else if (ext == "3ds") {
         if (!load_3ds_file(filename, &vertex_list)) {
             LOG_ERROR("Error reading mesh file");
             return;
         }
     }
+#endif  // USE_LIB3DS
     else {
         LOG_ERROR(std::string("Unknown file extension " + ext));
         return;

@@ -1,13 +1,17 @@
-#include <easylogging++.h>
 #include <iostream>
 
 #include "logger.h"
 
-INITIALIZE_EASYLOGGINGPP
+#ifdef USE_EASYLOGGING
+#include <easylogging++.h>
+#endif
 
 
 namespace mrtp {
 
+#ifdef USE_EASYLOGGING
+
+INITIALIZE_EASYLOGGINGPP
 class EasyLogFormatter : public LogFormatter
 {
 public:
@@ -34,7 +38,7 @@ public:
         LOG(ERROR) << message;
     }
 };
-
+#endif  // USE_EASYLOGGING
 
 class DefaultLogFormatter : public LogFormatter
 {
@@ -143,9 +147,11 @@ void Logger::set_config(LogLevel log_level, std::shared_ptr<LogFormatter> format
 
 std::shared_ptr<LogFormatter> create_log_formatter(LogFormatterType formatter_type)
 {
+#ifdef USE_EASYLOGGING
     if (formatter_type == LogFormatterType::EASY)
         return std::shared_ptr<LogFormatter>(new EasyLogFormatter());
-    else if (formatter_type == LogFormatterType::DEFAULT)
+#endif
+    if (formatter_type == LogFormatterType::DEFAULT)
         return std::shared_ptr<LogFormatter>(new DefaultLogFormatter());
 
     return std::shared_ptr<LogFormatter>(new DummyLogFormatter());

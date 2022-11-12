@@ -5,7 +5,6 @@ project (mrtp_cli)
 file(GLOB SRC_FILES
     src/*.cpp
     src/actors/*.cpp
-    /usr/include/easylogging++.cc
     ${PROJECT_SOURCE_DIR}/thirdparty/toojpeg/toojpeg.cpp
     ${PROJECT_SOURCE_DIR}/thirdparty/lodepng/lodepng.cpp
 )
@@ -22,7 +21,7 @@ target_include_directories(mrtp_cli
         /usr/include/eigen3
 )
 
-target_link_libraries(mrtp_cli PRIVATE m 3ds)
+target_link_libraries(mrtp_cli PRIVATE m)
 
 set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -O2")
 
