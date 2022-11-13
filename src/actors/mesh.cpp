@@ -1,5 +1,6 @@
 #include <string>
 #include <fstream>
+#include <iostream>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -144,6 +145,17 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
                 v << tmp_vertex_list[face.c];
                 vertex_list->push_back(v.cast<double>());
             }
+
+            // Debug info
+            std::stringstream convert;
+            convert << num_vertices;
+            std::string str_vertices(convert.str());
+
+            std::stringstream convert2;
+            convert2 << num_faces;
+            std::string str_faces(convert2.str());
+
+            LOG_DEBUG(std::string("Model has " + str_vertices + " vertices and " + str_faces + " faces"));
         }
     }
 }
