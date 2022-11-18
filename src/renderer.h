@@ -16,17 +16,30 @@ namespace mrtp {
 using Vector3d = Eigen::Vector3d;
 
 
-struct RendererConfig {
-    double field_of_vision = 93;
-    double max_distance = 60;
-    double shadow_bias = 0.25;
+struct RendererConfig
+{
+    double fov = 93;
     double ray_bias = 0.001;
+    double light_dist = 60;
+    double shadow_coeff = 0.25;
 
-    unsigned int buffer_width = 640;
-    unsigned int buffer_height = 480;
+    unsigned int width = 640;
+    unsigned int height = 480;
 
-    unsigned int max_ray_depth = 3;
-    unsigned int num_threads = 1;
+    unsigned int max_recurse = 3;
+    unsigned int num_thread = 1;
+
+    const double fov_min = 70;
+    const double fov_max = 150;
+
+    const unsigned int width_min = 320;
+    const unsigned int width_max = 3200;
+
+    const unsigned int height_min = 240;
+    const unsigned int height_max = 2400;
+
+    const unsigned int num_min_thread = 1;
+    const unsigned int num_max_thread = 32;
 };
 
 

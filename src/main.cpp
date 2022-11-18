@@ -19,11 +19,11 @@ int main(int argc, char* argv[])
     std::vector<std::string> input_files;
 
     std::string output_file;
-    std::string output_format;
+    std::string output_format = "png";
 
     mrtp::RendererConfig config;
-   
- 
+
+
     CLI::App app{"A simple raytracer"};
 
     app.add_option("input_files", input_files, "Input file(s)")->mandatory();
@@ -31,15 +31,12 @@ int main(int argc, char* argv[])
     app.add_option("-o,--output", output_file, "Output file");
     app.add_option("-F,--format", output_format, "Output format")->default_val("png")->check(CLI::IsMember({"png", "jpg"}));
 
-    app.add_option("-f,--fov", config.field_of_vision, "Field of vision in degrees")->default_val(config.field_of_vision)->check(CLI::Range(50, 170));
+    app.add_option("-f,--fov", config.fov, "Field of vision in degrees")->default_val(config.fov)->check(CLI::Range(config.fov_min, config.fov_max));
 
-    app.add_option("-W,--width", config.buffer_width, "Image width")->default_val(config.buffer_width)->check(CLI::Range(320, 3200));
-    app.add_option("-H,--height", config.buffer_height, "Image height")->default_val(config.buffer_height)->check(CLI::Range(240, 2400));
+    app.add_option("-W,--width", config.width, "Image width")->default_val(config.width)->check(CLI::Range(config.width_min, config.width_max));
+    app.add_option("-H,--height", config.height, "Image height")->default_val(config.height)->check(CLI::Range(config.height_min, config.height_max));
 
-    app.add_option("-r,--recursion", config.max_ray_depth, "Levels of recursion for reflected rays")->default_val(config.max_ray_depth)->check(CLI::Range(0, 5));
-    app.add_option("-s,--shadow", config.shadow_bias, "Shadow coefficient")->default_val(config.shadow_bias);
-
-    app.add_option("-t,--threads", config.num_threads, "Rendering threads (0 for auto)")->default_val(config.num_threads)->check(CLI::Range(0, 32));
+    app.add_option("-t,--threads", config.num_thread, "Rendering threads (0 for auto)")->default_val(config.num_thread)->check(CLI::Range(config.num_min_thread, config.num_max_thread));
 
     CLI11_PARSE(app, argc, argv);
 
@@ -85,7 +82,7 @@ int main(int argc, char* argv[])
         mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType::PNG : mrtp::WriterType::JPEG;
 
         float render_t = 0;
-        if (config.num_threads == 1) {
+        if (config.num_thread == 1) {
             mrtp::SceneRenderer scene_renderer(world_ptr.get(), config);
             //FIXME
             auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
@@ -94,7 +91,7 @@ int main(int argc, char* argv[])
             scene_writer->write_to_file(output_file);
         }
         else {
-            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), config, config.num_threads);
+            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), config, config.num_thread);
             //FIXME
             auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
 

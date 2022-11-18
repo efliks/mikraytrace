@@ -1,9 +1,11 @@
 #include <Eigen/Geometry>
+
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
 
 #include "renderer.h"
+#include "logger.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -19,10 +21,10 @@ SceneRendererBase::SceneRendererBase(SceneWorld* scene_world,
     scene_world_(scene_world),
     config_(config) {
 
-    ratio_ = static_cast<double>(config_.buffer_width) / static_cast<double>(config_.buffer_height);
-    perspective_ = ratio_ / (2 * std::tan(pi() / 180 * config_.field_of_vision / 2));
+    ratio_ = static_cast<double>(config_.width) / static_cast<double>(config_.height);
+    perspective_ = ratio_ / (2 * std::tan(pi() / 180 * config_.fov / 2));
 
-    framebuffer_.reserve(config_.buffer_width * config_.buffer_height);
+    framebuffer_.reserve(config_.width * config_.height);
 }
 
 
@@ -53,7 +55,7 @@ ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
         std::shared_ptr<ActorBase> actor = *actor_iterator.current();
-        double distance = actor->solve_light_ray(O, D, 0, config_.max_distance);
+        double distance = actor->solve_light_ray(O, D, 0, config_.light_dist);
         if (distance > 0 && distance < *curr_dist) {
             *curr_dist = distance;
             hit_actor = actor.get();
@@ -68,7 +70,7 @@ Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
                                      unsigned int depth) const {
     Pixel pixel{0, 0, 0};
 
-    double curr_dist = config_.max_distance;
+    double curr_dist = config_.light_dist;
     ActorBase* hit_actor = solve_hits(O, D, &curr_dist);
 
     if (hit_actor) {
@@ -90,10 +92,10 @@ Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
 
             // Check if intersection is in shadow
             bool is_shadow = solve_shadows(inter_corr, to_light, light_dist);
-            double shadow = (is_shadow) ? config_.shadow_bias : 1;
+            double shadow = (is_shadow) ? config_.shadow_coeff : 1;
 
             // Decrease light intensity for actors away from light
-            double ambient = 1 - std::pow(light_dist / config_.max_distance, 2);
+            double ambient = 1 - std::pow(light_dist / config_.light_dist, 2);
 
             // Combine pixels
             double lambda = intensity * shadow * ambient;
@@ -104,7 +106,7 @@ Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
             pixel = (1 - lambda) * pixel + lambda * pick;
 
             // If hit actor is reflective, trace reflected ray
-            if (depth < config_.max_ray_depth) {
+            if (depth < config_.max_recurse) {
                 if (my_pick.reflection_coeff > 0) {
                     Vector3d reflected_ray = D - (2 * D.dot(normal)) * normal;
                     Pixel reflected_pixel = trace_ray_r(inter_corr, reflected_ray, depth + 1);
@@ -122,10 +124,10 @@ void SceneRendererBase::render_block(unsigned int block_index,
                                      unsigned int num_lines) {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    Pixel* pixel = &framebuffer_[block_index * num_lines * config_.buffer_width];
+    Pixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
 
     for (unsigned int j = 0; j < num_lines; j++) {
-        for (unsigned int i = 0; i < config_.buffer_width; i++, pixel++) {
+        for (unsigned int i = 0; i < config_.width; i++, pixel++) {
             Vector3d origin = my_camera->calculate_origin(i, j + block_index * num_lines);
             Vector3d direction = my_camera->calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
@@ -146,7 +148,7 @@ ParallelSceneRenderer::ParallelSceneRenderer(SceneWorld* scene_world,
 float ParallelSceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
+    my_camera->calculate_window(config_.width, config_.height, perspective_);
     
     long time_start = clock();
 
@@ -174,7 +176,7 @@ float ParallelSceneRenderer::do_render() {
     }
 #else
     // No OpenMP compiled in, always do serial execution
-    render_block(0, config_.buffer_height);
+    render_block(0, config_.height);
 
 #endif  // !_OPENMP
 
@@ -194,11 +196,11 @@ SceneRenderer::SceneRenderer(SceneWorld* scene_world,
 
 float SceneRenderer::do_render() {
     Camera* my_camera = scene_world_->get_camera_ptr();
-    my_camera->calculate_window(config_.buffer_width, config_.buffer_height, perspective_);
+    my_camera->calculate_window(config_.width, config_.height, perspective_);
 
     long time_start = clock();
 
-    render_block(0, config_.buffer_height);
+    render_block(0, config_.height);
 
     return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
 }

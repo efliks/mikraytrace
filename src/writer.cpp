@@ -44,8 +44,8 @@ public:
 
         Pixel* in = &scene_renderer_->framebuffer_[0];
 
-        for (unsigned int i = 0; i < scene_renderer_->config_.buffer_height; i++) {
-            for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, in++) {
+        for (unsigned int i = 0; i < scene_renderer_->config_.height; i++) {
+            for (unsigned int j = 0; j < scene_renderer_->config_.width; j++, in++) {
                 Pixel bytes = 255 * (*in);
                 buffer.push_back(static_cast<unsigned char>(bytes[0]));
                 buffer.push_back(static_cast<unsigned char>(bytes[1]));
@@ -54,7 +54,7 @@ public:
         }
 
         fileout.open(filename, std::ios_base::out | std::ios_base::binary);
-        TooJpeg::writeJpeg(write_byte, buffer.data(), scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height, true, quality_);
+        TooJpeg::writeJpeg(write_byte, buffer.data(), scene_renderer_->config_.width, scene_renderer_->config_.height, true, quality_);
 
         fileout.close();
     }
@@ -79,8 +79,8 @@ public:
         Pixel* pixel_ptr = scene_renderer_->framebuffer_.data();
         std::vector<unsigned char> image;
 
-        for (unsigned int i = 0; i < scene_renderer_->config_.buffer_height; i++) {
-            for (unsigned int j = 0; j < scene_renderer_->config_.buffer_width; j++, pixel_ptr++) {
+        for (unsigned int i = 0; i < scene_renderer_->config_.height; i++) {
+            for (unsigned int j = 0; j < scene_renderer_->config_.width; j++, pixel_ptr++) {
                 Pixel bytes = 255 * (*pixel_ptr);
                 image.push_back(static_cast<unsigned char>(bytes[0]));
                 image.push_back(static_cast<unsigned char>(bytes[1]));
@@ -98,7 +98,7 @@ public:
         state.encoder.auto_convert = 0;
 
         std::vector<unsigned char> buffer;
-        unsigned int error = lodepng::encode(buffer, image.data(), scene_renderer_->config_.buffer_width, scene_renderer_->config_.buffer_height, state);
+        unsigned int error = lodepng::encode(buffer, image.data(), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
 
         if (!error) {
             LOG_INFO(std::string("Writing scene image " + filename + "..."));
