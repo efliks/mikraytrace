@@ -92,10 +92,16 @@ MyPixel MyTexture::pick_pixel(double frac_x, double frac_y) const {
 }
 
 
+TextureFactory::TextureFactory(std::list<TextureSharedState>* shared_states)
+    : shared_states_(shared_states)
+{
+}
+
+
 MyTexture* TextureFactory::create_texture(const std::string& texture_filename,
                                           double reflection_coeff,
                                           double scale_coeff) {
-    for (auto& shared_state : shared_states_) {
+    for (auto& shared_state : *shared_states_) {
         if (shared_state.is_same_texture(texture_filename)) {
             MyTexture new_texture(&shared_state, reflection_coeff, scale_coeff);
             textures_.push_back(new_texture);
@@ -104,9 +110,9 @@ MyTexture* TextureFactory::create_texture(const std::string& texture_filename,
     }
 
     TextureSharedState new_shared_state(texture_filename);
-    shared_states_.push_back(new_shared_state);
+    shared_states_->push_back(new_shared_state);
 
-    MyTexture new_texture(&shared_states_.back(), reflection_coeff, scale_coeff);
+    MyTexture new_texture(&shared_states_->back(), reflection_coeff, scale_coeff);
     textures_.push_back(new_texture);
     return &textures_.back();
 }

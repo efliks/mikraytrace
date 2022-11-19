@@ -71,13 +71,13 @@ private:
 
 class TextureFactory {
 public:
-    TextureFactory() = default;
+    TextureFactory(std::list<TextureSharedState>*);
     ~TextureFactory() = default;
 
     MyTexture* create_texture(const std::string&, double, double);
 
 private:
-    std::list<TextureSharedState> shared_states_;
+    std::list<TextureSharedState>* shared_states_;
     std::list<MyTexture> textures_;
 };
 

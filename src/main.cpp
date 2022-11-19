@@ -1,3 +1,4 @@
+#include <list>
 #include <vector>
 #include <string>
 #include <iomanip>
@@ -59,12 +60,13 @@ int main(int argc, char* argv[])
     }
 
     // Textures will be shared by all worlds
-    mrtp::TextureFactory texture_factory;
+    std::list<mrtp::TextureSharedState> texture_cache;
 
     // Iterate over all input files
     for (std::string& input_file : input_files) {
         LOG_INFO(std::string("Processing " + input_file + " ..."));
 
+        mrtp::TextureFactory texture_factory(&texture_cache);
         auto world_ptr = mrtp::build_world(input_file, &texture_factory);
         if (!world_ptr) {
             return EXIT_FAILURE;
