@@ -65,10 +65,10 @@ ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
 }
 
 
-Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
-                                     const Vector3d& D,
-                                     unsigned int depth) const {
-    Pixel pixel{0, 0, 0};
+TexturePixel SceneRendererBase::trace_ray_r(const Vector3d& O,
+        const Vector3d& D, unsigned int depth) const
+{
+    Vector3d pixel_vec{0, 0, 0};
 
     double curr_dist = config_.light_dist;
     ActorBase* hit_actor = solve_hits(O, D, &curr_dist);
@@ -100,23 +100,26 @@ Pixel SceneRendererBase::trace_ray_r(const Vector3d& O,
             // Combine pixels
             double lambda = intensity * shadow * ambient;
 
-            // TODO Clean up!
             MyPixel my_pick = hit_actor->pick_pixel(inter, normal);
             Vector3d pick = my_pick.pixel.to_vec();
-            pixel = (1 - lambda) * pixel + lambda * pick;
+            pixel_vec = (1 - lambda) * pixel_vec + lambda * pick;
 
             // If hit actor is reflective, trace reflected ray
             if (depth < config_.max_recurse) {
                 if (my_pick.reflection_coeff > 0) {
                     Vector3d reflected_ray = D - (2 * D.dot(normal)) * normal;
-                    Pixel reflected_pixel = trace_ray_r(inter_corr, reflected_ray, depth + 1);
-                    pixel = (1 - my_pick.reflection_coeff) * reflected_pixel + my_pick.reflection_coeff * pixel;
+                    TexturePixel reflected_pixel = trace_ray_r(inter_corr, reflected_ray, depth + 1);
+
+                    Vector3d reflected_vec = reflected_pixel.to_vec();
+                    Vector3d combined_vec = (1 - my_pick.reflection_coeff) * reflected_vec + my_pick.reflection_coeff * pixel_vec;
+
+                    pixel_vec = combined_vec;
                 }
             }
         }
     }
 
-    return pixel;
+    return TexturePixel(pixel_vec);
 }
 
 
@@ -124,7 +127,7 @@ void SceneRendererBase::render_block(unsigned int block_index,
                                      unsigned int num_lines) {
     Camera* my_camera = scene_world_->get_camera_ptr();
 
-    Pixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
+    TexturePixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
 
     for (unsigned int j = 0; j < num_lines; j++) {
         for (unsigned int i = 0; i < config_.width; i++, pixel++) {

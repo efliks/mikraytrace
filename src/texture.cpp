@@ -1,13 +1,8 @@
-#include <cstring>
-
 #include "lodepng.h"
 #include "texture.h"
 
 
 namespace mrtp {
-
-using Vector3d = Eigen::Vector3d;
-
 
 TexturePixel::TexturePixel() :
     red(0), green(0), blue(0) {
@@ -21,11 +16,9 @@ TexturePixel::TexturePixel(unsigned char r,
 }
 
 
-TexturePixel::TexturePixel(const Vector3d& color_vec) {
-    Vector3d v = 255 * color_vec;
-    red = static_cast<unsigned char>(v[0]);
-    green = static_cast<unsigned char>(v[1]);
-    blue = static_cast<unsigned char>(v[2]);
+TexturePixel::TexturePixel(const Vector3d& color_vec)
+{
+    from_vec(color_vec);
 }
 
 
@@ -35,6 +28,16 @@ Vector3d TexturePixel::to_vec() const {
         static_cast<double>(green),
         static_cast<double>(blue)
     } / 255;
+}
+
+
+void TexturePixel::from_vec(const Vector3d& color_vec)
+{
+    Vector3d v = color_vec * 255;
+
+    red = static_cast<unsigned char>(v[0]);
+    green = static_cast<unsigned char>(v[1]);
+    blue = static_cast<unsigned char>(v[2]);
 }
 
 

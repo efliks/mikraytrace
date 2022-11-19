@@ -4,7 +4,6 @@
 #include "lodepng.h"
 #include "toojpeg.h"
 
-#include "pixel.h"
 #include "writer.h"
 #include "logger.h"
 
@@ -42,14 +41,13 @@ public:
         std::vector<unsigned char> buffer;
         buffer.reserve(3 * scene_renderer_->framebuffer_.size());
 
-        Pixel* in = &scene_renderer_->framebuffer_[0];
+        TexturePixel* in = &scene_renderer_->framebuffer_[0];
 
         for (unsigned int i = 0; i < scene_renderer_->config_.height; i++) {
             for (unsigned int j = 0; j < scene_renderer_->config_.width; j++, in++) {
-                Pixel bytes = 255 * (*in);
-                buffer.push_back(static_cast<unsigned char>(bytes[0]));
-                buffer.push_back(static_cast<unsigned char>(bytes[1]));
-                buffer.push_back(static_cast<unsigned char>(bytes[2]));
+                buffer.push_back(in->red);
+                buffer.push_back(in->green);
+                buffer.push_back(in->blue);
             }
         }
 
@@ -76,21 +74,9 @@ public:
 
     void write_to_file(const std::string& filename) override
     {
-        Pixel* pixel_ptr = scene_renderer_->framebuffer_.data();
-        std::vector<unsigned char> image;
-
-        for (unsigned int i = 0; i < scene_renderer_->config_.height; i++) {
-            for (unsigned int j = 0; j < scene_renderer_->config_.width; j++, pixel_ptr++) {
-                Pixel bytes = 255 * (*pixel_ptr);
-                image.push_back(static_cast<unsigned char>(bytes[0]));
-                image.push_back(static_cast<unsigned char>(bytes[1]));
-                image.push_back(static_cast<unsigned char>(bytes[2]));
-            }
-        }
-
         lodepng::State state;
 
-        state.info_raw.colortype = LCT_RGB;
+        state.info_raw.colortype = LCT_RGBA;
         state.info_raw.bitdepth = 8;
 
         state.info_png.color.colortype = LCT_RGB;
@@ -98,10 +84,11 @@ public:
         state.encoder.auto_convert = 0;
 
         std::vector<unsigned char> buffer;
-        unsigned int error = lodepng::encode(buffer, image.data(), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
+        static_assert (sizeof(TexturePixel) == 4, "Wrong size of TexturePixel");
+        unsigned int error = lodepng::encode(buffer, static_cast<unsigned char *>(static_cast<void *>(scene_renderer_->framebuffer_.data())), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
 
         if (!error) {
-            LOG_INFO(std::string("Writing scene image " + filename + "..."));
+            LOG_INFO(std::string("Writing scene image " + filename + " ..."));
             error = lodepng::save_file(buffer, filename);
         }
 

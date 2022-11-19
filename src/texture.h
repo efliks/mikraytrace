@@ -6,16 +6,20 @@
 #include <vector>
 #include <string>
 
+using Vector3d = Eigen::Vector3d;
+
 
 namespace mrtp {
 
 class TexturePixel {
 public:
     TexturePixel();
-    TexturePixel(const Eigen::Vector3d&);
+    TexturePixel(const Vector3d&);
     TexturePixel(unsigned char, unsigned char, unsigned char);
     ~TexturePixel() = default;
-    Eigen::Vector3d to_vec() const;
+
+    Vector3d to_vec() const;
+    void from_vec(const Vector3d&);
 
     unsigned char red;
     unsigned char green;

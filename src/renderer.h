@@ -7,7 +7,6 @@
 #include "actors.h"
 #include "camera.h"
 #include "light.h"
-#include "pixel.h"
 #include "world.h"
 
 
@@ -54,7 +53,7 @@ public:
 
     //FIXME
     RendererConfig config_;
-    std::vector<Pixel> framebuffer_;
+    std::vector<TexturePixel> framebuffer_;
 
 protected:
     double ratio_;
@@ -62,7 +61,7 @@ protected:
 
     SceneWorld* scene_world_;
 
-    Pixel trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
+    TexturePixel trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
     ActorBase* solve_hits(const Vector3d&, const Vector3d&, double*) const;
     bool solve_shadows(const Vector3d&, const Vector3d&, double) const;
     void render_block(unsigned int, unsigned int);
