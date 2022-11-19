@@ -5,8 +5,6 @@
 #include <vector>
 
 #include "actors.h"
-#include "camera.h"
-#include "light.h"
 #include "world.h"
 
 
@@ -45,11 +43,11 @@ struct RendererConfig
 class SceneRendererBase {
 
 public:
-    SceneRendererBase(SceneWorld*, const RendererConfig&);
+    SceneRendererBase(const RendererConfig&);
     SceneRendererBase() = delete;
     virtual ~SceneRendererBase() = default;
 
-    virtual float do_render() = 0;
+    virtual float do_render(SceneWorld*) = 0;
 
     //FIXME
     RendererConfig config_;
@@ -70,27 +68,26 @@ protected:
 
 class ParallelSceneRenderer : public SceneRendererBase {
 public:
-    ParallelSceneRenderer(SceneWorld*, const RendererConfig&, unsigned int);
+    ParallelSceneRenderer(const RendererConfig&);
     ParallelSceneRenderer() = delete;
     ~ParallelSceneRenderer() override = default;
 
-    float do_render() override;
-
-private:
-    unsigned int num_threads_;
+    float do_render(SceneWorld*) override;
 };
 
 
 class SceneRenderer : public SceneRendererBase {
 public:
-    SceneRenderer(SceneWorld*, const RendererConfig&);
+    SceneRenderer(const RendererConfig&);
     SceneRenderer() = delete;
     ~SceneRenderer() override = default;
 
-    float do_render() override;
+    float do_render(SceneWorld*) override;
 };
 
+std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig&);
 
-}  //namespace mrtp
 
-#endif  //_RENDERER_H
+}
+
+#endif  // _RENDERER_H

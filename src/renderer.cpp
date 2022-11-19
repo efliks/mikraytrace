@@ -5,6 +5,8 @@
 #include <ctime>
 
 #include "renderer.h"
+#include "camera.h"
+#include "light.h"
 #include "logger.h"
 
 #ifdef _OPENMP
@@ -16,11 +18,9 @@ constexpr double pi() { return std::atan(1) * 4; }
 
 namespace mrtp {
 
-SceneRendererBase::SceneRendererBase(SceneWorld* scene_world,
-                                     const RendererConfig& config) :
-    scene_world_(scene_world),
-    config_(config) {
-
+SceneRendererBase::SceneRendererBase(const RendererConfig& config)
+    : config_(config)
+{
     ratio_ = static_cast<double>(config_.width) / static_cast<double>(config_.height);
     perspective_ = ratio_ / (2 * std::tan(pi() / 180 * config_.fov / 2));
 
@@ -139,16 +139,15 @@ void SceneRendererBase::render_block(unsigned int block_index,
 }
 
 
-ParallelSceneRenderer::ParallelSceneRenderer(SceneWorld* scene_world,
-                                             const RendererConfig& render_config,
-                                             unsigned int num_threads) :
-    SceneRendererBase(scene_world, render_config),
-    num_threads_(num_threads) {
-
+ParallelSceneRenderer::ParallelSceneRenderer(const RendererConfig& render_config)
+    : SceneRendererBase(render_config)
+{
 }
 
 
-float ParallelSceneRenderer::do_render() {
+float ParallelSceneRenderer::do_render(SceneWorld* scene_world)
+{
+    scene_world_ = scene_world;
     Camera* my_camera = scene_world_->get_camera_ptr();
 
     my_camera->calculate_window(config_.width, config_.height, perspective_);
@@ -184,20 +183,21 @@ float ParallelSceneRenderer::do_render() {
 #endif  // !_OPENMP
 
     long time_elapsed = std::clock() - time_start;
-    float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / num_threads_;
+    float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / config_.num_thread;
 
     return time_used;
 }
 
 
-SceneRenderer::SceneRenderer(SceneWorld* scene_world,
-                             const RendererConfig& render_config) :
-    SceneRendererBase(scene_world, render_config) {
-
+SceneRenderer::SceneRenderer(const RendererConfig& render_config)
+    : SceneRendererBase(render_config)
+{
 }
 
 
-float SceneRenderer::do_render() {
+float SceneRenderer::do_render(SceneWorld* scene_world)
+{
+    scene_world_ = scene_world;
     Camera* my_camera = scene_world_->get_camera_ptr();
     my_camera->calculate_window(config_.width, config_.height, perspective_);
 
@@ -206,6 +206,16 @@ float SceneRenderer::do_render() {
     render_block(0, config_.height);
 
     return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
+}
+
+
+std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
+{
+    if (config.num_thread > 1) {
+        return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config));
+    }
+
+    return std::shared_ptr<SceneRendererBase>(new SceneRenderer(config));
 }
 
 

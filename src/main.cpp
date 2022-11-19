@@ -62,6 +62,12 @@ int main(int argc, char* argv[])
     // Textures will be shared by all worlds
     std::list<mrtp::TextureSharedState> texture_cache;
 
+    mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType::PNG : mrtp::WriterType::JPEG;
+
+    auto scene_renderer = mrtp::create_renderer(config);
+    //FIXME pointer to renderer
+    auto scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
+
     // Iterate over all input files
     for (std::string& input_file : input_files) {
         LOG_INFO(std::string("Processing " + input_file + " ..."));
@@ -81,30 +87,13 @@ int main(int argc, char* argv[])
             output_file = foo + "." + output_format;
         }
 
-        mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType::PNG : mrtp::WriterType::JPEG;
+        float render_t = scene_renderer->do_render(world_ptr.get());
 
-        float render_t = 0;
-        if (config.num_thread == 1) {
-            mrtp::SceneRenderer scene_renderer(world_ptr.get(), config);
-            //FIXME
-            auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
+        std::stringstream render_time;
+        render_time << "Done in " << std::setprecision(2) << render_t << "s";
+        LOG_INFO(render_time.str());
 
-            render_t = scene_renderer.do_render();
-            scene_writer->write_to_file(output_file);
-        }
-        else {
-            mrtp::ParallelSceneRenderer scene_renderer(world_ptr.get(), config, config.num_thread);
-            //FIXME
-            auto scene_writer = mrtp::create_writer(&scene_renderer, writer_type);
-
-            render_t = scene_renderer.do_render();
-            scene_writer->write_to_file(output_file);
-        }
-
-        std::stringstream work_time;
-        work_time << "Done in " << std::setprecision(2) << render_t << "s";
-
-        LOG_INFO(work_time.str());
+        scene_writer->write_to_file(output_file);
     }
     
     return EXIT_SUCCESS;  // All done
