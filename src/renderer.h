@@ -3,15 +3,15 @@
 
 #include <Eigen/Core>
 #include <vector>
+#include <memory>
 
 #include "actors.h"
 #include "world.h"
 
-
-namespace mrtp {
-
 using Vector3d = Eigen::Vector3d;
 
+
+namespace mrtp {
 
 struct RendererConfig
 {
@@ -66,27 +66,7 @@ protected:
 };
 
 
-class ParallelSceneRenderer : public SceneRendererBase {
-public:
-    ParallelSceneRenderer(const RendererConfig&);
-    ParallelSceneRenderer() = delete;
-    ~ParallelSceneRenderer() override = default;
-
-    float do_render(SceneWorld*) override;
-};
-
-
-class SceneRenderer : public SceneRendererBase {
-public:
-    SceneRenderer(const RendererConfig&);
-    SceneRenderer() = delete;
-    ~SceneRenderer() override = default;
-
-    float do_render(SceneWorld*) override;
-};
-
 std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig&);
-
 
 }
 

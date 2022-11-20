@@ -1,17 +1,17 @@
 #include <Eigen/Geometry>
 
-#include <cstdlib>
 #include <cmath>
 #include <ctime>
+
+#ifdef USE_OPENMP
+#include <omp.h>
+#include <iostream>
+#endif
 
 #include "renderer.h"
 #include "camera.h"
 #include "light.h"
 #include "logger.h"
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 constexpr double pi() { return std::atan(1) * 4; }
 
@@ -138,85 +138,90 @@ void SceneRendererBase::render_block(unsigned int block_index,
     }
 }
 
-
-ParallelSceneRenderer::ParallelSceneRenderer(const RendererConfig& render_config)
-    : SceneRendererBase(render_config)
+#ifdef USE_OPENMP
+class ParallelSceneRenderer : public SceneRendererBase
 {
-}
+public:
+    ParallelSceneRenderer(const RendererConfig& config)
+        : SceneRendererBase(config)
+    {
+        std::stringstream convert;
+        convert << config.num_thread;
+        std::string str_thread(convert.str());
 
+        LOG_INFO(std::string("Using parallel renderer with " + str_thread + " threads"));
+    }
 
-float ParallelSceneRenderer::do_render(SceneWorld* scene_world)
-{
-    scene_world_ = scene_world;
-    Camera* my_camera = scene_world_->get_camera_ptr();
+    ~ParallelSceneRenderer() override = default;
 
-    my_camera->calculate_window(config_.width, config_.height, perspective_);
-    
-    long time_start = clock();
+    float do_render(SceneWorld* scene_world) override
+    {
+        scene_world_ = scene_world;
+        Camera* my_camera = scene_world_->get_camera_ptr();
+        my_camera->calculate_window(config_.width, config_.height, perspective_);
+        
+        unsigned int block_idx;
+        unsigned int rows_per_block = config_.height / config_.num_thread;
 
-#ifdef _OPENMP
-    if (num_threads_ == 1) {
-        // Serial execution
-        render_block(0, config_.buffer_height);
-    } else {
-        // Parallel execution
-        if (num_threads_ != 0) {
-            omp_set_num_threads(num_threads_);
+        clock_t time_start = clock();
+        if (config_.num_thread != 0) {
+            omp_set_num_threads(static_cast<int>(config_.num_thread));
         }
-        unsigned int num_lines = config_.buffer_height / num_threads_;
-        unsigned int block_index;
 
 #pragma omp parallel for
-        for (block_index = 0; block_index < num_threads_; block_index++) {
-            render_block(block_index, num_lines);
+        for (block_idx = 0; block_idx < config_.num_thread; block_idx++) {
+            render_block(block_idx, rows_per_block);
         }
 
-        unsigned int num_fill = config_.buffer_height % num_threads_;
-        if (num_fill) {
-            render_block(block_index + 1, num_fill);
+        // fill remaining rows if any
+        unsigned int rows_fill = config_.height % config_.num_thread;
+        if (rows_fill) {
+            render_block(block_idx + 1, rows_fill);
         }
+
+        clock_t time_elapsed = std::clock() - time_start;
+        float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / config_.num_thread;
+
+        return time_used;
     }
-#else
-    // No OpenMP compiled in, always do serial execution
-    render_block(0, config_.height);
+};
+#endif  // USE_OPENMP
 
-#endif  // !_OPENMP
-
-    long time_elapsed = std::clock() - time_start;
-    float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / config_.num_thread;
-
-    return time_used;
-}
-
-
-SceneRenderer::SceneRenderer(const RendererConfig& render_config)
-    : SceneRendererBase(render_config)
+class SceneRenderer : public SceneRendererBase
 {
-}
+public:
+    SceneRenderer(const RendererConfig& config)
+        : SceneRendererBase(config)
+    {
+        LOG_INFO("Using standard renderer with 1 thread");
+    }
 
+    ~SceneRenderer() override = default;
 
-float SceneRenderer::do_render(SceneWorld* scene_world)
-{
-    scene_world_ = scene_world;
-    Camera* my_camera = scene_world_->get_camera_ptr();
-    my_camera->calculate_window(config_.width, config_.height, perspective_);
+    float do_render(SceneWorld* scene_world) override
+    {
+        scene_world_ = scene_world;
+        Camera* my_camera = scene_world_->get_camera_ptr();
+        my_camera->calculate_window(config_.width, config_.height, perspective_);
 
-    long time_start = clock();
+        clock_t time_start = clock();
+        render_block(0, config_.height);
 
-    render_block(0, config_.height);
-
-    return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
-}
+        return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;
+    }
+};
 
 
 std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
 {
+#ifdef USE_OPENMP
     if (config.num_thread > 1) {
         return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config));
     }
+#endif  // USE_OPENMP
 
     return std::shared_ptr<SceneRendererBase>(new SceneRenderer(config));
 }
 
 
-}  //namespace mrtp
+}  // namespace mrtp
