@@ -18,8 +18,10 @@ constexpr double pi() { return std::atan(1) * 4; }
 
 namespace mrtp {
 
-SceneRendererBase::SceneRendererBase(const RendererConfig& config)
+SceneRendererBase::SceneRendererBase(const RendererConfig& config,
+                                     std::shared_ptr<ProgressSlider> slider)
     : config_(config)
+    , progress_slider_(slider)
 {
     ratio_ = static_cast<double>(config_.width) / static_cast<double>(config_.height);
     perspective_ = ratio_ / (2 * std::tan(pi() / 180 * config_.fov / 2));
@@ -135,6 +137,7 @@ void SceneRendererBase::render_block(unsigned int block_index,
             Vector3d direction = my_camera->calculate_direction(origin);
             *pixel = trace_ray_r(origin, direction, 0);
         }
+        progress_slider_->tick();
     }
 }
 
@@ -142,8 +145,8 @@ void SceneRendererBase::render_block(unsigned int block_index,
 class ParallelSceneRenderer : public SceneRendererBase
 {
 public:
-    ParallelSceneRenderer(const RendererConfig& config)
-        : SceneRendererBase(config)
+    ParallelSceneRenderer(const RendererConfig& config, std::shared_ptr<ProgressSlider> slider)
+        : SceneRendererBase(config, slider)
     {
         std::stringstream convert;
         convert << config.num_thread;
@@ -190,8 +193,8 @@ public:
 class SceneRenderer : public SceneRendererBase
 {
 public:
-    SceneRenderer(const RendererConfig& config)
-        : SceneRendererBase(config)
+    SceneRenderer(const RendererConfig& config, std::shared_ptr<ProgressSlider> slider)
+        : SceneRendererBase(config, slider)
     {
         LOG_INFO("Using standard renderer with 1 thread");
     }
@@ -215,12 +218,16 @@ public:
 std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
 {
 #ifdef USE_OPENMP
+    // TODO Implement slider for multiple threads
+    auto dummy_slider = create_progress_slider(config.height, ProgressSliderType::DUMMY);
     if (config.num_thread > 1) {
-        return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config));
+        return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config, dummy_slider));
     }
 #endif  // USE_OPENMP
 
-    return std::shared_ptr<SceneRendererBase>(new SceneRenderer(config));
+    auto slider = create_progress_slider(config.height, ProgressSliderType::DEFAULT);
+
+    return std::shared_ptr<SceneRendererBase>(new SceneRenderer(config, slider));
 }
 
 
