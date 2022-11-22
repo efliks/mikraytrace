@@ -67,8 +67,9 @@ ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
 }
 
 
-TexturePixel SceneRendererBase::trace_ray_r(const Vector3d& O,
-        const Vector3d& D, unsigned int depth) const
+Vector3d SceneRendererBase::trace_ray_r(const Vector3d& O,
+                                        const Vector3d& D,
+                                        unsigned int depth) const
 {
     Vector3d pixel_vec{0, 0, 0};
 
@@ -110,32 +111,31 @@ TexturePixel SceneRendererBase::trace_ray_r(const Vector3d& O,
             if (depth < config_.max_recurse) {
                 if (my_pick.reflection_coeff > 0) {
                     Vector3d reflected_ray = D - (2 * D.dot(normal)) * normal;
-                    TexturePixel reflected_pixel = trace_ray_r(inter_corr, reflected_ray, depth + 1);
-
-                    Vector3d reflected_vec = reflected_pixel.to_vec();
-                    Vector3d combined_vec = (1 - my_pick.reflection_coeff) * reflected_vec + my_pick.reflection_coeff * pixel_vec;
-
-                    pixel_vec = combined_vec;
+                    Vector3d reflected_pixel = trace_ray_r(inter_corr, reflected_ray, depth + 1);
+                    pixel_vec = (1 - my_pick.reflection_coeff) * reflected_pixel + my_pick.reflection_coeff * pixel_vec;
                 }
             }
         }
     }
 
-    return TexturePixel(pixel_vec);
+    return pixel_vec;
 }
 
 
 void SceneRendererBase::render_block(unsigned int block_index,
-                                     unsigned int num_lines) {
+                                     unsigned int num_lines)
+{
     Camera* my_camera = scene_world_->get_camera_ptr();
 
     TexturePixel* pixel = &framebuffer_[block_index * num_lines * config_.width];
 
     for (unsigned int j = 0; j < num_lines; j++) {
-        for (unsigned int i = 0; i < config_.width; i++, pixel++) {
+        for (unsigned int i = 0; i < config_.width; i++) {
             Vector3d origin = my_camera->calculate_origin(i, j + block_index * num_lines);
             Vector3d direction = my_camera->calculate_direction(origin);
-            *pixel = trace_ray_r(origin, direction, 0);
+            Vector3d work_pixel = trace_ray_r(origin, direction, 0);
+            *pixel = TexturePixel(work_pixel);
+            pixel++;
         }
         progress_slider_->tick();
     }

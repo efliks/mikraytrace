@@ -61,7 +61,7 @@ protected:
     SceneWorld* scene_world_;
     std::shared_ptr<ProgressSlider> progress_slider_;
 
-    TexturePixel trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
+    Vector3d trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
     ActorBase* solve_hits(const Vector3d&, const Vector3d&, double*) const;
     bool solve_shadows(const Vector3d&, const Vector3d&, double) const;
     void render_block(unsigned int, unsigned int);
