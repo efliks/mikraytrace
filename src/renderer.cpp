@@ -163,23 +163,21 @@ public:
         Camera* my_camera = scene_world_->get_camera_ptr();
         my_camera->calculate_window(config_.width, config_.height, perspective_);
         
-        unsigned int block_idx;
-        unsigned int rows_per_block = config_.height / config_.num_thread;
-
-        clock_t time_start = clock();
         if (config_.num_thread != 0) {
             omp_set_num_threads(static_cast<int>(config_.num_thread));
         }
 
+        clock_t time_start = clock();
+
 #pragma omp parallel for
-        for (block_idx = 0; block_idx < config_.num_thread; block_idx++) {
-            render_block(block_idx, rows_per_block);
+        for (unsigned int i = 0; i < config_.num_thread; i++) {
+            render_block(i, config_.height / config_.num_thread);
         }
 
         // fill remaining rows if any
         unsigned int rows_fill = config_.height % config_.num_thread;
         if (rows_fill) {
-            render_block(block_idx + 1, rows_fill);
+            render_block(config_.num_thread, rows_fill);
         }
 
         clock_t time_elapsed = std::clock() - time_start;

@@ -28,8 +28,7 @@ private:
 };
 
 
-void create_cylinder(TextureFactory*, std::shared_ptr<ConfigTable>, 
-        std::vector<std::shared_ptr<ActorBase>>*);
+void create_cylinder(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*);
 
 }
 

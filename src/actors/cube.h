@@ -11,9 +11,7 @@
 
 namespace mrtp {
 
-void create_cube(TextureFactory*, std::shared_ptr<ConfigTable>, 
-        std::vector<std::shared_ptr<ActorBase>>*); 
-
+void create_cube(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*); 
 
 }
 

@@ -4,15 +4,15 @@
 #include <iomanip>
 #include <iostream>
 
-#include "CLI/App.hpp"
-#include "CLI/Formatter.hpp"
-#include "CLI/Config.hpp"
-
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
 #include "writer.h"
 #include "logger.h"
+
+#include "CLI/App.hpp"
+#include "CLI/Formatter.hpp"
+#include "CLI/Config.hpp"
 
 
 int main(int argc, char* argv[])

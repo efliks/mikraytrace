@@ -25,9 +25,7 @@ private:
     double radius_;
 };
 
-
-void create_sphere(TextureFactory*, std::shared_ptr<ConfigTable>, 
-        std::vector<std::shared_ptr<ActorBase>>*); 
+void create_sphere(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*); 
 
 }
 

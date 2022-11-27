@@ -31,9 +31,7 @@ private:
     Vector3d TC_;
 };
 
-
-void create_triangle(TextureFactory*, std::shared_ptr<ConfigTable>, 
-        std::vector<std::shared_ptr<ActorBase>>*);
+void create_triangle(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*);
 
 }
 

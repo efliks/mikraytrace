@@ -22,9 +22,7 @@ public:
     bool has_shadow() const override;
 };
 
-
-void create_plane(TextureFactory*, std::shared_ptr<ConfigTable>, 
-        std::vector<std::shared_ptr<ActorBase>>*);
+void create_plane(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*);
 
 }
 

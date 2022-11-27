@@ -11,8 +11,7 @@
 
 namespace mrtp {
 
-void create_mesh(TextureFactory*, std::shared_ptr<ConfigTable>,
-        std::vector<std::shared_ptr<ActorBase>>*);
+void create_mesh(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase>>*);
 
 }
 
