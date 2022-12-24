@@ -4,7 +4,6 @@
 
 #include "slider.h"
 
-extern "C" {
 #if (defined (LINUX) || defined (__linux__))
 
 #include <sys/ioctl.h> // ioctl() and TIOCGWINSZ
@@ -16,14 +15,23 @@ unsigned int get_columns()
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
     return static_cast<unsigned int>(win_size.ws_col);
 }
+
+void clear_slider()
+{
+    std::cout << "\r\e[K" << std::flush;
+}
+
 #else  // probably MS-DOS
 unsigned int get_columns()
 {
     return 80;
 }
-#endif
 
+void clear_slider()
+{
+    std::cout << std::endl;
 }
+#endif
 
 
 namespace mrtp {
@@ -49,15 +57,15 @@ public:
     {
         double progress = static_cast<double>(current_tick_) / static_cast<double>(max_tick_);
 
-        unsigned int num_ticks = static_cast<unsigned int>(std::round(progress * num_col_));
+        unsigned int num_ticks = static_cast<unsigned int>(std::ceil(progress * num_col_ - 0.5));  // no std::round in DJGPP
 
         std::string bar(num_ticks, 'x');
         std::string fill(num_col_ - num_ticks, ' ');
-        std::cout << "<" << bar << fill << ">\r" << std::flush;
+        std::cout << "[" << bar << fill << "]\r" << std::flush;
 
         if (++current_tick_ == max_tick_) {
             current_tick_ = 0;
-            std::cout << "\r\e[K" << std::flush;  // clear progress slider
+            clear_slider();
         }
     }
 
