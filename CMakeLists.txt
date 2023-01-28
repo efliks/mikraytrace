@@ -18,7 +18,7 @@ target_include_directories(mrtp_cli
         ${PROJECT_SOURCE_DIR}/thirdparty/CLI11/include
         ${PROJECT_SOURCE_DIR}/thirdparty/toojpeg
         ${PROJECT_SOURCE_DIR}/thirdparty/lodepng
-        /usr/include/eigen3
+        ${PROJECT_SOURCE_DIR}/thirdparty/eigen
 )
 
 find_package(OpenMP)

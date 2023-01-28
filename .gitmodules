@@ -10,3 +10,7 @@
 [submodule "thirdparty/lodepng"]
 	path = thirdparty/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+[submodule "thirdparty/eigen"]
+	path = thirdparty/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+	shallow = true

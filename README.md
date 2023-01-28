@@ -7,11 +7,12 @@ A weekend project to build a simple raytracer in C++.
 
 ### Installation instructions
 
-Firstly, install the required libraries and tools. In Debian, or in 
-a Debian-like Linux, this can be done like so:
+Firstly, install the required tools. It may be that you already have
+them installed. If not, in Debian or in a Debian-like Linux, this can be 
+done like so:
 
 ```
-apt-get install build-essential cmake libeigen3-dev
+apt-get install build-essential cmake
 ```
 
 Optionally, you may add:
@@ -20,6 +21,7 @@ apt-get install libopenbabel-dev lib3ds-dev libeasyloggingpp-dev
 ```
 
 Secondly, you need some third party libraries. These are:
+ * eigen for linear algebra
  * CLI11 for command line processing
  * cpptoml for reading configuration files
  * toojpeg for writing scenes in JPEG format
