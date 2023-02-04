@@ -23,5 +23,14 @@ if(USE_OPENMP)
         target_link_libraries(mrtp_cli PUBLIC OpenMP::OpenMP_CXX)
     endif()
 endif()
+
+option(USE_EASYLOGGING "Enable Easylogging++ support" OFF)
+if(USE_EASYLOGGING)
+    add_library(easyloggingpp STATIC thirdparty/easyloggingpp/src/easylogging++.cc)
+    target_include_directories(easyloggingpp PUBLIC thirdparty/easyloggingpp/src)
+
+    target_compile_definitions(mrtp_cli PRIVATE USE_EASYLOGGING)
+    target_link_libraries(mrtp_cli PUBLIC easyloggingpp)
+endif()
     
 target_link_libraries(mrtp_cli PUBLIC m lodepng toojpeg)

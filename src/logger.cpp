@@ -4,14 +4,14 @@
 
 #ifdef USE_EASYLOGGING
 #include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
 #endif
 
 
 namespace mrtp {
 
 #ifdef USE_EASYLOGGING
-
-INITIALIZE_EASYLOGGINGPP
 class EasyLogFormatter : public LogFormatter
 {
 public:
@@ -130,12 +130,19 @@ Logger& Logger::get()
     return instance;
 }
 
-
+#ifdef USE_EASYLOGGING
+Logger::Logger()
+    : level_(LogLevel::DEBUG)
+    , formatter_(std::shared_ptr<LogFormatter>(new EasyLogFormatter()))
+{
+}
+#else
 Logger::Logger()
     : level_(LogLevel::DEBUG)
     , formatter_(std::shared_ptr<LogFormatter>(new DefaultLogFormatter()))
 {
 }
+#endif  // USE_EASYLOGGING
 
 
 void Logger::set_config(LogLevel log_level, std::shared_ptr<LogFormatter> formatter)
