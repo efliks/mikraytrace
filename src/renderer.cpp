@@ -3,7 +3,7 @@
 #include <cmath>
 #include <ctime>
 
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #include <iostream>
 #endif
@@ -141,7 +141,7 @@ void SceneRendererBase::render_block(unsigned int block_index,
     }
 }
 
-#ifdef USE_OPENMP
+#ifdef _OPENMP
 class ParallelSceneRenderer : public SceneRendererBase
 {
 public:
@@ -186,7 +186,7 @@ public:
         return time_used;
     }
 };
-#endif  // USE_OPENMP
+#endif  // _OPENMP
 
 class SceneRenderer : public SceneRendererBase
 {
@@ -215,13 +215,13 @@ public:
 
 std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
 {
-#ifdef USE_OPENMP
+#ifdef _OPENMP
     // TODO Implement slider for multiple threads
     auto dummy_slider = create_progress_slider(config.height, ProgressSliderType::DUMMY);
     if (config.num_thread > 1) {
         return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config, dummy_slider));
     }
-#endif  // USE_OPENMP
+#endif  // _OPENMP
 
     auto slider = create_progress_slider(config.height, ProgressSliderType::DEFAULT);
 

@@ -16,4 +16,12 @@ add_subdirectory("src")
 add_subdirectory("src/actors")
 target_include_directories(mrtp_cli PUBLIC src thirdparty/eigen thirdparty/cpptoml/include thirdparty/CLI11/include)
 
+option(USE_OPENMP "Enable OpenMP support" ON)
+if(USE_OPENMP)
+    find_package(OpenMP)
+    if (OpenMP_CXX_FOUND)
+        target_link_libraries(mrtp_cli PUBLIC OpenMP::OpenMP_CXX)
+    endif()
+endif()
+    
 target_link_libraries(mrtp_cli PUBLIC m lodepng toojpeg)
