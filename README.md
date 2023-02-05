@@ -1,23 +1,17 @@
 # mikraytrace
 
-A weekend project to build a simple raytracer in C++. 
+A weekend project to create a simple raytracer in C++. 
 
 <img src="./sample.png" alt="Sample image" width="300" />
 
 
-### Installation instructions
+### Build instructions
 
 Firstly, install the required tools. It may be that you already have
-them installed. If not, in Debian or in a Debian-like Linux, this can be 
-done like so:
+them installed. If not, in Debian or in a Debian-like Linux, you may do:
 
 ```
 apt-get install build-essential cmake
-```
-
-Optionally, you may add:
-```
-apt-get install libopenbabel-dev lib3ds-dev libeasyloggingpp-dev
 ```
 
 Secondly, you need some third party libraries. These are:
@@ -46,7 +40,7 @@ bash gettex.sh
 ```
 
 Now you may want to review CMakeLists.txt. If everything looks okay, create
-a build directory, and run cmake followed by make:
+a build directory, and run CMake followed by make:
 
 ```
 cd mikraytrace/
@@ -64,3 +58,17 @@ cd mikraytrace/
 ./build/mrtp_cli bluemol.toml
 ```
 
+There are some optional dependencies: Open Babel for handling of MOL2 files, 
+lib3ds for reading models in 3D Studio format, and Easylogging++ for having more 
+fancy logs. The latter one is already in the submodules. At the moment, Open Babel 
+and lib3ds come from the system. You may install them like so:
+
+```
+apt-get install libopenbabel-dev lib3ds-dev
+```
+
+If you want to use any of the optional dependencies, you should add options to CMake:
+
+```
+cmake -DUSE_OPENBABEL=ON -DUSE_LIB3DS=ON -DUSE_EASYLOGGING=ON ..
+```
