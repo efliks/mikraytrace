@@ -24,7 +24,6 @@ enum class LogLevel
 enum class LogFormatterType
 {
     DEFAULT,
-    EASY,
     DUMMY
 };
 

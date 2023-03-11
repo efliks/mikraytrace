@@ -24,28 +24,10 @@ if(USE_OPENMP)
     endif()
 endif()
 
-option(USE_EASYLOGGING "Enable Easylogging++ support" OFF)
-if(USE_EASYLOGGING)
-    add_library(easyloggingpp STATIC thirdparty/easyloggingpp/src/easylogging++.cc)
-    target_include_directories(easyloggingpp PUBLIC thirdparty/easyloggingpp/src)
-
-    target_compile_definitions(mrtp_cli PRIVATE USE_EASYLOGGING)
-    target_link_libraries(mrtp_cli PUBLIC easyloggingpp)
-endif()
-
 option(USE_LIB3DS "Enable support for models in 3D Studio format" OFF)
 if(USE_LIB3DS)
     target_compile_definitions(mrtp_cli PRIVATE USE_LIB3DS)
     target_link_libraries(mrtp_cli PUBLIC 3ds)
 endif()
 
-option(USE_OPENBABEL "Use Open Babel for reading MOL2 format" OFF)
-if(USE_OPENBABEL)
-    target_compile_definitions(mrtp_cli PRIVATE USE_OPENBABEL)
-    target_include_directories(mrtp_cli PUBLIC /usr/include/openbabel-2.0)
-    target_link_libraries(mrtp_cli PUBLIC openbabel)
-endif()
-
 target_link_libraries(mrtp_cli PUBLIC m lodepng toojpeg)
-
-

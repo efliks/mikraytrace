@@ -58,17 +58,10 @@ cd mikraytrace/
 ./build/mrtp_cli bluemol.toml
 ```
 
-There are some optional dependencies: Open Babel for handling of MOL2 files, 
-lib3ds for reading models in 3D Studio format, and Easylogging++ for having more 
-fancy logs. The latter one is already in the submodules. At the moment, Open Babel 
-and lib3ds come from the system. You may install them like so:
+For reading models in 3D Studio format, install lib3ds and pass the following 
+option to CMake:
 
 ```
-apt-get install libopenbabel-dev lib3ds-dev
-```
-
-If you want to use any of the optional dependencies, you should add options to CMake:
-
-```
-cmake -DUSE_OPENBABEL=ON -DUSE_LIB3DS=ON -DUSE_EASYLOGGING=ON ..
+apt-get install lib3ds-dev
+cmake -DUSE_LIB3DS=ON ..
 ```

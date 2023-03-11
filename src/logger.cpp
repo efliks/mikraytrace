@@ -2,43 +2,8 @@
 
 #include "logger.h"
 
-#ifdef USE_EASYLOGGING
-#include <easylogging++.h>
-
-INITIALIZE_EASYLOGGINGPP
-#endif
-
 
 namespace mrtp {
-
-#ifdef USE_EASYLOGGING
-class EasyLogFormatter : public LogFormatter
-{
-public:
-    EasyLogFormatter() = default;
-    ~EasyLogFormatter() override = default;
-
-    void debug(const std::string& message) override
-    {
-        LOG(DEBUG) << message;
-    }
-
-    void info(const std::string& message) override
-    {
-        LOG(INFO) << message;
-    }
-
-    void warning(const std::string& message) override
-    {
-        LOG(WARNING) << message;
-    }
-
-    void error(const std::string& message) override
-    {
-        LOG(ERROR) << message;
-    }
-};
-#endif  // USE_EASYLOGGING
 
 class DefaultLogFormatter : public LogFormatter
 {
@@ -130,19 +95,11 @@ Logger& Logger::get()
     return instance;
 }
 
-#ifdef USE_EASYLOGGING
-Logger::Logger()
-    : level_(LogLevel::DEBUG)
-    , formatter_(std::shared_ptr<LogFormatter>(new EasyLogFormatter()))
-{
-}
-#else
 Logger::Logger()
     : level_(LogLevel::DEBUG)
     , formatter_(std::shared_ptr<LogFormatter>(new DefaultLogFormatter()))
 {
 }
-#endif  // USE_EASYLOGGING
 
 
 void Logger::set_config(LogLevel log_level, std::shared_ptr<LogFormatter> formatter)
@@ -154,12 +111,9 @@ void Logger::set_config(LogLevel log_level, std::shared_ptr<LogFormatter> format
 
 std::shared_ptr<LogFormatter> create_log_formatter(LogFormatterType formatter_type)
 {
-#ifdef USE_EASYLOGGING
-    if (formatter_type == LogFormatterType::EASY)
-        return std::shared_ptr<LogFormatter>(new EasyLogFormatter());
-#endif
-    if (formatter_type == LogFormatterType::DEFAULT)
+    if (formatter_type == LogFormatterType::DEFAULT) {
         return std::shared_ptr<LogFormatter>(new DefaultLogFormatter());
+    }
 
     return std::shared_ptr<LogFormatter>(new DummyLogFormatter());
 }
