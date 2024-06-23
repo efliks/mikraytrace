@@ -35,12 +35,23 @@ texture = "textures/02camino.png"
 
 [[molecules]]
 mol2file = "trp.mol2"
-center = [0.0, 0.0, 4.0]
-atom_color = [0.0, 0.0, 1.0]
-bond_color = [0.0, 0.0, 1.0]
-mol_scale = 10.0
-atom_scale = 0.25
-bond_scale = 0.125
+center = [0.0, 0.0, 4.5]
+atom_color = [1.0, 0.0, 1.0]
+bond_color = [1.0, 0.0, 1.0]
+mol_scale = 1.0
+atom_scale = 0.15
+bond_scale = 0.075
 angle_x = 0.0
 angle_y = 0.0
 angle_z = 90.0
+
+[[meshes]]
+center = [-4.5, 0.0, 3.0]
+color = [0.0, 1.0, 1.0]
+scale = 3.0
+file3ds = "models/cone.3ds"
+
+[[spheres]]
+center = [3.0, 0.0, 1.0]
+color = [1.0, 1.0, 0.0]
+radius = 0.8
