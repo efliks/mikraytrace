@@ -39,15 +39,15 @@ Vector3d fill_vector(const Vector3d& vec)
     double y = (vec[1] < 0) ? -vec[1] : vec[1];
     double z = (vec[2] < 0) ? -vec[2] : vec[2];
 
-    Vector3d unit{0, 0, 1};
+    Vector3d unit(0, 0, 1);
 
     if (x < y) {
         if (x < z) {
-            unit << 1, 0, 0;
+            unit = Vector3d(1, 0, 0);
         }
     } else { // if ( x >= y)
         if (y < z) {
-            unit << 0, 1, 0;
+            unit = Vector3d(0, 1, 0);
         }
     }
     return unit;

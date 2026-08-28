@@ -20,8 +20,7 @@ void Camera::calculate_window(unsigned int width,
     Eigen::Vector3d i = lookat_ - eye_;
     i *= (1 / i.norm());
 
-    Eigen::Vector3d k;
-    k << 0, 0, 1;
+    Eigen::Vector3d k(0, 0, 1);
 
     Eigen::Vector3d j = i.cross(k);
     j *= (1 / j.norm());

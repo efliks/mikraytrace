@@ -134,15 +134,13 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
             f.close();
 
             for (const TriangleFace& face : faces_list) {
-                Eigen::Vector3f v;
-
-                v << tmp_vertex_list[face.a];
+                Eigen::Vector3f v = tmp_vertex_list[face.a];
                 vertex_list->push_back(v.cast<double>());
 
-                v << tmp_vertex_list[face.b];
+                v = tmp_vertex_list[face.b];
                 vertex_list->push_back(v.cast<double>());
 
-                v << tmp_vertex_list[face.c];
+                v = tmp_vertex_list[face.c];
                 vertex_list->push_back(v.cast<double>());
             }
 
