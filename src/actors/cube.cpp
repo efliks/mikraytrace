@@ -1,5 +1,3 @@
-#include <Eigen/Geometry>
-
 #include "logger.h"
 
 #include "actors/cube.h"
@@ -38,7 +36,7 @@ void create_cube(TextureFactory* texture_factory,
     cube_vec_j *= (1 / cube_vec_j.norm());
     cube_vec_k *= (1 / cube_vec_k.norm());
 
-    Eigen::Matrix3d m_rot = create_rotation_matrix(cube_items);
+    Matrix3d m_rot = create_rotation_matrix(cube_items);
 
     cube_vec_i = m_rot * cube_vec_i;
     cube_vec_j = m_rot * cube_vec_j;

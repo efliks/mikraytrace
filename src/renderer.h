@@ -1,7 +1,7 @@
 #ifndef _RENDERER_H
 #define _RENDERER_H
 
-#include <Eigen/Core>
+#include "vector3.h"
 #include <vector>
 #include <memory>
 
@@ -9,7 +9,7 @@
 #include "actors.h"
 #include "world.h"
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = mrtp::Vector3;
 
 
 namespace mrtp {

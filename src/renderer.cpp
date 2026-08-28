@@ -1,7 +1,6 @@
-#include <Eigen/Geometry>
-
 #include <cmath>
 #include <ctime>
+#include <sstream>
 
 #ifdef _OPENMP
 #include <omp.h>

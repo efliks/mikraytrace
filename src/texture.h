@@ -1,12 +1,12 @@
 #ifndef _TEXTURE_H
 #define _TEXTURE_H
 
-#include <Eigen/Core>
+#include "vector3.h"
 #include <list>
 #include <vector>
 #include <string>
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = mrtp::Vector3;
 
 
 namespace mrtp {

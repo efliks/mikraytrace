@@ -1,5 +1,3 @@
-#include <Eigen/Geometry>
-
 #include "actors/plane.h"
 #include "actors/tools.h"
 

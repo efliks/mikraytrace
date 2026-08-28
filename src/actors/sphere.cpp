@@ -1,5 +1,3 @@
-#include <Eigen/Geometry>
-
 #include "actors/sphere.h"
 #include "actors/tools.h"
 

@@ -1,5 +1,3 @@
-#include <Eigen/Core>
-
 #include "logger.h"
 #include "config.h"
 #include "world.h"
@@ -16,7 +14,7 @@
 
 namespace mrtp {
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = Vector3;
 
 
 void SceneWorld::add_light(std::shared_ptr<Light> light_ptr) {

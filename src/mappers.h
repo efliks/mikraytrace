@@ -2,7 +2,7 @@
 #define MAPPERS_H
 
 #include <memory>
-#include <Eigen/Core>
+#include "vector3.h"
 
 #include "config.h"
 #include "common.h"
@@ -11,7 +11,7 @@
 
 namespace mrtp {
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = Vector3;
 
 
 class TextureMapper {

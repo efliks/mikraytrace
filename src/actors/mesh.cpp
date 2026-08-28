@@ -1,9 +1,10 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <cstring>
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "vector3.h"
 
 #ifdef USE_LIB3DS
 #include <lib3ds/file.h>
@@ -17,7 +18,7 @@
 #include "actors/tools.h"
 #include "actors/triangle.h"
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = mrtp::Vector3;
 
 
 namespace mrtp {
@@ -121,11 +122,11 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
             unsigned short num_faces;
             f.read(static_cast<char *>(static_cast<void *>(&num_faces)), sizeof(unsigned short));
 
-            static_assert(sizeof(Eigen::Vector3f) == 12, "Vector3f is not 12 bytes");
+            static_assert(sizeof(Vector3f) == 12, "Vector3f is not 12 bytes");
 
-            std::vector<Eigen::Vector3f> tmp_vertex_list;
+            std::vector<Vector3f> tmp_vertex_list;
             tmp_vertex_list.resize(num_vertices);
-            f.read(static_cast<char *>(static_cast<void *>(tmp_vertex_list.data())), sizeof(Eigen::Vector3f) * num_vertices);
+            f.read(static_cast<char *>(static_cast<void *>(tmp_vertex_list.data())), sizeof(Vector3f) * num_vertices);
 
             std::vector<TriangleFace> faces_list;
             faces_list.resize(num_faces);
@@ -134,14 +135,14 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
             f.close();
 
             for (const TriangleFace& face : faces_list) {
-                Eigen::Vector3f v = tmp_vertex_list[face.a];
-                vertex_list->push_back(v.cast<double>());
+                Vector3f v = tmp_vertex_list[face.a];
+                vertex_list->push_back(v.to_vector3());
 
                 v = tmp_vertex_list[face.b];
-                vertex_list->push_back(v.cast<double>());
+                vertex_list->push_back(v.to_vector3());
 
                 v = tmp_vertex_list[face.c];
-                vertex_list->push_back(v.cast<double>());
+                vertex_list->push_back(v.to_vector3());
             }
 
             // Debug info
@@ -233,7 +234,7 @@ void create_mesh(TextureFactory* texture_factory,
     }
 
     // Rotate, scale, and translate model to center
-    Eigen::Matrix3d m_rot = create_rotation_matrix(items);
+    Matrix3d m_rot = create_rotation_matrix(items);
 
     double mesh_scale = items->get_value("scale", 1);
 

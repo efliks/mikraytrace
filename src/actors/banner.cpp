@@ -1,7 +1,5 @@
 #include <string>
 
-#include <Eigen/Geometry>
-
 #include "actors/banner.h"
 #include "actors/sphere.h"
 #include "actors/tools.h"
@@ -71,7 +69,7 @@ void create_banner(TextureFactory* texture_factory,
         return;
     }
 
-    Eigen::Matrix3d m_rot = create_rotation_matrix(items);
+    Matrix3d m_rot = create_rotation_matrix(items);
 
     Vector3d banner_i_vec{m_rot.col(0)};
     Vector3d banner_j_vec{m_rot.col(1)};
@@ -82,7 +80,7 @@ void create_banner(TextureFactory* texture_factory,
     banner_k_vec *= (1 / banner_k_vec.norm());
 
     // Each char can rotate individually
-    Eigen::Matrix3d m_char_rot = create_rotation_matrix(items, "char_");
+    Matrix3d m_char_rot = create_rotation_matrix(items, "char_");
 
     Vector3d char_i_vec = m_char_rot * banner_i_vec;
     Vector3d char_j_vec = m_char_rot * banner_j_vec;

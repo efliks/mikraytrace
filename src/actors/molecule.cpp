@@ -1,5 +1,3 @@
-#include <Eigen/Geometry>
-
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -34,7 +32,7 @@ static bool read_line(std::ifstream& f, std::string& buffer, const std::string& 
 
 static void create_tables(const std::string& mol2file,
     std::vector<unsigned int>* atomic_nums,
-    std::vector<Eigen::Vector3d>* positions,
+    std::vector<Vector3d>* positions,
     std::vector<std::pair<unsigned int, unsigned int>>* bonds)
 {
     std::ifstream f(mol2file);
@@ -100,7 +98,7 @@ void create_molecule(TextureFactory* texture_factory,
     double sphere_scale = items->get_value("atom_scale", 1);
     double cylinder_scale = items->get_value("bond_scale", 0.5);
 
-    Eigen::Matrix3d m_rot = create_rotation_matrix(items);
+    Matrix3d m_rot = create_rotation_matrix(items);
 
     auto sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
     if (!sphere_mapper_ptr) {

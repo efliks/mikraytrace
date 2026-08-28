@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "lodepng.h"
 #include "texture.h"
 

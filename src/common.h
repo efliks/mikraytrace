@@ -1,12 +1,12 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <Eigen/Core>
+#include "vector3.h"
 
 
 namespace mrtp {
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = Vector3;
 
 struct StandardBasis 
 {

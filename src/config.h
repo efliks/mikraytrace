@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <Eigen/Core>
+#include "vector3.h"
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = mrtp::Vector3;
 
 
 namespace mrtp {

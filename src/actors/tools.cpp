@@ -1,5 +1,5 @@
 #include <cmath>
-#include <Eigen/Core>
+#include "matrix3.h"
 
 #include "actors/tools.h"
 #include "common.h"
@@ -13,50 +13,7 @@ namespace mrtp
 const double kMyZero = 0.0001;
 
 
-namespace {
-
-// Elementary rotations of `angle` radians around the X, Y, and Z axes.
-
-Eigen::Matrix3d rotation_x(double angle)
-{
-    double c = std::cos(angle);
-    double s = std::sin(angle);
-
-    Eigen::Matrix3d result;
-    result(0, 0) = 1;  result(0, 1) = 0;  result(0, 2) = 0;
-    result(1, 0) = 0;  result(1, 1) = c;  result(1, 2) = -s;
-    result(2, 0) = 0;  result(2, 1) = s;  result(2, 2) = c;
-    return result;
-}
-
-Eigen::Matrix3d rotation_y(double angle)
-{
-    double c = std::cos(angle);
-    double s = std::sin(angle);
-
-    Eigen::Matrix3d result;
-    result(0, 0) = c;   result(0, 1) = 0;  result(0, 2) = s;
-    result(1, 0) = 0;   result(1, 1) = 1;  result(1, 2) = 0;
-    result(2, 0) = -s;  result(2, 1) = 0;  result(2, 2) = c;
-    return result;
-}
-
-Eigen::Matrix3d rotation_z(double angle)
-{
-    double c = std::cos(angle);
-    double s = std::sin(angle);
-
-    Eigen::Matrix3d result;
-    result(0, 0) = c;  result(0, 1) = -s;  result(0, 2) = 0;
-    result(1, 0) = s;  result(1, 1) = c;   result(1, 2) = 0;
-    result(2, 0) = 0;  result(2, 1) = 0;   result(2, 2) = 1;
-    return result;
-}
-
-}  // namespace
-
-
-double solve_quadratic(double a, double b, double c) 
+double solve_quadratic(double a, double b, double c)
 {
     double delta = b * b - 4 * a * c;
     if (delta < 0) {
@@ -97,8 +54,8 @@ Vector3d fill_vector(const Vector3d& vec)
 }
 
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items,
-                                       const std::string& prefix)
+Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items,
+                                const std::string& prefix)
 {
     double angle_x = items->get_value(prefix + "angle_x", 0) * pi() / 180;
     double angle_y = items->get_value(prefix + "angle_y", 0) * pi() / 180;

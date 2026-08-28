@@ -3,12 +3,13 @@
 
 #include <memory>
 #include <string>
-#include <Eigen/Core>
+#include "matrix3.h"
 
 #include "config.h"
 #include "common.h"
 
-using Vector3d = Eigen::Vector3d;
+using Vector3d = mrtp::Vector3;
+using Matrix3d = mrtp::Matrix3;
 
 
 namespace mrtp {
@@ -19,7 +20,7 @@ double solve_quadratic(double, double, double);
 
 Vector3d fill_vector(const Vector3d&);
 
-Eigen::Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable>, const std::string& = "");
+Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable>, const std::string& = "");
 
 void set_basis(StandardBasis*, const Vector3d&, const Vector3d&, const Vector3d&, const Vector3d&);
 

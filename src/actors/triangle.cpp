@@ -1,5 +1,3 @@
-#include <Eigen/Geometry>
-
 #include "actors/triangle.h"
 #include "actors/plane.h"
 

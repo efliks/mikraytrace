@@ -2,12 +2,12 @@
 
 namespace mrtp {
 
-Light::Light(const Eigen::Vector3d& center)
+Light::Light(const Vector3d& center)
     : center_(center)
 {
 }
 
-Eigen::Vector3d Light::calculate_ray(const Eigen::Vector3d& hit) const
+Vector3d Light::calculate_ray(const Vector3d& hit) const
 {
     return (center_ - hit);
 }
