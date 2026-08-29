@@ -94,28 +94,28 @@ public:
 
         std::vector<std::shared_ptr<ActorBase>> new_actors;
 
-        auto planes_array = world_config->get_tables("planes");
+        auto planes_array = world_config->get_tables("plane");
         process_actor_array(ActorType::Plane, planes_array, &new_actors);
 
-        auto spheres_array = world_config->get_tables("spheres");
+        auto spheres_array = world_config->get_tables("sphere");
         process_actor_array(ActorType::Sphere, spheres_array, &new_actors);
 
-        auto cylinders_array = world_config->get_tables("cylinders");
+        auto cylinders_array = world_config->get_tables("cylinder");
         process_actor_array(ActorType::Cylinder, cylinders_array, &new_actors);
 
-        auto triangles_array = world_config->get_tables("triangles");
+        auto triangles_array = world_config->get_tables("triangle");
         process_actor_array(ActorType::Triangle, triangles_array, &new_actors);
 
-        auto cubes_array = world_config->get_tables("cubes");
+        auto cubes_array = world_config->get_tables("cube");
         process_actor_array(ActorType::Cube, cubes_array, &new_actors);
 
-        auto molecules_array = world_config->get_tables("molecules");
+        auto molecules_array = world_config->get_tables("molecule");
         process_actor_array(ActorType::Molecule, molecules_array, &new_actors);
 
-        auto banners_array = world_config->get_tables("banners");
+        auto banners_array = world_config->get_tables("banner");
         process_actor_array(ActorType::Banner, banners_array, &new_actors);
 
-        auto meshes_array = world_config->get_tables("meshes");
+        auto meshes_array = world_config->get_tables("mesh");
         process_actor_array(ActorType::Mesh, meshes_array, &new_actors);
 
         if (new_actors.size() < 1) {
@@ -128,7 +128,7 @@ public:
             world_ptr->add_actor(actor);
         }
 
-        std::shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "cameras", "camera");
+        std::shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "camera");
         if (!camera_table) {
             return std::shared_ptr<SceneWorld>();
         }
@@ -147,7 +147,7 @@ public:
 
         double camera_roll = camera_table->get_value("roll", 0);
 
-        std::shared_ptr<ConfigTable> light_table = get_single_table(world_config, "lights", "light");
+        std::shared_ptr<ConfigTable> light_table = get_single_table(world_config, "light");
         if (!light_table) {
             return std::shared_ptr<SceneWorld>();
         }
@@ -167,16 +167,15 @@ public:
     }
 
     std::shared_ptr<ConfigTable> get_single_table(std::shared_ptr<ConfigReader> config,
-                                                  const std::string& array_name,
-                                                  const std::string& item_label) const
+                                                  const std::string& table_name) const
     {
-        auto it = config->get_tables(array_name);
+        auto it = config->get_tables(table_name);
         if (it) {
             it->first();
         }
 
         if (!it || it->is_done()) {
-            LOG_ERROR("No " + item_label + " found");
+            LOG_ERROR("No " + table_name + " found");
             return std::shared_ptr<ConfigTable>();
         }
 
@@ -184,7 +183,7 @@ public:
 
         it->next();
         if (!it->is_done()) {
-            LOG_ERROR("Multiple " + item_label + "s found");
+            LOG_ERROR("Multiple " + table_name + "s found");
             return std::shared_ptr<ConfigTable>();
         }
 
