@@ -191,6 +191,9 @@ int main(int argc, char* argv[])
         if (auto_name) {
             std::string foo(input_file);
             size_t pos = input_file.rfind(".toml");  //FIXME
+            if (pos == std::string::npos) {
+                pos = input_file.rfind(".txt");
+            }
             if (pos != std::string::npos) {
                 foo = input_file.substr(0, pos);
             }
