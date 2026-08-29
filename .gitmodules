@@ -1,6 +1,3 @@
-[submodule "cpptoml"]
-	path = thirdparty/cpptoml
-	url = https://github.com/skystrife/cpptoml
 [submodule "thirdparty/toojpeg"]
 	path = thirdparty/toojpeg
 	url = https://github.com/stbrumme/toojpeg
