@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 
-#include "slider.h"
 #include "actors.h"
 #include "world.h"
 
@@ -44,7 +43,7 @@ struct RendererConfig
 class SceneRendererBase {
 
 public:
-    SceneRendererBase(const RendererConfig&, std::shared_ptr<ProgressSlider>);
+    SceneRendererBase(const RendererConfig&);
     SceneRendererBase() = delete;
     virtual ~SceneRendererBase() = default;
 
@@ -59,7 +58,6 @@ protected:
     double perspective_;
 
     SceneWorld* scene_world_;
-    std::shared_ptr<ProgressSlider> progress_slider_;
 
     Vector3d trace_ray_r(const Vector3d&, const Vector3d&, unsigned int) const;
     ActorBase* solve_hits(const Vector3d&, const Vector3d&, double*) const;
