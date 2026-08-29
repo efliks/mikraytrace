@@ -1,8 +1,10 @@
+#include <cstdlib>
 #include <list>
 #include <vector>
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 #include "world.h"
 #include "renderer.h"
@@ -10,9 +12,71 @@
 #include "writer.h"
 #include "logger.h"
 
-#include "CLI/App.hpp"
-#include "CLI/Formatter.hpp"
-#include "CLI/Config.hpp"
+
+namespace {
+
+void print_usage(const char* program_name)
+{
+    std::cout << "A simple raytracer\n\n"
+              << "Usage: " << program_name << " [options] input_file...\n\n"
+              << "Positional arguments:\n"
+              << "  input_files        Input file(s), one or more, mandatory\n\n"
+              << "Options:\n"
+              << "  -h, --help         Print this help message and exit\n"
+              << "  -o, --output ARG   Output file (only allowed with a single input file)\n"
+              << "  -F, --format ARG   Output format, one of: png, jpg (default: png)\n"
+              << "  -f, --fov ARG      Field of vision in degrees\n"
+              << "  -W, --width ARG    Image width\n"
+              << "  -H, --height ARG   Image height\n"
+              << "  -t, --threads ARG  Rendering threads, 0 for auto\n";
+}
+
+// Parses the value following an option flag; returns false (and logs) if
+// the flag is the last argument on the command line.
+bool next_value(int argc, char* argv[], int& i, const std::string& flag, std::string* value)
+{
+    if (++i >= argc) {
+        LOG_ERROR("Missing value for option " + flag);
+        return false;
+    }
+    *value = argv[i];
+    return true;
+}
+
+bool parse_double_option(const std::string& text, const std::string& flag,
+                          double min_value, double max_value, double* target)
+{
+    char* end = 0;
+    double value = std::strtod(text.c_str(), &end);
+    if (*end != '\0' || value < min_value || value > max_value) {
+        std::stringstream message;
+        message << "Value for option " << flag << " must be a number in range ["
+                << min_value << ", " << max_value << "]";
+        LOG_ERROR(message.str());
+        return false;
+    }
+    *target = value;
+    return true;
+}
+
+bool parse_uint_option(const std::string& text, const std::string& flag,
+                        unsigned int min_value, unsigned int max_value, unsigned int* target)
+{
+    char* end = 0;
+    long value = std::strtol(text.c_str(), &end, 10);
+    if (*end != '\0' || value < 0 ||
+        static_cast<unsigned int>(value) < min_value || static_cast<unsigned int>(value) > max_value) {
+        std::stringstream message;
+        message << "Value for option " << flag << " must be an integer in range ["
+                << min_value << ", " << max_value << "]";
+        LOG_ERROR(message.str());
+        return false;
+    }
+    *target = static_cast<unsigned int>(value);
+    return true;
+}
+
+}  // namespace
 
 
 int main(int argc, char* argv[])
@@ -24,23 +88,69 @@ int main(int argc, char* argv[])
 
     mrtp::RendererConfig config;
 
+    // Rudimentary scan of argv
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        std::string value;
 
-    CLI::App app{"A simple raytracer"};
+        if (arg == "-h" || arg == "--help") {
+            print_usage(argv[0]);
+            return EXIT_SUCCESS;
+        }
+        else if (arg == "-o" || arg == "--output") {
+            if (!next_value(argc, argv, i, arg, &value)) {
+                return EXIT_FAILURE;
+            }
+            output_file = value;
+        }
+        else if (arg == "-F" || arg == "--format") {
+            if (!next_value(argc, argv, i, arg, &value)) {
+                return EXIT_FAILURE;
+            }
+            if (value != "png" && value != "jpg") {
+                LOG_ERROR("Value for option " + arg + " must be one of: png, jpg");
+                return EXIT_FAILURE;
+            }
+            output_format = value;
+        }
+        else if (arg == "-f" || arg == "--fov") {
+            if (!next_value(argc, argv, i, arg, &value) ||
+                !parse_double_option(value, arg, config.fov_min, config.fov_max, &config.fov)) {
+                return EXIT_FAILURE;
+            }
+        }
+        else if (arg == "-W" || arg == "--width") {
+            if (!next_value(argc, argv, i, arg, &value) ||
+                !parse_uint_option(value, arg, config.width_min, config.width_max, &config.width)) {
+                return EXIT_FAILURE;
+            }
+        }
+        else if (arg == "-H" || arg == "--height") {
+            if (!next_value(argc, argv, i, arg, &value) ||
+                !parse_uint_option(value, arg, config.height_min, config.height_max, &config.height)) {
+                return EXIT_FAILURE;
+            }
+        }
+        else if (arg == "-t" || arg == "--threads") {
+            if (!next_value(argc, argv, i, arg, &value) ||
+                !parse_uint_option(value, arg, config.num_min_thread, config.num_max_thread, &config.num_thread)) {
+                return EXIT_FAILURE;
+            }
+        }
+        else if (!arg.empty() && arg[0] == '-') {
+            LOG_ERROR("Unknown option: " + arg);
+            return EXIT_FAILURE;
+        }
+        else {
+            input_files.push_back(arg);
+        }
+    }
 
-    app.add_option("input_files", input_files, "Input file(s)")->mandatory();
-
-    app.add_option("-o,--output", output_file, "Output file");
-    app.add_option("-F,--format", output_format, "Output format")->default_val("png")->check(CLI::IsMember({"png", "jpg"}));
-
-    app.add_option("-f,--fov", config.fov, "Field of vision in degrees")->default_val(config.fov)->check(CLI::Range(config.fov_min, config.fov_max));
-
-    app.add_option("-W,--width", config.width, "Image width")->default_val(config.width)->check(CLI::Range(config.width_min, config.width_max));
-    app.add_option("-H,--height", config.height, "Image height")->default_val(config.height)->check(CLI::Range(config.height_min, config.height_max));
-
-    app.add_option("-t,--threads", config.num_thread, "Rendering threads (0 for auto)")->default_val(config.num_thread)->check(CLI::Range(config.num_min_thread, config.num_max_thread));
-
-    CLI11_PARSE(app, argc, argv);
-
+    if (input_files.empty()) {
+        LOG_ERROR("At least one input file is required");
+        print_usage(argv[0]);
+        return EXIT_FAILURE;
+    }
 
     bool auto_name = input_files.size() > 1 || output_file.empty();
     if (auto_name && !output_file.empty()) {
