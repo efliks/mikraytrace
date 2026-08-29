@@ -1,11 +1,11 @@
 # An example scene file
 
-[camera]
+[[cameras]]
 center = [7.0, 0.0, 7.0]
 target = [0.0, 0.0, 3.0]
 roll = 0.0
 
-[light]
+[[lights]]
 center = [5.0, -5.0, 10.0]
 
 [[planes]]

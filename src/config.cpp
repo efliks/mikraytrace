@@ -114,16 +114,6 @@ public:
         return std::shared_ptr<ConfigTableIterator>(new TomlTableIterator(table_array));
     }
 
-    std::shared_ptr<ConfigTable> get_table(const std::string& table_name) override
-    {
-        auto raw_table = c_->get_table(table_name);
-        if (!raw_table) {
-            return std::shared_ptr<ConfigTable>();
-        }
-
-        return std::shared_ptr<ConfigTable>(new TomlTable(raw_table));
-    }
-
 private:
     std::shared_ptr<cpptoml::table> c_;
 };

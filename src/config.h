@@ -46,8 +46,6 @@ public:
     virtual ~ConfigReader() = default;
 
     virtual std::shared_ptr<ConfigTableIterator> get_tables(const std::string&) = 0;
-
-    virtual std::shared_ptr<ConfigTable> get_table(const std::string&) = 0;
 };
 
 

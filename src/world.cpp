@@ -128,9 +128,8 @@ public:
             world_ptr->add_actor(actor);
         }
 
-        std::shared_ptr<ConfigTable> camera_table = world_config->get_table("camera");
+        std::shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "cameras", "camera");
         if (!camera_table) {
-            LOG_ERROR("No camera found");
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -148,9 +147,8 @@ public:
 
         double camera_roll = camera_table->get_value("roll", 0);
 
-        std::shared_ptr<ConfigTable> light_table = world_config->get_table("light");
+        std::shared_ptr<ConfigTable> light_table = get_single_table(world_config, "lights", "light");
         if (!light_table) {
-            LOG_ERROR("No light found");
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -166,6 +164,31 @@ public:
         world_ptr->add_light(std::shared_ptr<Light>(new Light(light_center)));
 
         return world_ptr;
+    }
+
+    std::shared_ptr<ConfigTable> get_single_table(std::shared_ptr<ConfigReader> config,
+                                                  const std::string& array_name,
+                                                  const std::string& item_label) const
+    {
+        auto it = config->get_tables(array_name);
+        if (it) {
+            it->first();
+        }
+
+        if (!it || it->is_done()) {
+            LOG_ERROR("No " + item_label + " found");
+            return std::shared_ptr<ConfigTable>();
+        }
+
+        std::shared_ptr<ConfigTable> table = it->current();
+
+        it->next();
+        if (!it->is_done()) {
+            LOG_ERROR("Multiple " + item_label + "s found");
+            return std::shared_ptr<ConfigTable>();
+        }
+
+        return table;
     }
 
     void process_actor_array(ActorType actor_type,
