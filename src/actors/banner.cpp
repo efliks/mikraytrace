@@ -1,10 +1,10 @@
 #include <string>
+#include <iostream>
 
 #include "actors/banner.h"
 #include "actors/sphere.h"
 #include "actors/tools.h"
 
-#include "logger.h"
 #include "common.h"
 #include "mappers.h"
 
@@ -53,7 +53,7 @@ void create_banner(TextureFactory* texture_factory,
 {
     std::string banner_text = items->get_text("text");
     if (banner_text.empty()) {
-        LOG_ERROR("Error parsing banner text");
+        std::cerr << "ERROR: Error parsing banner text" << std::endl;
         return;
     }
 
@@ -65,7 +65,7 @@ void create_banner(TextureFactory* texture_factory,
 
     Vector3d banner_o_vec = items->get_vector("center");
     if (!banner_o_vec.size()) {
-        LOG_ERROR("Error parsing banner center");
+        std::cerr << "ERROR: Error parsing banner center" << std::endl;
         return;
     }
 

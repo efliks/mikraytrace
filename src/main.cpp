@@ -2,15 +2,13 @@
 #include <list>
 #include <vector>
 #include <string>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
+#include <iomanip>
 
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
 #include "writer.h"
-#include "logger.h"
 
 
 namespace {
@@ -36,7 +34,7 @@ void print_usage(const char* program_name)
 bool next_value(int argc, char* argv[], int& i, const std::string& flag, std::string* value)
 {
     if (++i >= argc) {
-        LOG_ERROR("Missing value for option " + flag);
+        std::cerr << "ERROR: Missing value for option " << flag << std::endl;
         return false;
     }
     *value = argv[i];
@@ -49,10 +47,8 @@ bool parse_double_option(const std::string& text, const std::string& flag,
     char* end = 0;
     double value = std::strtod(text.c_str(), &end);
     if (*end != '\0' || value < min_value || value > max_value) {
-        std::stringstream message;
-        message << "Value for option " << flag << " must be a number in range ["
-                << min_value << ", " << max_value << "]";
-        LOG_ERROR(message.str());
+        std::cerr << "ERROR: Value for option " << flag << " must be a number in range ["
+                  << min_value << ", " << max_value << "]" << std::endl;
         return false;
     }
     *target = value;
@@ -66,10 +62,8 @@ bool parse_uint_option(const std::string& text, const std::string& flag,
     long value = std::strtol(text.c_str(), &end, 10);
     if (*end != '\0' || value < 0 ||
         static_cast<unsigned int>(value) < min_value || static_cast<unsigned int>(value) > max_value) {
-        std::stringstream message;
-        message << "Value for option " << flag << " must be an integer in range ["
-                << min_value << ", " << max_value << "]";
-        LOG_ERROR(message.str());
+        std::cerr << "ERROR: Value for option " << flag << " must be an integer in range ["
+                  << min_value << ", " << max_value << "]" << std::endl;
         return false;
     }
     *target = static_cast<unsigned int>(value);
@@ -108,7 +102,7 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
             }
             if (value != "png" && value != "jpg") {
-                LOG_ERROR("Value for option " + arg + " must be one of: png, jpg");
+                std::cerr << "ERROR: Value for option " << arg << " must be one of: png, jpg" << std::endl;
                 return EXIT_FAILURE;
             }
             output_format = value;
@@ -138,7 +132,7 @@ int main(int argc, char* argv[])
             }
         }
         else if (!arg.empty() && arg[0] == '-') {
-            LOG_ERROR("Unknown option: " + arg);
+            std::cerr << "ERROR: Unknown option: " << arg << std::endl;
             return EXIT_FAILURE;
         }
         else {
@@ -147,14 +141,14 @@ int main(int argc, char* argv[])
     }
 
     if (input_files.empty()) {
-        LOG_ERROR("At least one input file is required");
+        std::cerr << "ERROR: At least one input file is required" << std::endl;
         print_usage(argv[0]);
         return EXIT_FAILURE;
     }
 
     bool auto_name = input_files.size() > 1 || output_file.empty();
     if (auto_name && !output_file.empty()) {
-        LOG_ERROR("Output file not allowed with multiple input files");
+        std::cerr << "ERROR: Output file not allowed with multiple input files" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -163,7 +157,7 @@ int main(int argc, char* argv[])
         if (pos != std::string::npos) {
             std::string extension = output_file.substr(pos + 1, output_file.size());
             if (extension != output_format) {
-                LOG_ERROR("Output format and output file extension should match");
+                std::cerr << "ERROR: Output format and output file extension should match" << std::endl;
                 return EXIT_FAILURE;
             }
         }
@@ -180,7 +174,7 @@ int main(int argc, char* argv[])
 
     // Iterate over all input files
     for (std::string& input_file : input_files) {
-        LOG_INFO(std::string("Processing " + input_file + " ..."));
+        std::cout << "INFO: Processing " << input_file << " ..." << std::endl;
 
         mrtp::TextureFactory texture_factory(&texture_cache);
         auto world_ptr = mrtp::build_world(input_file, &texture_factory);
@@ -202,9 +196,7 @@ int main(int argc, char* argv[])
 
         float render_t = scene_renderer->do_render(world_ptr.get());
 
-        std::stringstream render_time;
-        render_time << "Done in " << std::setprecision(2) << render_t << "s";
-        LOG_INFO(render_time.str());
+        std::cout << "INFO: Done in " << std::setprecision(2) << render_t << "s" << std::endl;
 
         scene_writer->write_to_file(output_file);
     }

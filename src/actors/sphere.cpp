@@ -1,7 +1,7 @@
+#include <iostream>
+
 #include "actors/sphere.h"
 #include "actors/tools.h"
-
-#include "logger.h"
 
 
 namespace mrtp {
@@ -48,7 +48,7 @@ void create_sphere(TextureFactory* texture_factory,
 {
     Vector3d sphere_center_vec = sphere_items->get_vector("center");
     if (!sphere_center_vec.size()) {
-        LOG_ERROR("Error parsing sphere center");
+        std::cerr << "ERROR: Error parsing sphere center" << std::endl;
         return;
     }
 

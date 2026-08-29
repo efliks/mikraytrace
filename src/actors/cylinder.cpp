@@ -1,4 +1,4 @@
-#include "logger.h"
+#include <iostream>
 
 #include "actors/tools.h"
 #include "actors/cylinder.h"
@@ -100,13 +100,13 @@ void create_cylinder(TextureFactory* texture_factory,
 {
     Vector3d cylinder_center_vec = cylinder_items->get_vector("center");
     if (!cylinder_center_vec.size()) {
-        LOG_ERROR("Error parsing cylinder center");
+        std::cerr << "ERROR: Error parsing cylinder center" << std::endl;
         return;
     }
 
     Vector3d cylinder_direction_vec = cylinder_items->get_vector("direction");
     if (!cylinder_direction_vec.size()) {
-        LOG_ERROR("Error parsing cylinder direction");
+        std::cerr << "ERROR: Error parsing cylinder direction" << std::endl;
         return;
     }
 

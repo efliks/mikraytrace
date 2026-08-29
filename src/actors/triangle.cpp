@@ -1,7 +1,8 @@
+#include <iostream>
+
 #include "actors/triangle.h"
 #include "actors/plane.h"
 
-#include "logger.h"
 #include "tools.h"
 
 
@@ -54,19 +55,19 @@ void create_triangle(TextureFactory* texture_factory,
 {
     Vector3d A = items->get_vector("A");
     if (!A.size()) {
-        LOG_ERROR("Error parsing vertex A in triangle");
+        std::cerr << "ERROR: Error parsing vertex A in triangle" << std::endl;
         return;
     }
 
     Vector3d B = items->get_vector("B");
     if (!B.size()) {
-        LOG_ERROR("Error parsing vertex B in triangle");
+        std::cerr << "ERROR: Error parsing vertex B in triangle" << std::endl;
         return;
     }
 
     Vector3d C = items->get_vector("C");
     if (!C.size()) {
-        LOG_ERROR("Error parsing vertex C in triangle");
+        std::cerr << "ERROR: Error parsing vertex C in triangle" << std::endl;
         return;
     }
 

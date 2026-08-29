@@ -1,7 +1,6 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <cstring>
 
 #include "vector3.h"
@@ -11,8 +10,6 @@
 #include <lib3ds/node.h>
 #include <lib3ds/mesh.h>
 #endif
-
-#include "logger.h"
 
 #include "actors/mesh.h"
 #include "actors/tools.h"
@@ -145,16 +142,6 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
                 vertex_list->push_back(v.to_vector3());
             }
 
-            // Debug info
-            std::stringstream convert;
-            convert << num_vertices;
-            std::string str_vertices(convert.str());
-
-            std::stringstream convert2;
-            convert2 << num_faces;
-            std::string str_faces(convert2.str());
-
-            LOG_DEBUG(std::string("Model has " + str_vertices + " vertices and " + str_faces + " faces"));
         }
     }
 }
@@ -166,13 +153,13 @@ void create_mesh(TextureFactory* texture_factory,
 {
     std::string filename = items->get_text("file3ds");
     if (filename.empty()) {
-        LOG_ERROR("Undefined mesh file");
+        std::cerr << "ERROR: Undefined mesh file" << std::endl;
         return;
     }
 
     Vector3d mesh_vec_o = items->get_vector("center");
     if (!mesh_vec_o.size()) {
-        LOG_ERROR("Error parsing mesh center");
+        std::cerr << "ERROR: Error parsing mesh center" << std::endl;
         return;
     }
 
@@ -192,18 +179,18 @@ void create_mesh(TextureFactory* texture_factory,
 #ifdef USE_LIB3DS
     else if (ext == "3ds") {
         if (!load_3ds_file(filename, &vertex_list)) {
-            LOG_ERROR("Error reading mesh file");
+            std::cerr << "ERROR: Error reading mesh file" << std::endl;
             return;
         }
     }
 #endif  // USE_LIB3DS
     else {
-        LOG_ERROR(std::string("Unknown file extension " + ext));
+        std::cerr << "ERROR: Unknown file extension " << ext << std::endl;
         return;
     }
 
     if (vertex_list.empty()) {
-        LOG_ERROR("No triangles found");
+        std::cerr << "ERROR: No triangles found" << std::endl;
         return;
     }
 

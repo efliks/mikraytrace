@@ -1,4 +1,5 @@
-#include "logger.h"
+#include <iostream>
+
 #include "config.h"
 #include "world.h"
 
@@ -119,7 +120,7 @@ public:
         process_actor_array(ActorType::Mesh, meshes_array, &new_actors);
 
         if (new_actors.size() < 1) {
-            LOG_ERROR("No actors found");
+            std::cerr << "ERROR: No actors found" << std::endl;
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -135,13 +136,13 @@ public:
 
         Vector3d camera_eye = camera_table->get_vector("center");
         if (!camera_eye.size()) {
-            LOG_ERROR("Error parsing camera center");
+            std::cerr << "ERROR: Error parsing camera center" << std::endl;
             return std::shared_ptr<SceneWorld>();
         }
 
         Vector3d camera_lookat = camera_table->get_vector("target");
         if (!camera_lookat.size()) {
-            LOG_ERROR("Error parsing camera target");
+            std::cerr << "ERROR: Error parsing camera target" << std::endl;
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -154,7 +155,7 @@ public:
 
         Vector3d light_center = light_table->get_vector("center");
         if (!light_center.size()) {
-            LOG_ERROR("Error parsing light center");
+            std::cerr << "ERROR: Error parsing light center" << std::endl;
             return std::shared_ptr<SceneWorld>();
         }
 
@@ -175,7 +176,7 @@ public:
         }
 
         if (!it || it->is_done()) {
-            LOG_ERROR("No " + table_name + " found");
+            std::cerr << "ERROR: No " << table_name << " found" << std::endl;
             return std::shared_ptr<ConfigTable>();
         }
 
@@ -183,7 +184,7 @@ public:
 
         it->next();
         if (!it->is_done()) {
-            LOG_ERROR("Multiple " + table_name + "s found");
+            std::cerr << "ERROR: Multiple " << table_name << "s found" << std::endl;
             return std::shared_ptr<ConfigTable>();
         }
 

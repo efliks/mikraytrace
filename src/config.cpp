@@ -1,10 +1,10 @@
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <map>
 #include <cstdlib>
 
 #include "config.h"
-#include "logger.h"
 
 
 namespace mrtp {
@@ -195,7 +195,7 @@ std::shared_ptr<ConfigReader> open_config(const std::string& filename)
 {
     std::ifstream in(filename);
     if (!in.good()) {
-        LOG_ERROR("Cannot open world file");
+        std::cerr << "ERROR: Cannot open world file" << std::endl;
         return std::shared_ptr<ConfigReader>();
     }
 
@@ -212,7 +212,7 @@ std::shared_ptr<ConfigReader> open_config(const std::string& filename)
         size_t close_paren = trimmed.rfind(')');
         if (open_paren == std::string::npos || close_paren == std::string::npos ||
                 close_paren < open_paren) {
-            LOG_ERROR("Malformed line in world file: " + line);
+            std::cerr << "ERROR: Malformed line in world file: " << line << std::endl;
             return std::shared_ptr<ConfigReader>();
         }
 

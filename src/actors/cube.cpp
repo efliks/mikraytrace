@@ -1,4 +1,4 @@
-#include "logger.h"
+#include <iostream>
 
 #include "actors/cube.h"
 #include "actors/tools.h"
@@ -15,7 +15,7 @@ void create_cube(TextureFactory* texture_factory,
 {
     Vector3d cube_vec_o = cube_items->get_vector("center");
     if (!cube_vec_o.size()) {
-        LOG_ERROR("Error parsing cube center");
+        std::cerr << "ERROR: Error parsing cube center" << std::endl;
         return;
     }
 

@@ -1,16 +1,14 @@
 #include <cmath>
 #include <ctime>
-#include <sstream>
+#include <iostream>
 
 #ifdef _OPENMP
 #include <omp.h>
-#include <iostream>
 #endif
 
 #include "renderer.h"
 #include "camera.h"
 #include "light.h"
-#include "logger.h"
 
 constexpr double pi() { return std::atan(1) * 4; }
 
@@ -147,11 +145,7 @@ public:
     ParallelSceneRenderer(const RendererConfig& config, std::shared_ptr<ProgressSlider> slider)
         : SceneRendererBase(config, slider)
     {
-        std::stringstream convert;
-        convert << config.num_thread;
-        std::string str_thread(convert.str());
-
-        LOG_INFO(std::string("Using parallel renderer with " + str_thread + " threads"));
+        std::cout << "INFO: Using parallel renderer with " << config.num_thread << " threads" << std::endl;
     }
 
     ~ParallelSceneRenderer() override = default;
@@ -193,7 +187,7 @@ public:
     SceneRenderer(const RendererConfig& config, std::shared_ptr<ProgressSlider> slider)
         : SceneRendererBase(config, slider)
     {
-        LOG_INFO("Using standard renderer with 1 thread");
+        std::cout << "INFO: Using standard renderer with 1 thread" << std::endl;
     }
 
     ~SceneRenderer() override = default;
