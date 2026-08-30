@@ -8,21 +8,13 @@ A weekend project to create a simple raytracer in C++.
 
 ### Build instructions
 
-Firstly, install the required tools. It may be that you already have
-them installed. If not, in Debian or in a Debian-like Linux, you may do:
+Firstly, install the required tools if not already present:
 
 ```
 mikraytrace > apt-get install build-essential cmake
 ```
 
-Secondly, you need some third party libraries. These are:
- * eigen for linear algebra
- * CLI11 for command line processing
- * cpptoml for reading configuration files
- * toojpeg for writing scenes in JPEG format
- * lodepng for loading textures and writing scenes in PNG format
-
-Install them by updating the submodules:
+Secondly, update the submodules to pull some third party libraries (these are toojpeg98 and lodepng for image processing):
 
 ```
 mikraytrace > git submodule update --init --recursive
