@@ -17,7 +17,7 @@ static void create_char3d(char c,
                           double char_scale,
                           const StandardBasis& char_basis,
                           std::shared_ptr<TextureMapper> texture_mapper,
-                          std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
+                          std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
 {
     if (c > 'a' && c < 'z') {
         c += ('A' - 'a');
@@ -37,7 +37,7 @@ static void create_char3d(char c,
                 StandardBasis sphere_basis;
                 sphere_basis.o = o_vec;
 
-                auto sphere_ptr = std::shared_ptr<ActorBase>(
+                std::shared_ptr<ActorBase> sphere_ptr = std::shared_ptr<ActorBase>(
                     new SimpleSphere(sphere_basis, char_scale / 8 / 2, texture_mapper));
 
                 actor_ptrs->push_back(sphere_ptr);
@@ -49,7 +49,7 @@ static void create_char3d(char c,
 
 void create_banner(TextureFactory* texture_factory,
                    std::shared_ptr<ConfigTable> items,
-                   std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
+                   std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
 {
     std::string banner_text = items->get_text("text");
     if (banner_text.empty()) {
@@ -71,9 +71,9 @@ void create_banner(TextureFactory* texture_factory,
 
     Matrix3d m_rot = create_rotation_matrix(items);
 
-    Vector3d banner_i_vec{m_rot.col(0)};
-    Vector3d banner_j_vec{m_rot.col(1)};
-    Vector3d banner_k_vec{m_rot.col(2)};
+    Vector3d banner_i_vec(m_rot.col(0));
+    Vector3d banner_j_vec(m_rot.col(1));
+    Vector3d banner_k_vec(m_rot.col(2));
 
     banner_i_vec *= (1 / banner_i_vec.norm());
     banner_j_vec *= (1 / banner_j_vec.norm());

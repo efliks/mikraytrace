@@ -34,9 +34,9 @@ public:
     {
     }
 
-    ~SceneWriterJPEG() override = default;
+    ~SceneWriterJPEG() = default; // override
 
-    void write_to_file(const std::string& filename) override
+    void write_to_file(const std::string& filename) // override
     {
         std::vector<unsigned char> buffer;
         buffer.reserve(3 * scene_renderer_->framebuffer_.size());
@@ -70,9 +70,9 @@ public:
     {
     }
 
-    ~SceneWriterPNG() override = default;
+    ~SceneWriterPNG() = default; // override
 
-    void write_to_file(const std::string& filename) override
+    void write_to_file(const std::string& filename) // override
     {
         lodepng::State state;
 
@@ -84,7 +84,6 @@ public:
         state.encoder.auto_convert = 0;
 
         std::vector<unsigned char> buffer;
-        static_assert (sizeof(TexturePixel) == 4, "Wrong size of TexturePixel");
         unsigned int error = lodepng::encode(buffer, static_cast<unsigned char *>(static_cast<void *>(scene_renderer_->framebuffer_.data())), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
 
         if (!error) {
@@ -101,7 +100,7 @@ public:
 
 std::shared_ptr<SceneWriterBase> create_writer(SceneRendererBase* renderer, WriterType type)
 {
-    if (type == WriterType::PNG) {
+    if (type == WriterType_PNG) {
         return std::shared_ptr<SceneWriterBase>(new SceneWriterPNG(renderer));
     }
 

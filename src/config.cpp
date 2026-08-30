@@ -69,11 +69,11 @@ public:
     {
     }
 
-    ~TextTable() override = default;
+    ~TextTable() = default; // override
 
-    double get_value(const std::string& key, double val_default) override
+    double get_value(const std::string& key, double val_default) // override
     {
-        auto it = fields_.find(key);
+        std::map<std::string, std::string>::iterator it = fields_.find(key);
         if (it == fields_.end()) {
             return val_default;
         }
@@ -81,9 +81,9 @@ public:
         return std::atof(it->second.c_str());
     }
 
-    Vector3d get_vector(const std::string& key, const Vector3d& vec_default) override
+    Vector3d get_vector(const std::string& key, const Vector3d& vec_default) // override
     {
-        auto it = fields_.find(key);
+        std::map<std::string, std::string>::iterator it = fields_.find(key);
         if (it == fields_.end()) {
             return vec_default;
         }
@@ -91,16 +91,16 @@ public:
         return parse_vector(it->second);
     }
 
-    Vector3d get_vector(const std::string& key) override
+    Vector3d get_vector(const std::string& key) // override
     {
-        return get_vector(key, Vector3d{});
+        return get_vector(key, Vector3d());
     }
 
-    std::string get_text(const std::string& key) override
+    std::string get_text(const std::string& key) // override
     {
-        auto it = fields_.find(key);
+        std::map<std::string, std::string>::iterator it = fields_.find(key);
         if (it == fields_.end()) {
-            return std::string{};
+            return std::string();
         }
 
         return it->second;
@@ -117,7 +117,7 @@ private:
             components[i] = std::atof(trim(token).c_str());
         }
 
-        return Vector3d{components};
+        return Vector3d(components);
     }
 
     std::map<std::string, std::string> fields_;
@@ -127,52 +127,52 @@ private:
 class TextTableIterator : public ConfigTableIterator
 {
 public:
-    TextTableIterator(const std::vector<std::shared_ptr<ConfigTable>>& tables)
+    TextTableIterator(const std::vector<std::shared_ptr<ConfigTable> >& tables)
         : tables_(tables)
     {
     }
 
-    ~TextTableIterator() override = default;
+    ~TextTableIterator() = default; // override
 
-    void first() override
+    void first() // override
     {
         iter_ = tables_.begin();
     }
 
-    void next() override
+    void next() // override
     {
         ++iter_;
     }
 
-    bool is_done() override
+    bool is_done() // override
     {
         return iter_ == tables_.end();
     }
 
-    std::shared_ptr<ConfigTable> current() override
+    std::shared_ptr<ConfigTable> current() // override
     {
         return *iter_;
     }
 
 private:
-    std::vector<std::shared_ptr<ConfigTable>> tables_;
-    std::vector<std::shared_ptr<ConfigTable>>::iterator iter_;
+    std::vector<std::shared_ptr<ConfigTable> > tables_;
+    std::vector<std::shared_ptr<ConfigTable> >::iterator iter_;
 };
 
 
 class TextReader : public ConfigReader
 {
 public:
-    TextReader(const std::vector<std::pair<std::string, std::shared_ptr<ConfigTable>>>& rows)
+    TextReader(const std::vector<std::pair<std::string, std::shared_ptr<ConfigTable> > >& rows)
         : rows_(rows)
     {
     }
 
-    ~TextReader() override = default;
+    ~TextReader() = default; // override
 
-    std::shared_ptr<ConfigTableIterator> get_tables(const std::string& row_type) override
+    std::shared_ptr<ConfigTableIterator> get_tables(const std::string& row_type) // override
     {
-        std::vector<std::shared_ptr<ConfigTable>> matches;
+        std::vector<std::shared_ptr<ConfigTable> > matches;
         for (const auto& row : rows_) {
             if (row.first == row_type) {
                 matches.push_back(row.second);
@@ -187,7 +187,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<std::string, std::shared_ptr<ConfigTable>>> rows_;
+    std::vector<std::pair<std::string, std::shared_ptr<ConfigTable> > > rows_;
 };
 
 
@@ -199,7 +199,7 @@ std::shared_ptr<ConfigReader> open_config(const std::string& filename)
         return std::shared_ptr<ConfigReader>();
     }
 
-    std::vector<std::pair<std::string, std::shared_ptr<ConfigTable>>> rows;
+    std::vector<std::pair<std::string, std::shared_ptr<ConfigTable> > > rows;
 
     std::string line;
     while (std::getline(in, line)) {
@@ -219,7 +219,7 @@ std::shared_ptr<ConfigReader> open_config(const std::string& filename)
         std::string row_type = trim(trimmed.substr(0, open_paren));
         std::string body = trimmed.substr(open_paren + 1, close_paren - open_paren - 1);
 
-        auto table = std::shared_ptr<ConfigTable>(new TextTable(parse_fields(body)));
+        std::shared_ptr<ConfigTable> table = std::shared_ptr<ConfigTable>(new TextTable(parse_fields(body)));
         rows.push_back(std::make_pair(row_type, table));
     }
 

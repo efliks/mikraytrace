@@ -14,18 +14,18 @@ namespace mrtp {
 
 class ActorIterator {
 public:
-    ActorIterator(std::vector<std::shared_ptr<ActorBase>>*);
+    ActorIterator(std::vector<std::shared_ptr<ActorBase> >*);
     ActorIterator() = delete;
     ~ActorIterator() = default;
 
     void first();
     void next();
     bool is_done();
-    std::vector<std::shared_ptr<ActorBase>>::iterator current();
+    std::vector<std::shared_ptr<ActorBase> >::iterator current();
 
 private:
-    std::vector<std::shared_ptr<ActorBase>>* actor_ptrs_;
-    std::vector<std::shared_ptr<ActorBase>>::iterator actor_iter_;
+    std::vector<std::shared_ptr<ActorBase> >* actor_ptrs_;
+    std::vector<std::shared_ptr<ActorBase> >::iterator actor_iter_;
 };
 
 
@@ -47,7 +47,7 @@ private:
     std::shared_ptr<Light> light_;
     std::shared_ptr<Camera> camera_;
 
-    std::vector<std::shared_ptr<ActorBase>> actor_ptrs_;
+    std::vector<std::shared_ptr<ActorBase> > actor_ptrs_;
 };
 
 

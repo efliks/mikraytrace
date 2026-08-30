@@ -25,11 +25,11 @@ TexturePixel::TexturePixel(const Vector3d& color_vec)
 
 
 Vector3d TexturePixel::to_vec() const {
-    return Vector3d{
+    return Vector3d(
         static_cast<double>(red),
         static_cast<double>(green),
         static_cast<double>(blue)
-    } / 255;
+    ) / 255;
 }
 
 
@@ -51,7 +51,6 @@ TextureSharedState::TextureSharedState(const std::string& filename)
 
     texture_data_.resize(texture_width_ * texture_heigth_);
 
-    static_assert(sizeof(TexturePixel) == sizeof(unsigned char) * 4, "Cannot copy temporary buffer into texture data");
     std::memcpy(static_cast<void *>(texture_data_.data()), static_cast<void *>(buffer.data()), sizeof(TexturePixel) * texture_width_ * texture_heigth_);
 }
 
@@ -90,7 +89,8 @@ MyTexture::MyTexture(TextureSharedState* shared_state,
 MyPixel MyTexture::pick_pixel(double frac_x, double frac_y) const {
     TexturePixel pixel = shared_state_->pick_pixel(frac_x, frac_y, scale_coeff_);
 
-    return MyPixel{pixel, reflection_coeff_};
+    MyPixel result = {pixel, reflection_coeff_};
+    return result;
 }
 
 

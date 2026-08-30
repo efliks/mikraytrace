@@ -8,22 +8,24 @@ namespace mrtp {
 
 struct StandardBasis
 {
-    Vector3d o { 0, 0, 0 };
-    Vector3d vi { 1, 0, 0 };
-    Vector3d vj { 0, 1, 0 };
-    Vector3d vk { 0, 0, 1 };
+    StandardBasis() : o(0, 0, 0), vi(1, 0, 0), vj(0, 1, 0), vk(0, 0, 1) {}
+
+    Vector3d o;
+    Vector3d vi;
+    Vector3d vj;
+    Vector3d vk;
 };
 
-enum class ActorType 
+enum ActorType
 {
-    Plane,
-    Sphere,
-    Cylinder,
-    Triangle,
-    Cube,
-    Molecule,
-    Banner,
-    Mesh
+    ActorType_Plane,
+    ActorType_Sphere,
+    ActorType_Cylinder,
+    ActorType_Triangle,
+    ActorType_Cube,
+    ActorType_Molecule,
+    ActorType_Banner,
+    ActorType_Mesh
 };
 
 }

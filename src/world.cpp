@@ -45,7 +45,7 @@ ActorIterator SceneWorld::get_actor_iterator() {
 }
 
 
-ActorIterator::ActorIterator(std::vector<std::shared_ptr<ActorBase>>* actor_ptrs):
+ActorIterator::ActorIterator(std::vector<std::shared_ptr<ActorBase> >* actor_ptrs):
     actor_ptrs_(actor_ptrs) {
     actor_iter_ = actor_ptrs_->begin();
 }
@@ -66,7 +66,7 @@ bool ActorIterator::is_done() {
 }
 
 
-std::vector<std::shared_ptr<ActorBase>>::iterator ActorIterator::current() {
+std::vector<std::shared_ptr<ActorBase> >::iterator ActorIterator::current() {
     return actor_iter_;
 }
 
@@ -90,38 +90,38 @@ public:
             return std::shared_ptr<SceneWorld>();
         }
 
-        std::vector<std::shared_ptr<ActorBase>> new_actors;
+        std::vector<std::shared_ptr<ActorBase> > new_actors;
 
-        auto planes_array = world_config->get_tables("plane");
-        process_actor_array(ActorType::Plane, planes_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> planes_array = world_config->get_tables("plane");
+        process_actor_array(ActorType_Plane, planes_array, &new_actors);
 
-        auto spheres_array = world_config->get_tables("sphere");
-        process_actor_array(ActorType::Sphere, spheres_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> spheres_array = world_config->get_tables("sphere");
+        process_actor_array(ActorType_Sphere, spheres_array, &new_actors);
 
-        auto cylinders_array = world_config->get_tables("cylinder");
-        process_actor_array(ActorType::Cylinder, cylinders_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> cylinders_array = world_config->get_tables("cylinder");
+        process_actor_array(ActorType_Cylinder, cylinders_array, &new_actors);
 
-        auto triangles_array = world_config->get_tables("triangle");
-        process_actor_array(ActorType::Triangle, triangles_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> triangles_array = world_config->get_tables("triangle");
+        process_actor_array(ActorType_Triangle, triangles_array, &new_actors);
 
-        auto cubes_array = world_config->get_tables("cube");
-        process_actor_array(ActorType::Cube, cubes_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> cubes_array = world_config->get_tables("cube");
+        process_actor_array(ActorType_Cube, cubes_array, &new_actors);
 
-        auto molecules_array = world_config->get_tables("molecule");
-        process_actor_array(ActorType::Molecule, molecules_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> molecules_array = world_config->get_tables("molecule");
+        process_actor_array(ActorType_Molecule, molecules_array, &new_actors);
 
-        auto banners_array = world_config->get_tables("banner");
-        process_actor_array(ActorType::Banner, banners_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> banners_array = world_config->get_tables("banner");
+        process_actor_array(ActorType_Banner, banners_array, &new_actors);
 
-        auto meshes_array = world_config->get_tables("mesh");
-        process_actor_array(ActorType::Mesh, meshes_array, &new_actors);
+        std::shared_ptr<ConfigTableIterator> meshes_array = world_config->get_tables("mesh");
+        process_actor_array(ActorType_Mesh, meshes_array, &new_actors);
 
         if (new_actors.size() < 1) {
             std::cerr << "ERROR: No actors found" << std::endl;
             return std::shared_ptr<SceneWorld>();
         }
 
-        auto world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
+        std::shared_ptr<SceneWorld> world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
         for (const auto& actor : new_actors) {
             world_ptr->add_actor(actor);
         }
@@ -167,7 +167,7 @@ public:
     std::shared_ptr<ConfigTable> get_single_table(std::shared_ptr<ConfigReader> config,
                                                   const std::string& table_name) const
     {
-        auto it = config->get_tables(table_name);
+        std::shared_ptr<ConfigTableIterator> it = config->get_tables(table_name);
         if (it) {
             it->first();
         }
@@ -190,27 +190,27 @@ public:
 
     void process_actor_array(ActorType actor_type,
                              std::shared_ptr<ConfigTableIterator> it,
-                             std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) const
+                             std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) const
     {
         if (it)
         {
             for (it->first(); !it->is_done(); it->next())
             {
-                if (actor_type == ActorType::Plane)
+                if (actor_type == ActorType_Plane)
                     create_plane(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Sphere)
+                else if (actor_type == ActorType_Sphere)
                     create_sphere(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Cylinder)
+                else if (actor_type == ActorType_Cylinder)
                     create_cylinder(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Triangle)
+                else if (actor_type == ActorType_Triangle)
                     create_triangle(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Cube)
+                else if (actor_type == ActorType_Cube)
                     create_cube(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Molecule)
+                else if (actor_type == ActorType_Molecule)
                     create_molecule(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Banner)
+                else if (actor_type == ActorType_Banner)
                     create_banner(texture_factory_, it->current(), actor_ptrs);
-                else if (actor_type == ActorType::Mesh)
+                else if (actor_type == ActorType_Mesh)
                     create_mesh(texture_factory_, it->current(), actor_ptrs);
 
                 // Ignore when unknown type

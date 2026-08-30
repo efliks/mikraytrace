@@ -44,7 +44,7 @@ double SimpleSphere::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 void create_sphere(TextureFactory* texture_factory,
                    std::shared_ptr<ConfigTable> sphere_items,
-                   std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
+                   std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d sphere_center_vec = sphere_items->get_vector("center");
     if (!sphere_center_vec.size()) {
@@ -52,7 +52,7 @@ void create_sphere(TextureFactory* texture_factory,
         return;
     }
 
-    Vector3d sphere_axis_vec = sphere_items->get_vector("axis", Vector3d{0, 0, 1});
+    Vector3d sphere_axis_vec = sphere_items->get_vector("axis", Vector3d(0, 0, 1));
 
     double sphere_radius = sphere_items->get_value("radius", 1);
 
@@ -69,13 +69,13 @@ void create_sphere(TextureFactory* texture_factory,
     set_basis(&sphere_basis, sphere_center_vec, sphere_vec_i,
               sphere_vec_j, sphere_axis_vec);
 
-    auto texture_mapper_ptr = create_texture_mapper(
-                sphere_items, ActorType::Sphere, texture_factory);
+    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
+                sphere_items, ActorType_Sphere, texture_factory);
     if (!texture_mapper_ptr) {
         return;
     }
 
-    auto sphere_ptr = std::shared_ptr<ActorBase>(
+    std::shared_ptr<ActorBase> sphere_ptr = std::shared_ptr<ActorBase>(
             new SimpleSphere(sphere_basis, sphere_radius, texture_mapper_ptr));
 
     actor_ptrs->push_back(sphere_ptr);

@@ -1,6 +1,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cstddef>
 #include <cstring>
 
 #include "vector3.h"
@@ -28,14 +29,14 @@ public:
 
     ~File3dsWrapper()
     {
-        if (libfile != nullptr) {
+        if (libfile != NULL) {
             lib3ds_file_free(libfile);
         }
     }
 
     bool is_failed() const
     {
-        return libfile == nullptr;
+        return libfile == NULL;
     }
 
     Lib3dsFile *libfile;
@@ -47,7 +48,7 @@ static void load_node_r(Lib3dsFile* libfile,
                         std::vector<Vector3d>* vertex_list)
 {
     Lib3dsNode* p = node->childs;
-    while (p != nullptr) {
+    while (p != NULL) {
         load_node_r(libfile, p, vertex_list);
         p = p->next;
     }
@@ -59,7 +60,7 @@ static void load_node_r(Lib3dsFile* libfile,
 
     if (!node->user.d) {
         Lib3dsMesh* mesh = lib3ds_file_mesh_by_name(libfile, node->name);
-        if (mesh == nullptr) {
+        if (mesh == NULL) {
             return;
         }
 
@@ -67,9 +68,9 @@ static void load_node_r(Lib3dsFile* libfile,
             Lib3dsFace* face = &mesh->faceL[p];
 
             for (int i = 0; i < 3; i++) {
-                Vector3d V{ static_cast<double>(mesh->pointL[face->points[i]].pos[0]),
+                Vector3d V(static_cast<double>(mesh->pointL[face->points[i]].pos[0]),
                             static_cast<double>(mesh->pointL[face->points[i]].pos[1]),
-                            static_cast<double>(mesh->pointL[face->points[i]].pos[2]) };
+                            static_cast<double>(mesh->pointL[face->points[i]].pos[2]));
 
                 vertex_list->push_back(V);
             }
@@ -86,7 +87,7 @@ static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* ver
     }
 
     Lib3dsNode* node = filewrap.libfile->nodes;
-    while (node != nullptr) {
+    while (node != NULL) {
         load_node_r(filewrap.libfile, node, vertex_list);
         node = node->next;
     }
@@ -110,13 +111,10 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
 
         if (std::strncmp(filetag, "MF3D", 4) == 0) {
             unsigned short num_vertices;
-            static_assert (sizeof(unsigned short) == 2, "Short is not 2 bytes");
             f.read(static_cast<char *>(static_cast<void *>(&num_vertices)), sizeof(unsigned short));
 
             unsigned short num_faces;
             f.read(static_cast<char *>(static_cast<void *>(&num_faces)), sizeof(unsigned short));
-
-            static_assert(sizeof(Vector3f) == 12, "Vector3f is not 12 bytes");
 
             std::vector<Vector3f> tmp_vertex_list;
             tmp_vertex_list.resize(num_vertices);
@@ -146,7 +144,7 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
 
 void create_mesh(TextureFactory* texture_factory,
                  std::shared_ptr<ConfigTable> items,
-                 std::vector<std::shared_ptr<ActorBase>>* actor_ptrs)
+                 std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
 {
     std::string filename = items->get_text("file3ds");
     if (filename.empty()) {
@@ -228,9 +226,9 @@ void create_mesh(TextureFactory* texture_factory,
 
     // Create triangles
     for (size_t i = 0; i < vertex_list.size() / 3; i++) {
-        Vector3d A{vertex_list[i * 3]};
-        Vector3d B{vertex_list[i * 3 + 1]};
-        Vector3d C{vertex_list[i * 3 + 2]};
+        Vector3d A(vertex_list[i * 3]);
+        Vector3d B(vertex_list[i * 3 + 1]);
+        Vector3d C(vertex_list[i * 3 + 2]);
 
         Vector3d vec_o = (A + B + C) / 3;
         Vector3d vec_i = B - A;

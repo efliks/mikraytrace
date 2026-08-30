@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -31,7 +32,7 @@ static bool read_line(std::ifstream& f, std::string& buffer, const std::string& 
 static void create_tables(const std::string& mol2file,
     std::vector<unsigned int>* atomic_nums,
     std::vector<Vector3d>* positions,
-    std::vector<std::pair<unsigned int, unsigned int>>* bonds)
+    std::vector<std::pair<unsigned int, unsigned int> >* bonds)
 {
     std::ifstream f(mol2file);
     std::string buffer;
@@ -43,17 +44,17 @@ static void create_tables(const std::string& mol2file,
         while (read_line(f, buffer, "@<TRIPOS>BOND")) {
             std::vector<std::string> tokens = tokenize_line(buffer);
 
-            unsigned int atomic_num = static_cast<unsigned int>(std::stoi(tokens[0]));
+            unsigned int atomic_num = static_cast<unsigned int>(std::atoi(tokens[0].c_str()));
             atomic_nums->push_back(atomic_num);
 
-            Vector3d coor(std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+            Vector3d coor(std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), std::atof(tokens[4].c_str()));
             positions->push_back(coor);
         }
 
         while (read_line(f, buffer, "@<TRIPOS>SUBSTRUCTURE")) {
             std::vector<std::string> tokens = tokenize_line(buffer);
 
-            std::pair<unsigned int, unsigned int> bond(static_cast<unsigned int>(std::stoi(tokens[1])) - 1, static_cast<unsigned int>(std::stoi(tokens[2])) - 1);
+            std::pair<unsigned int, unsigned int> bond(static_cast<unsigned int>(std::atoi(tokens[1].c_str())) - 1, static_cast<unsigned int>(std::atoi(tokens[2].c_str())) - 1);
             bonds->push_back(bond);
         }
     }
@@ -61,7 +62,7 @@ static void create_tables(const std::string& mol2file,
 
 void create_molecule(TextureFactory* texture_factory,
                      std::shared_ptr<ConfigTable> items,
-                     std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
+                     std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
 {
     std::string mol2file_str = items->get_text("mol2file");
     if (mol2file_str.empty()) {
@@ -77,7 +78,7 @@ void create_molecule(TextureFactory* texture_factory,
 
     std::vector<unsigned int> atomic_nums;
     std::vector<Vector3d> positions;
-    std::vector<std::pair<unsigned int, unsigned int>> bonds;
+    std::vector<std::pair<unsigned int, unsigned int> > bonds;
 
     create_tables(mol2file_str, &atomic_nums, &positions, &bonds);
 
@@ -98,17 +99,17 @@ void create_molecule(TextureFactory* texture_factory,
 
     Matrix3d m_rot = create_rotation_matrix(items);
 
-    auto sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
+    std::shared_ptr<TextureMapper> sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
     if (!sphere_mapper_ptr) {
         return;
     }
 
-    auto cylinder_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
+    std::shared_ptr<TextureMapper> cylinder_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
     if (!cylinder_mapper_ptr) {
         return;
     }
 
-    Vector3d center_vec{0, 0, 0};
+    Vector3d center_vec(0, 0, 0);
     for (auto& atom_vec : positions) {
         center_vec += atom_vec;
     }

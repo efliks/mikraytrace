@@ -96,7 +96,7 @@ Vector3d SimpleCylinder::calculate_normal_at_hit(const Vector3d& hit) const
 
 void create_cylinder(TextureFactory* texture_factory,
                      std::shared_ptr<ConfigTable> cylinder_items,
-                     std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
+                     std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d cylinder_center_vec = cylinder_items->get_vector("center");
     if (!cylinder_center_vec.size()) {
@@ -126,13 +126,13 @@ void create_cylinder(TextureFactory* texture_factory,
     set_basis(&cylinder_basis, cylinder_center_vec, cylinder_vec_i,
               cylinder_vec_j, cylinder_direction_vec);
 
-    auto texture_mapper_ptr = create_texture_mapper(
-                cylinder_items, ActorType::Cylinder, texture_factory);
+    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
+                cylinder_items, ActorType_Cylinder, texture_factory);
     if (!texture_mapper_ptr) {
         return;
     }
 
-    auto cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
+    std::shared_ptr<ActorBase> cylinder_ptr = std::shared_ptr<ActorBase>(new SimpleCylinder(
         cylinder_basis,
         cylinder_radius,
         cylinder_span,

@@ -51,7 +51,7 @@ double SimpleTriangle::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 void create_triangle(TextureFactory* texture_factory,
                      std::shared_ptr<ConfigTable> items,
-                     std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
+                     std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d A = items->get_vector("A");
     if (!A.size()) {
@@ -83,12 +83,12 @@ void create_triangle(TextureFactory* texture_factory,
     StandardBasis local_basis;
     set_basis(&local_basis, vec_o, vec_i, vec_j, vec_k);
 
-    auto texture_mapper_ptr = create_dummy_mapper(items, "color", "reflect");
+    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_dummy_mapper(items, "color", "reflect");
     if (!texture_mapper_ptr) {
         return;
     }
 
-    auto new_triangle_ptr = std::shared_ptr<ActorBase>(
+    std::shared_ptr<ActorBase> new_triangle_ptr = std::shared_ptr<ActorBase>(
                 new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));
 
     actor_ptrs->push_back(new_triangle_ptr);

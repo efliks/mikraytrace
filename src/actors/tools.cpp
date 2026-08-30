@@ -4,7 +4,7 @@
 #include "actors/tools.h"
 #include "common.h"
 
-constexpr double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1) * 4; }
 
 
 namespace mrtp

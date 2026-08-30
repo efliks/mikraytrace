@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstddef>
 #include <ctime>
 #include <iostream>
 
@@ -10,7 +11,7 @@
 #include "camera.h"
 #include "light.h"
 
-constexpr double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1) * 4; }
 
 
 namespace mrtp {
@@ -46,7 +47,7 @@ bool SceneRendererBase::solve_shadows(const Vector3d& O,
 ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
                                          const Vector3d& D,
                                          double* curr_dist) const {
-    ActorBase* hit_actor = nullptr;
+    ActorBase* hit_actor = NULL;
 
     ActorIterator actor_iterator = scene_world_->get_actor_iterator();
 
@@ -66,7 +67,7 @@ Vector3d SceneRendererBase::trace_ray_r(const Vector3d& O,
                                         const Vector3d& D,
                                         unsigned int depth) const
 {
-    Vector3d pixel_vec{0, 0, 0};
+    Vector3d pixel_vec(0, 0, 0);
 
     double curr_dist = config_.light_dist;
     ActorBase* hit_actor = solve_hits(O, D, &curr_dist);
@@ -145,9 +146,9 @@ public:
         std::cout << "INFO: Using parallel renderer with " << config.num_thread << " threads" << std::endl;
     }
 
-    ~ParallelSceneRenderer() override = default;
+    ~ParallelSceneRenderer() = default; // override
 
-    float do_render(SceneWorld* scene_world) override
+    float do_render(SceneWorld* scene_world) // override
     {
         scene_world_ = scene_world;
         Camera* my_camera = scene_world_->get_camera_ptr();
@@ -187,9 +188,9 @@ public:
         std::cout << "INFO: Using standard renderer with 1 thread" << std::endl;
     }
 
-    ~SceneRenderer() override = default;
+    ~SceneRenderer() = default; // override
 
-    float do_render(SceneWorld* scene_world) override
+    float do_render(SceneWorld* scene_world) // override
     {
         scene_world_ = scene_world;
         Camera* my_camera = scene_world_->get_camera_ptr();

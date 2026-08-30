@@ -166,18 +166,18 @@ int main(int argc, char* argv[])
     // Textures will be shared by all worlds
     std::list<mrtp::TextureSharedState> texture_cache;
 
-    mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType::PNG : mrtp::WriterType::JPEG;
+    mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType_PNG : mrtp::WriterType_JPEG;
 
-    auto scene_renderer = mrtp::create_renderer(config);
+    std::shared_ptr<mrtp::SceneRendererBase> scene_renderer = mrtp::create_renderer(config);
     //FIXME pointer to renderer
-    auto scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
+    std::shared_ptr<mrtp::SceneWriterBase> scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
 
     // Iterate over all input files
     for (std::string& input_file : input_files) {
         std::cout << "INFO: Processing " << input_file << " ..." << std::endl;
 
         mrtp::TextureFactory texture_factory(&texture_cache);
-        auto world_ptr = mrtp::build_world(input_file, &texture_factory);
+        std::shared_ptr<mrtp::SceneWorld> world_ptr = mrtp::build_world(input_file, &texture_factory);
         if (!world_ptr) {
             return EXIT_FAILURE;
         }

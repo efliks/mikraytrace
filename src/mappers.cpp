@@ -4,7 +4,7 @@
 
 #include "mappers.h"
 
-constexpr double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1) * 4; }
 
 
 namespace mrtp {
@@ -16,12 +16,13 @@ public:
         reflection_coef_(reflection_coef) {
     }
 
-    ~DummyTextureMapper() override = default;
+    ~DummyTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
-                       const StandardBasis& local_basis) const override {
-        return MyPixel{color_, reflection_coef_};
+                       const StandardBasis& local_basis) const { // override
+        MyPixel result = {color_, reflection_coef_};
+        return result;
     }
 
 private:
@@ -36,11 +37,11 @@ public:
         texture_(texture) {
     }
 
-    ~PlaneTextureMapper() override = default;
+    ~PlaneTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
-                       const StandardBasis& local_basis) const override {
+                       const StandardBasis& local_basis) const { // override
         Vector3d v = hit - local_basis.o;
         double tx_i = v.dot(local_basis.vi);
         double tx_j = v.dot(local_basis.vj);
@@ -59,11 +60,11 @@ public:
         texture_(texture) {
     }
 
-    ~SphereTextureMapper() override = default;
+    ~SphereTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
-                       const StandardBasis& local_basis) const override {
+                       const StandardBasis& local_basis) const { // override
         // Taken from https://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
         double dot_vj = normal_at_hit.dot(local_basis.vj);
         double phi = std::acos(-dot_vj);
@@ -90,11 +91,11 @@ public:
         radius_(radius) {
     }
 
-    ~CylinderTextureMapper() override = default;
+    ~CylinderTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
-                       const StandardBasis& local_basis) const override {
+                       const StandardBasis& local_basis) const { // override
         Vector3d t = hit - local_basis.o;
 
         double alpha = t.dot(local_basis.vk);
@@ -131,19 +132,19 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable
             return std::shared_ptr<TextureMapper>();
         }
 
-        double default_coef = (actor_type == ActorType::Sphere) ? 1 : 0.15;
+        double default_coef = (actor_type == ActorType_Sphere) ? 1 : 0.15;
         double scale_coef = actor_items->get_value("scale", default_coef);
 
         MyTexture* texture_ptr = texture_factory->create_texture(
                                     actor_texture, reflect_coef, scale_coef);
 
-        if (actor_type == ActorType::Plane) {
+        if (actor_type == ActorType_Plane) {
             return std::shared_ptr<TextureMapper>(new PlaneTextureMapper(texture_ptr));
         }
-        else if (actor_type == ActorType::Sphere) {
+        else if (actor_type == ActorType_Sphere) {
             return std::shared_ptr<TextureMapper>(new SphereTextureMapper(texture_ptr));
         }
-        else if (actor_type == ActorType::Cylinder) {
+        else if (actor_type == ActorType_Cylinder) {
             double cylinder_radius = actor_items->get_value("radius", 1);
             return std::shared_ptr<TextureMapper>(new CylinderTextureMapper(texture_ptr, cylinder_radius));
         }

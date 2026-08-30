@@ -9,10 +9,10 @@
 
 namespace mrtp {
 
-enum class WriterType
+enum WriterType
 {
-    PNG,
-    JPEG
+    WriterType_PNG,
+    WriterType_JPEG
 };
 
 
@@ -30,7 +30,7 @@ protected:
 };
 
 
-std::shared_ptr<SceneWriterBase> create_writer(SceneRendererBase*, WriterType = WriterType::PNG);
+std::shared_ptr<SceneWriterBase> create_writer(SceneRendererBase*, WriterType = WriterType_PNG);
 
 
 }

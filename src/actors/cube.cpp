@@ -11,7 +11,7 @@ namespace mrtp {
 
 void create_cube(TextureFactory* texture_factory,
                  std::shared_ptr<ConfigTable> cube_items,
-                 std::vector<std::shared_ptr<ActorBase>>* actor_ptrs) 
+                 std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d cube_vec_o = cube_items->get_vector("center");
     if (!cube_vec_o.size()) {
@@ -19,11 +19,11 @@ void create_cube(TextureFactory* texture_factory,
         return;
     }
 
-    Vector3d cube_vec_k = cube_items->get_vector("direction", Vector3d{0, 0, 1});
+    Vector3d cube_vec_k = cube_items->get_vector("direction", Vector3d(0, 0, 1));
 
     double cube_scale = cube_items->get_value("scale", 1) / 2;
 
-    auto texture_mapper = create_dummy_mapper(cube_items, "color", "reflect");
+    std::shared_ptr<TextureMapper> texture_mapper = create_dummy_mapper(cube_items, "color", "reflect");
     if (!texture_mapper) {
         return;
     }
