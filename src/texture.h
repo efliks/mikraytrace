@@ -6,9 +6,6 @@
 #include <vector>
 #include <string>
 
-using Vector3d = mrtp::Vector3;
-
-
 namespace mrtp {
 
 class TexturePixel {

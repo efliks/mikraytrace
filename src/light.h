@@ -6,8 +6,6 @@
 
 namespace mrtp {
 
-using Vector3d = Vector3;
-
 class Light {
 public:
     Light(const Vector3d& center);

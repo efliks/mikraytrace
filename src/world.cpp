@@ -15,9 +15,6 @@
 
 namespace mrtp {
 
-using Vector3d = Vector3;
-
-
 void SceneWorld::add_light(std::shared_ptr<Light> light_ptr) {
     light_ = light_ptr;
 }

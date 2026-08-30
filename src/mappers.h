@@ -11,9 +11,6 @@
 
 namespace mrtp {
 
-using Vector3d = Vector3;
-
-
 class TextureMapper {
 public:
     TextureMapper() = default;

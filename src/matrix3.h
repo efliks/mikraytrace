@@ -14,26 +14,26 @@
 
 namespace mrtp {
 
-class Matrix3 {
+class Matrix3d {
 public:
-    Matrix3();
+    Matrix3d();
 
     double& operator()(int row, int col);
     double operator()(int row, int col) const;
 
-    Vector3 col(int index) const;
+    Vector3d col(int index) const;
 
-    Matrix3 operator*(const Matrix3& other) const;
-    Vector3 operator*(const Vector3& vec) const;
+    Matrix3d operator*(const Matrix3d& other) const;
+    Vector3d operator*(const Vector3d& vec) const;
 
 private:
     double m_[3][3];
 };
 
 // Elementary rotations of `angle` radians around the X, Y, and Z axes.
-Matrix3 rotation_x(double angle);
-Matrix3 rotation_y(double angle);
-Matrix3 rotation_z(double angle);
+Matrix3d rotation_x(double angle);
+Matrix3d rotation_y(double angle);
+Matrix3d rotation_z(double angle);
 
 } // namespace mrtp
 

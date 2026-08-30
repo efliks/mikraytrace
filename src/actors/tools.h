@@ -8,10 +8,6 @@
 #include "config.h"
 #include "common.h"
 
-using Vector3d = mrtp::Vector3;
-using Matrix3d = mrtp::Matrix3;
-
-
 namespace mrtp {
 
 extern const double kMyZero;

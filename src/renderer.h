@@ -8,9 +8,6 @@
 #include "actors.h"
 #include "world.h"
 
-using Vector3d = mrtp::Vector3;
-
-
 namespace mrtp {
 
 struct RendererConfig

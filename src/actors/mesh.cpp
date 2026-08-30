@@ -15,9 +15,6 @@
 #include "actors/tools.h"
 #include "actors/triangle.h"
 
-using Vector3d = mrtp::Vector3;
-
-
 namespace mrtp {
 
 #ifdef USE_LIB3DS

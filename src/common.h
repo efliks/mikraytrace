@@ -6,9 +6,7 @@
 
 namespace mrtp {
 
-using Vector3d = Vector3;
-
-struct StandardBasis 
+struct StandardBasis
 {
     Vector3d o { 0, 0, 0 };
     Vector3d vi { 1, 0, 0 };

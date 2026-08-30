@@ -6,8 +6,6 @@
 
 namespace mrtp {
 
-using Vector3d = Vector3;
-
 class Camera {
 public:
     Camera(const Vector3d& eye, const Vector3d& lookat, double roll);

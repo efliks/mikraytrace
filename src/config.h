@@ -6,9 +6,6 @@
 #include <memory>
 #include "vector3.h"
 
-using Vector3d = mrtp::Vector3;
-
-
 namespace mrtp {
 
 class ConfigTable

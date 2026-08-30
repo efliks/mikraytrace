@@ -7,9 +7,6 @@
 #include "common.h"
 #include "mappers.h"
 
-using Vector3d = mrtp::Vector3;
-
-
 namespace mrtp {
 
 class ActorBase 

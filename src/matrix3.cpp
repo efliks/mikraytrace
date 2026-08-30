@@ -4,9 +4,9 @@
 
 namespace mrtp {
 
-// ---------------------------------------------------------------- Matrix3
+// ---------------------------------------------------------------- Matrix3d
 
-Matrix3::Matrix3()
+Matrix3d::Matrix3d()
 {
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++) {
@@ -15,24 +15,24 @@ Matrix3::Matrix3()
     }
 }
 
-double& Matrix3::operator()(int row, int col)
+double& Matrix3d::operator()(int row, int col)
 {
     return m_[row][col];
 }
 
-double Matrix3::operator()(int row, int col) const
+double Matrix3d::operator()(int row, int col) const
 {
     return m_[row][col];
 }
 
-Vector3 Matrix3::col(int index) const
+Vector3d Matrix3d::col(int index) const
 {
-    return Vector3(m_[0][index], m_[1][index], m_[2][index]);
+    return Vector3d(m_[0][index], m_[1][index], m_[2][index]);
 }
 
-Matrix3 Matrix3::operator*(const Matrix3& other) const
+Matrix3d Matrix3d::operator*(const Matrix3d& other) const
 {
-    Matrix3 result;
+    Matrix3d result;
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++) {
             double sum = 0;
@@ -45,9 +45,9 @@ Matrix3 Matrix3::operator*(const Matrix3& other) const
     return result;
 }
 
-Vector3 Matrix3::operator*(const Vector3& vec) const
+Vector3d Matrix3d::operator*(const Vector3d& vec) const
 {
-    return Vector3(
+    return Vector3d(
         m_[0][0] * vec[0] + m_[0][1] * vec[1] + m_[0][2] * vec[2],
         m_[1][0] * vec[0] + m_[1][1] * vec[1] + m_[1][2] * vec[2],
         m_[2][0] * vec[0] + m_[2][1] * vec[1] + m_[2][2] * vec[2]);
@@ -55,12 +55,12 @@ Vector3 Matrix3::operator*(const Vector3& vec) const
 
 // ------------------------------------------------------ Elementary rotations
 
-Matrix3 rotation_x(double angle)
+Matrix3d rotation_x(double angle)
 {
     double c = std::cos(angle);
     double s = std::sin(angle);
 
-    Matrix3 result;
+    Matrix3d result;
     result(0, 0) = 1;
     result(1, 1) = c;
     result(1, 2) = -s;
@@ -69,12 +69,12 @@ Matrix3 rotation_x(double angle)
     return result;
 }
 
-Matrix3 rotation_y(double angle)
+Matrix3d rotation_y(double angle)
 {
     double c = std::cos(angle);
     double s = std::sin(angle);
 
-    Matrix3 result;
+    Matrix3d result;
     result(0, 0) = c;
     result(0, 2) = s;
     result(1, 1) = 1;
@@ -83,12 +83,12 @@ Matrix3 rotation_y(double angle)
     return result;
 }
 
-Matrix3 rotation_z(double angle)
+Matrix3d rotation_z(double angle)
 {
     double c = std::cos(angle);
     double s = std::sin(angle);
 
-    Matrix3 result;
+    Matrix3d result;
     result(0, 0) = c;
     result(0, 1) = -s;
     result(1, 0) = s;
