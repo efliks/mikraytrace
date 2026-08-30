@@ -96,13 +96,13 @@ static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* ver
 }
 #endif  // USE_LIB3DS
 
+struct TriangleFace
+{
+    unsigned short a, b, c;
+};
+
 static void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
 {
-    struct TriangleFace
-    {
-        unsigned short a, b, c;
-    };
-
     std::ifstream f(filename.c_str(), std::ios::binary);
 
     if (f.is_open()) {
@@ -118,11 +118,11 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
 
             std::vector<Vector3f> tmp_vertex_list;
             tmp_vertex_list.resize(num_vertices);
-            f.read(static_cast<char *>(static_cast<void *>(tmp_vertex_list.data())), sizeof(Vector3f) * num_vertices);
+            f.read(static_cast<char *>(static_cast<void *>(&tmp_vertex_list[0])), sizeof(Vector3f) * num_vertices);
 
             std::vector<TriangleFace> faces_list;
             faces_list.resize(num_faces);
-            f.read(static_cast<char *>(static_cast<void *>(faces_list.data())), sizeof(TriangleFace) * num_faces);
+            f.read(static_cast<char *>(static_cast<void *>(&faces_list[0])), sizeof(TriangleFace) * num_faces);
 
             f.close();
 

@@ -34,7 +34,7 @@ static void create_tables(const std::string& mol2file,
     std::vector<Vector3d>* positions,
     std::vector<std::pair<unsigned int, unsigned int> >* bonds)
 {
-    std::ifstream f(mol2file);
+    std::ifstream f(mol2file.c_str());
     std::string buffer;
 
     if (f.is_open()) {

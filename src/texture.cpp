@@ -51,7 +51,7 @@ TextureSharedState::TextureSharedState(const std::string& filename)
 
     texture_data_.resize(texture_width_ * texture_heigth_);
 
-    std::memcpy(static_cast<void *>(texture_data_.data()), static_cast<void *>(buffer.data()), sizeof(TexturePixel) * texture_width_ * texture_heigth_);
+    std::memcpy(static_cast<void *>(&texture_data_[0]), static_cast<void *>(&buffer[0]), sizeof(TexturePixel) * texture_width_ * texture_heigth_);
 }
 
 

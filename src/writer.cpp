@@ -49,8 +49,8 @@ public:
             }
         }
 
-        fileout.open(filename, std::ios_base::out | std::ios_base::binary);
-        TooJpeg::writeJpeg(write_byte, buffer.data(), scene_renderer_->config_.width, scene_renderer_->config_.height, true, quality_);
+        fileout.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+        TooJpeg::writeJpeg(write_byte, &buffer[0], scene_renderer_->config_.width, scene_renderer_->config_.height, true, quality_);
 
         fileout.close();
     }
@@ -80,7 +80,7 @@ public:
         state.encoder.auto_convert = 0;
 
         std::vector<unsigned char> buffer;
-        unsigned int error = lodepng::encode(buffer, static_cast<unsigned char *>(static_cast<void *>(scene_renderer_->framebuffer_.data())), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
+        unsigned int error = lodepng::encode(buffer, static_cast<unsigned char *>(static_cast<void *>(&scene_renderer_->framebuffer_[0])), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
 
         if (!error) {
             std::cout << "INFO: Writing scene image " << filename << " ..." << std::endl;

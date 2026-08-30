@@ -118,7 +118,7 @@ shared_ptr<TextureMapper> create_texture_mapper(shared_ptr<ConfigTable> actor_it
             std::cerr << "WARNING: Ignoring color and using texture file" << std::endl;
         }
 
-        std::fstream check(actor_texture);
+        std::fstream check(actor_texture.c_str());
         if (!check.good()) {
             std::cerr << "ERROR: Cannot open texture file " << actor_texture << std::endl;
             return shared_ptr<TextureMapper>();

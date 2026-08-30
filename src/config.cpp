@@ -188,7 +188,7 @@ private:
 
 shared_ptr<ConfigReader> open_config(const std::string& filename)
 {
-    std::ifstream in(filename);
+    std::ifstream in(filename.c_str());
     if (!in.good()) {
         std::cerr << "ERROR: Cannot open world file" << std::endl;
         return shared_ptr<ConfigReader>();
