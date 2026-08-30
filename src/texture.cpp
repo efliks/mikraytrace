@@ -103,9 +103,10 @@ TextureFactory::TextureFactory(std::list<TextureSharedState>* shared_states)
 MyTexture* TextureFactory::create_texture(const std::string& texture_filename,
                                           double reflection_coeff,
                                           double scale_coeff) {
-    for (auto& shared_state : *shared_states_) {
-        if (shared_state.is_same_texture(texture_filename)) {
-            MyTexture new_texture(&shared_state, reflection_coeff, scale_coeff);
+    for (std::list<TextureSharedState>::iterator it = shared_states_->begin();
+         it != shared_states_->end(); ++it) {
+        if (it->is_same_texture(texture_filename)) {
+            MyTexture new_texture(&(*it), reflection_coeff, scale_coeff);
             textures_.push_back(new_texture);
             return &textures_.back();
         }

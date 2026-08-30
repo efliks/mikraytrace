@@ -119,8 +119,9 @@ public:
         }
 
         std::shared_ptr<SceneWorld> world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
-        for (const auto& actor : new_actors) {
-            world_ptr->add_actor(actor);
+        for (std::vector<std::shared_ptr<ActorBase> >::const_iterator it = new_actors.begin();
+             it != new_actors.end(); ++it) {
+            world_ptr->add_actor(*it);
         }
 
         std::shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "camera");

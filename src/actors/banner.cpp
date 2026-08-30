@@ -87,11 +87,10 @@ void create_banner(TextureFactory* texture_factory,
     Vector3d char_k_vec = m_char_rot * banner_k_vec;
 
     double char_scale = items->get_value("scale", 1);
-    int char_idx = 0;
 
-    for (char c : banner_text) {
+    for (std::string::size_type char_idx = 0; char_idx < banner_text.size(); ++char_idx) {
+        char c = banner_text[char_idx];
         Vector3d char_o_vec = banner_o_vec + (char_scale * char_idx - (banner_text.size() - 1) * char_scale / 2) * banner_j_vec;
-        char_idx++;
 
         StandardBasis char_basis;
         set_basis(&char_basis, char_o_vec, char_i_vec, char_j_vec, char_k_vec);

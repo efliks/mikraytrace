@@ -167,9 +167,10 @@ public:
     std::shared_ptr<ConfigTableIterator> get_tables(const std::string& row_type) // override
     {
         std::vector<std::shared_ptr<ConfigTable> > matches;
-        for (const auto& row : rows_) {
-            if (row.first == row_type) {
-                matches.push_back(row.second);
+        for (std::vector<std::pair<std::string, std::shared_ptr<ConfigTable> > >::const_iterator it = rows_.begin();
+             it != rows_.end(); ++it) {
+            if (it->first == row_type) {
+                matches.push_back(it->second);
             }
         }
 

@@ -110,28 +110,29 @@ void create_molecule(TextureFactory* texture_factory,
     }
 
     Vector3d center_vec(0, 0, 0);
-    for (auto& atom_vec : positions) {
-        center_vec += atom_vec;
+    for (std::vector<Vector3d>::iterator it = positions.begin(); it != positions.end(); ++it) {
+        center_vec += *it;
     }
     center_vec *= (1. / positions.size());
 
     std::vector<Vector3d> transl_pos;
-    for (auto& atom_vec : positions) {
-        Vector3d transl_atom_vec = (m_rot * (atom_vec - center_vec)) * mol_scale + mol_vec_o;
+    for (std::vector<Vector3d>::iterator it = positions.begin(); it != positions.end(); ++it) {
+        Vector3d transl_atom_vec = (m_rot * (*it - center_vec)) * mol_scale + mol_vec_o;
         transl_pos.push_back(transl_atom_vec);
     }
 
-    for (auto& atom_vec : transl_pos) {
+    for (std::vector<Vector3d>::iterator it = transl_pos.begin(); it != transl_pos.end(); ++it) {
         StandardBasis sphere_basis;
-        sphere_basis.o = atom_vec;
+        sphere_basis.o = *it;
 
         actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleSphere(
                 sphere_basis, sphere_scale, sphere_mapper_ptr)));
     }
 
-    for (auto& bond : bonds) {
-        Vector3d cylinder_begin_vec = transl_pos[bond.first];
-        Vector3d cylinder_end_vec = transl_pos[bond.second];
+    for (std::vector<std::pair<unsigned int, unsigned int> >::iterator it = bonds.begin();
+         it != bonds.end(); ++it) {
+        Vector3d cylinder_begin_vec = transl_pos[it->first];
+        Vector3d cylinder_end_vec = transl_pos[it->second];
 
         Vector3d cylinder_center_vec = (cylinder_begin_vec + cylinder_end_vec) / 2;
         Vector3d cylinder_k_vec = cylinder_end_vec - cylinder_begin_vec;

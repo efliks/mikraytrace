@@ -126,14 +126,15 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
 
             f.close();
 
-            for (const TriangleFace& face : faces_list) {
-                Vector3f v = tmp_vertex_list[face.a];
+            for (std::vector<TriangleFace>::const_iterator it = faces_list.begin();
+                 it != faces_list.end(); ++it) {
+                Vector3f v = tmp_vertex_list[it->a];
                 vertex_list->push_back(v.to_vector3());
 
-                v = tmp_vertex_list[face.b];
+                v = tmp_vertex_list[it->b];
                 vertex_list->push_back(v.to_vector3());
 
-                v = tmp_vertex_list[face.c];
+                v = tmp_vertex_list[it->c];
                 vertex_list->push_back(v.to_vector3());
             }
 
@@ -192,27 +193,27 @@ void create_mesh(TextureFactory* texture_factory,
     // Translate model to 0, 0, 0
     Vector3d vec_o;
 
-    for (const Vector3d& v : vertex_list) {
-        vec_o += v;
+    for (std::vector<Vector3d>::const_iterator it = vertex_list.begin(); it != vertex_list.end(); ++it) {
+        vec_o += *it;
     }
     vec_o /= vertex_list.size();
 
-    for (Vector3d& v : vertex_list) {
-        v -= vec_o;
+    for (std::vector<Vector3d>::iterator it = vertex_list.begin(); it != vertex_list.end(); ++it) {
+        *it -= vec_o;
     }
 
     // Normalize model
     double max_d = 0;
 
-    for (const Vector3d& v : vertex_list) {
-        double d = v.norm();
+    for (std::vector<Vector3d>::const_iterator it = vertex_list.begin(); it != vertex_list.end(); ++it) {
+        double d = it->norm();
         if (d > max_d) {
             max_d = d;
         }
     }
 
-    for (Vector3d& v : vertex_list) {
-        v /= max_d;
+    for (std::vector<Vector3d>::iterator it = vertex_list.begin(); it != vertex_list.end(); ++it) {
+        *it /= max_d;
     }
 
     // Rotate, scale, and translate model to center
@@ -220,8 +221,8 @@ void create_mesh(TextureFactory* texture_factory,
 
     double mesh_scale = items->get_value("scale", 1);
 
-    for (Vector3d& v : vertex_list) {
-        v = mesh_scale * (m_rot * v) + mesh_vec_o;
+    for (std::vector<Vector3d>::iterator it = vertex_list.begin(); it != vertex_list.end(); ++it) {
+        *it = mesh_scale * (m_rot * *it) + mesh_vec_o;
     }
 
     // Create triangles

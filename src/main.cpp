@@ -173,7 +173,9 @@ int main(int argc, char* argv[])
     std::shared_ptr<mrtp::SceneWriterBase> scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
 
     // Iterate over all input files
-    for (std::string& input_file : input_files) {
+    for (std::vector<std::string>::iterator it = input_files.begin();
+         it != input_files.end(); ++it) {
+        std::string& input_file = *it;
         std::cout << "INFO: Processing " << input_file << " ..." << std::endl;
 
         mrtp::TextureFactory texture_factory(&texture_cache);
