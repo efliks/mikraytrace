@@ -1,7 +1,7 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include <memory>
+#include "shrptr.h"
 #include <vector>
 
 #include "config.h"
@@ -11,7 +11,7 @@
 
 namespace mrtp {
 
-void create_cube(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase> >*); 
+void create_cube(TextureFactory*, shared_ptr<ConfigTable>, std::vector<shared_ptr<ActorBase> >*); 
 
 }
 

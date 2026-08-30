@@ -16,8 +16,8 @@ extern const unsigned char kCharacterData[];
 static void create_char3d(char c,
                           double char_scale,
                           const StandardBasis& char_basis,
-                          std::shared_ptr<TextureMapper> texture_mapper,
-                          std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
+                          shared_ptr<TextureMapper> texture_mapper,
+                          std::vector<shared_ptr<ActorBase> >* actor_ptrs)
 {
     if (c > 'a' && c < 'z') {
         c += ('A' - 'a');
@@ -37,7 +37,7 @@ static void create_char3d(char c,
                 StandardBasis sphere_basis;
                 sphere_basis.o = o_vec;
 
-                std::shared_ptr<ActorBase> sphere_ptr = std::shared_ptr<ActorBase>(
+                shared_ptr<ActorBase> sphere_ptr = shared_ptr<ActorBase>(
                     new SimpleSphere(sphere_basis, char_scale / 8 / 2, texture_mapper));
 
                 actor_ptrs->push_back(sphere_ptr);
@@ -48,8 +48,8 @@ static void create_char3d(char c,
 
 
 void create_banner(TextureFactory* texture_factory,
-                   std::shared_ptr<ConfigTable> items,
-                   std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
+                   shared_ptr<ConfigTable> items,
+                   std::vector<shared_ptr<ActorBase> >* actor_ptrs)
 {
     std::string banner_text = items->get_text("text");
     if (banner_text.empty()) {
@@ -57,7 +57,7 @@ void create_banner(TextureFactory* texture_factory,
         return;
     }
 
-    std::shared_ptr<TextureMapper> banner_mapper =
+    shared_ptr<TextureMapper> banner_mapper =
             create_dummy_mapper(items, "color", "reflect");
     if (!banner_mapper) {
         return;

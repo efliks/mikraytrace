@@ -7,7 +7,7 @@
 namespace mrtp {
 
 SimplePlane::SimplePlane(const StandardBasis& local_basis, 
-        std::shared_ptr<TextureMapper> texture_mapper_ptr) : 
+        shared_ptr<TextureMapper> texture_mapper_ptr) : 
     ActorBase(local_basis, texture_mapper_ptr) {
 
 }
@@ -39,8 +39,8 @@ double SimplePlane::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_plane(TextureFactory* texture_factory,
-                  std::shared_ptr<ConfigTable> plane_items,
-                  std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
+                  shared_ptr<ConfigTable> plane_items,
+                  std::vector<shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d plane_center_vec = plane_items->get_vector("center");
     if (!plane_center_vec.size()) {
@@ -66,13 +66,13 @@ void create_plane(TextureFactory* texture_factory,
     StandardBasis plane_basis;
     set_basis(&plane_basis, plane_center_vec, plane_vec_i, plane_vec_j, plane_normal_vec);
 
-    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
+    shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
             plane_items, ActorType_Plane, texture_factory);
     if (!texture_mapper_ptr) {
         return;
     }
 
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                 new SimplePlane(plane_basis, texture_mapper_ptr)));
 }
 

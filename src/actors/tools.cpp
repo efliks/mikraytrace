@@ -54,7 +54,7 @@ Vector3d fill_vector(const Vector3d& vec)
 }
 
 
-Matrix3d create_rotation_matrix(std::shared_ptr<ConfigTable> items,
+Matrix3d create_rotation_matrix(shared_ptr<ConfigTable> items,
                                 const std::string& prefix)
 {
     double angle_x = items->get_value(prefix + "angle_x", 0) * pi() / 180;

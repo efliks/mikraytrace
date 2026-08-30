@@ -5,7 +5,7 @@
 namespace mrtp {
 
 SimplePolygon::SimplePolygon(const StandardBasis& local_basis,
-                             std::shared_ptr<TextureMapper> texture_mapper,
+                             shared_ptr<TextureMapper> texture_mapper,
                              double xsize, double ysize)
     : ActorBase(local_basis, texture_mapper)
     , xsize_(xsize), ysize_(ysize)

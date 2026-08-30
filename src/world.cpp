@@ -15,17 +15,17 @@
 
 namespace mrtp {
 
-void SceneWorld::add_light(std::shared_ptr<Light> light_ptr) {
+void SceneWorld::add_light(shared_ptr<Light> light_ptr) {
     light_ = light_ptr;
 }
 
 
-void SceneWorld::add_camera(std::shared_ptr<Camera> camera_ptr) {
+void SceneWorld::add_camera(shared_ptr<Camera> camera_ptr) {
     camera_ = camera_ptr;
 }
 
 
-void SceneWorld::add_actor(std::shared_ptr<ActorBase> actor_ptr) {
+void SceneWorld::add_actor(shared_ptr<ActorBase> actor_ptr) {
     actor_ptrs_.push_back(actor_ptr);
 }
 
@@ -45,7 +45,7 @@ ActorIterator SceneWorld::get_actor_iterator() {
 }
 
 
-ActorIterator::ActorIterator(std::vector<std::shared_ptr<ActorBase> >* actor_ptrs):
+ActorIterator::ActorIterator(std::vector<shared_ptr<ActorBase> >* actor_ptrs):
     actor_ptrs_(actor_ptrs) {
     actor_iter_ = actor_ptrs_->begin();
 }
@@ -66,7 +66,7 @@ bool ActorIterator::is_done() {
 }
 
 
-std::vector<std::shared_ptr<ActorBase> >::iterator ActorIterator::current() {
+std::vector<shared_ptr<ActorBase> >::iterator ActorIterator::current() {
     return actor_iter_;
 }
 
@@ -80,115 +80,115 @@ public:
 
     }
 
-    std::shared_ptr<SceneWorld> build() const
+    shared_ptr<SceneWorld> build() const
     {
-        std::shared_ptr<ConfigReader> world_config = open_config(world_filename_);
+        shared_ptr<ConfigReader> world_config = open_config(world_filename_);
         if (!world_config) {
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
-        std::vector<std::shared_ptr<ActorBase> > new_actors;
+        std::vector<shared_ptr<ActorBase> > new_actors;
 
-        std::shared_ptr<ConfigTableIterator> planes_array = world_config->get_tables("plane");
+        shared_ptr<ConfigTableIterator> planes_array = world_config->get_tables("plane");
         process_actor_array(ActorType_Plane, planes_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> spheres_array = world_config->get_tables("sphere");
+        shared_ptr<ConfigTableIterator> spheres_array = world_config->get_tables("sphere");
         process_actor_array(ActorType_Sphere, spheres_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> cylinders_array = world_config->get_tables("cylinder");
+        shared_ptr<ConfigTableIterator> cylinders_array = world_config->get_tables("cylinder");
         process_actor_array(ActorType_Cylinder, cylinders_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> triangles_array = world_config->get_tables("triangle");
+        shared_ptr<ConfigTableIterator> triangles_array = world_config->get_tables("triangle");
         process_actor_array(ActorType_Triangle, triangles_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> cubes_array = world_config->get_tables("cube");
+        shared_ptr<ConfigTableIterator> cubes_array = world_config->get_tables("cube");
         process_actor_array(ActorType_Cube, cubes_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> molecules_array = world_config->get_tables("molecule");
+        shared_ptr<ConfigTableIterator> molecules_array = world_config->get_tables("molecule");
         process_actor_array(ActorType_Molecule, molecules_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> banners_array = world_config->get_tables("banner");
+        shared_ptr<ConfigTableIterator> banners_array = world_config->get_tables("banner");
         process_actor_array(ActorType_Banner, banners_array, &new_actors);
 
-        std::shared_ptr<ConfigTableIterator> meshes_array = world_config->get_tables("mesh");
+        shared_ptr<ConfigTableIterator> meshes_array = world_config->get_tables("mesh");
         process_actor_array(ActorType_Mesh, meshes_array, &new_actors);
 
         if (new_actors.size() < 1) {
             std::cerr << "ERROR: No actors found" << std::endl;
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
-        std::shared_ptr<SceneWorld> world_ptr = std::shared_ptr<SceneWorld>(new SceneWorld());
-        for (std::vector<std::shared_ptr<ActorBase> >::const_iterator it = new_actors.begin();
+        shared_ptr<SceneWorld> world_ptr = shared_ptr<SceneWorld>(new SceneWorld());
+        for (std::vector<shared_ptr<ActorBase> >::const_iterator it = new_actors.begin();
              it != new_actors.end(); ++it) {
             world_ptr->add_actor(*it);
         }
 
-        std::shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "camera");
+        shared_ptr<ConfigTable> camera_table = get_single_table(world_config, "camera");
         if (!camera_table) {
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
         Vector3d camera_eye = camera_table->get_vector("center");
         if (!camera_eye.size()) {
             std::cerr << "ERROR: Error parsing camera center" << std::endl;
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
         Vector3d camera_lookat = camera_table->get_vector("target");
         if (!camera_lookat.size()) {
             std::cerr << "ERROR: Error parsing camera target" << std::endl;
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
         double camera_roll = camera_table->get_value("roll", 0);
 
-        std::shared_ptr<ConfigTable> light_table = get_single_table(world_config, "light");
+        shared_ptr<ConfigTable> light_table = get_single_table(world_config, "light");
         if (!light_table) {
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
         Vector3d light_center = light_table->get_vector("center");
         if (!light_center.size()) {
             std::cerr << "ERROR: Error parsing light center" << std::endl;
-            return std::shared_ptr<SceneWorld>();
+            return shared_ptr<SceneWorld>();
         }
 
-        world_ptr->add_camera(std::shared_ptr<Camera>(
+        world_ptr->add_camera(shared_ptr<Camera>(
                                  new Camera(camera_eye, camera_lookat, camera_roll)));
 
-        world_ptr->add_light(std::shared_ptr<Light>(new Light(light_center)));
+        world_ptr->add_light(shared_ptr<Light>(new Light(light_center)));
 
         return world_ptr;
     }
 
-    std::shared_ptr<ConfigTable> get_single_table(std::shared_ptr<ConfigReader> config,
+    shared_ptr<ConfigTable> get_single_table(shared_ptr<ConfigReader> config,
                                                   const std::string& table_name) const
     {
-        std::shared_ptr<ConfigTableIterator> it = config->get_tables(table_name);
+        shared_ptr<ConfigTableIterator> it = config->get_tables(table_name);
         if (it) {
             it->first();
         }
 
         if (!it || it->is_done()) {
             std::cerr << "ERROR: No " << table_name << " found" << std::endl;
-            return std::shared_ptr<ConfigTable>();
+            return shared_ptr<ConfigTable>();
         }
 
-        std::shared_ptr<ConfigTable> table = it->current();
+        shared_ptr<ConfigTable> table = it->current();
 
         it->next();
         if (!it->is_done()) {
             std::cerr << "ERROR: Multiple " << table_name << "s found" << std::endl;
-            return std::shared_ptr<ConfigTable>();
+            return shared_ptr<ConfigTable>();
         }
 
         return table;
     }
 
     void process_actor_array(ActorType actor_type,
-                             std::shared_ptr<ConfigTableIterator> it,
-                             std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) const
+                             shared_ptr<ConfigTableIterator> it,
+                             std::vector<shared_ptr<ActorBase> >* actor_ptrs) const
     {
         if (it)
         {
@@ -222,7 +222,7 @@ private:
 };
 
 
-std::shared_ptr<SceneWorld> build_world(const std::string& world_filename,
+shared_ptr<SceneWorld> build_world(const std::string& world_filename,
                                         TextureFactory* texture_factory) {
     return WorldBuilder(
                 world_filename,

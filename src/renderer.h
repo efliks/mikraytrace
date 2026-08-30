@@ -3,7 +3,7 @@
 
 #include "vector3.h"
 #include <vector>
-#include <memory>
+#include "shrptr.h"
 
 #include "actors.h"
 #include "world.h"
@@ -62,7 +62,7 @@ protected:
 };
 
 
-std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig&);
+shared_ptr<SceneRendererBase> create_renderer(const RendererConfig&);
 
 }
 

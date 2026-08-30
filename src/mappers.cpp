@@ -104,7 +104,7 @@ private:
 };
 
 
-std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable> actor_items,
+shared_ptr<TextureMapper> create_texture_mapper(shared_ptr<ConfigTable> actor_items,
                                                      ActorType actor_type,
                                                      TextureFactory* texture_factory)
 {
@@ -121,7 +121,7 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable
         std::fstream check(actor_texture);
         if (!check.good()) {
             std::cerr << "ERROR: Cannot open texture file " << actor_texture << std::endl;
-            return std::shared_ptr<TextureMapper>();
+            return shared_ptr<TextureMapper>();
         }
 
         double default_coef = (actor_type == ActorType_Sphere) ? 1 : 0.15;
@@ -131,32 +131,32 @@ std::shared_ptr<TextureMapper> create_texture_mapper(std::shared_ptr<ConfigTable
                                     actor_texture, reflect_coef, scale_coef);
 
         if (actor_type == ActorType_Plane) {
-            return std::shared_ptr<TextureMapper>(new PlaneTextureMapper(texture_ptr));
+            return shared_ptr<TextureMapper>(new PlaneTextureMapper(texture_ptr));
         }
         else if (actor_type == ActorType_Sphere) {
-            return std::shared_ptr<TextureMapper>(new SphereTextureMapper(texture_ptr));
+            return shared_ptr<TextureMapper>(new SphereTextureMapper(texture_ptr));
         }
         else if (actor_type == ActorType_Cylinder) {
             double cylinder_radius = actor_items->get_value("radius", 1);
-            return std::shared_ptr<TextureMapper>(new CylinderTextureMapper(texture_ptr, cylinder_radius));
+            return shared_ptr<TextureMapper>(new CylinderTextureMapper(texture_ptr, cylinder_radius));
         }
 
         // Unknown actor type
-        return std::shared_ptr<TextureMapper>();
+        return shared_ptr<TextureMapper>();
     }
 
     Vector3d actor_color = actor_items->get_vector("color");
     if (actor_color.size()) {
         TexturePixel pixel_color(actor_color);
-        return std::shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
+        return shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
     }
 
     std::cerr << "ERROR: Cannot parse texture file and color for texture mapper" << std::endl;
-    return std::shared_ptr<TextureMapper>();
+    return shared_ptr<TextureMapper>();
 }
 
 
-std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<ConfigTable> items,
+shared_ptr<TextureMapper> create_dummy_mapper(shared_ptr<ConfigTable> items,
                                                    const std::string& color_str,
                                                    const std::string& reflect_str)
 {
@@ -166,11 +166,11 @@ std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<ConfigTable> 
         double reflect_coef = items->get_value(reflect_str, 0);
         TexturePixel pixel_color(actor_color);
 
-        return std::shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
+        return shared_ptr<TextureMapper>(new DummyTextureMapper(pixel_color, reflect_coef));
     }
 
     std::cerr << "ERROR: Color for texture mapper not found" << std::endl;
-    return std::shared_ptr<TextureMapper>();
+    return shared_ptr<TextureMapper>();
 }
 
 

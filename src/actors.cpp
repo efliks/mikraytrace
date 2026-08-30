@@ -3,7 +3,7 @@
 namespace mrtp {
 
 ActorBase::ActorBase(const StandardBasis& local_basis,
-    std::shared_ptr<TextureMapper> texture_mapper_ptr)
+    shared_ptr<TextureMapper> texture_mapper_ptr)
     : local_basis_(local_basis)
     , texture_mapper_(texture_mapper_ptr)
 {

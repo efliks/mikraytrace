@@ -10,7 +10,7 @@ namespace mrtp {
 class SimpleSphere : public ActorBase 
 {
 public:
-    SimpleSphere(const StandardBasis&, double, std::shared_ptr<TextureMapper>);
+    SimpleSphere(const StandardBasis&, double, shared_ptr<TextureMapper>);
 
     double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override
@@ -22,7 +22,7 @@ private:
     double radius_;
 };
 
-void create_sphere(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase> >*); 
+void create_sphere(TextureFactory*, shared_ptr<ConfigTable>, std::vector<shared_ptr<ActorBase> >*); 
 
 }
 

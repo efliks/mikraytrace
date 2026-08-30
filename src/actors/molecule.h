@@ -1,7 +1,7 @@
 #ifndef MOLECULE_H
 #define MOLECULE_H
 
-#include <memory>
+#include "shrptr.h"
 #include <vector>
 
 #include "config.h"
@@ -11,7 +11,7 @@
 
 namespace mrtp {
 
-void create_molecule(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase> >*);
+void create_molecule(TextureFactory*, shared_ptr<ConfigTable>, std::vector<shared_ptr<ActorBase> >*);
 
 }
 

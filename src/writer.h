@@ -2,7 +2,7 @@
 #define WRITER_H
 
 #include <string>
-#include <memory>
+#include "shrptr.h"
 
 #include "renderer.h"
 
@@ -29,7 +29,7 @@ protected:
 };
 
 
-std::shared_ptr<SceneWriterBase> create_writer(SceneRendererBase*, WriterType = WriterType_PNG);
+shared_ptr<SceneWriterBase> create_writer(SceneRendererBase*, WriterType = WriterType_PNG);
 
 
 }

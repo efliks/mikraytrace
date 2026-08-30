@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <memory>
+#include "shrptr.h"
 #include "vector3.h"
 
 namespace mrtp {
@@ -30,7 +30,7 @@ public:
     virtual void first() = 0;
     virtual void next() = 0;
     virtual bool is_done() = 0;
-    virtual std::shared_ptr<ConfigTable> current() = 0;
+    virtual shared_ptr<ConfigTable> current() = 0;
 };
 
 
@@ -39,11 +39,11 @@ class ConfigReader
 public:
     virtual ~ConfigReader() {}
 
-    virtual std::shared_ptr<ConfigTableIterator> get_tables(const std::string&) = 0;
+    virtual shared_ptr<ConfigTableIterator> get_tables(const std::string&) = 0;
 };
 
 
-std::shared_ptr<ConfigReader> open_config(const std::string&);
+shared_ptr<ConfigReader> open_config(const std::string&);
 
 
 }

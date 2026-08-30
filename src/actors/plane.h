@@ -10,7 +10,7 @@ namespace mrtp {
 class SimplePlane : public ActorBase 
 {
 public:
-    SimplePlane(const StandardBasis&, std::shared_ptr<TextureMapper>);
+    SimplePlane(const StandardBasis&, shared_ptr<TextureMapper>);
 
     double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override
@@ -19,7 +19,7 @@ public:
     bool has_shadow() const; // override
 };
 
-void create_plane(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase> >*);
+void create_plane(TextureFactory*, shared_ptr<ConfigTable>, std::vector<shared_ptr<ActorBase> >*);
 
 }
 

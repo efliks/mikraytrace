@@ -1,7 +1,7 @@
 #ifndef MAPPERS_H
 #define MAPPERS_H
 
-#include <memory>
+#include "shrptr.h"
 #include "vector3.h"
 
 #include "config.h"
@@ -22,10 +22,10 @@ public:
 };
 
 
-std::shared_ptr<TextureMapper> create_texture_mapper(
-        std::shared_ptr<ConfigTable>, ActorType, TextureFactory*);
+shared_ptr<TextureMapper> create_texture_mapper(
+        shared_ptr<ConfigTable>, ActorType, TextureFactory*);
 
-std::shared_ptr<TextureMapper> create_dummy_mapper(std::shared_ptr<ConfigTable>,
+shared_ptr<TextureMapper> create_dummy_mapper(shared_ptr<ConfigTable>,
         const std::string&, const std::string&);
 
 

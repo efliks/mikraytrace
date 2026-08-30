@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "shrptr.h"
 #include "world.h"
 #include "renderer.h"
 #include "texture.h"
@@ -185,9 +186,9 @@ int main(int argc, char* argv[])
 
     mrtp::WriterType writer_type = (output_format == "png") ? mrtp::WriterType_PNG : mrtp::WriterType_JPEG;
 
-    std::shared_ptr<mrtp::SceneRendererBase> scene_renderer = mrtp::create_renderer(config);
+    mrtp::shared_ptr<mrtp::SceneRendererBase> scene_renderer = mrtp::create_renderer(config);
     //FIXME pointer to renderer
-    std::shared_ptr<mrtp::SceneWriterBase> scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
+    mrtp::shared_ptr<mrtp::SceneWriterBase> scene_writer = mrtp::create_writer(scene_renderer.get(), writer_type);
 
     // Iterate over all input files
     for (std::vector<std::string>::iterator it = input_files.begin();
@@ -196,7 +197,7 @@ int main(int argc, char* argv[])
         std::cout << "INFO: Processing " << input_file << " ..." << std::endl;
 
         mrtp::TextureFactory texture_factory(&texture_cache);
-        std::shared_ptr<mrtp::SceneWorld> world_ptr = mrtp::build_world(input_file, &texture_factory);
+        mrtp::shared_ptr<mrtp::SceneWorld> world_ptr = mrtp::build_world(input_file, &texture_factory);
         if (!world_ptr) {
             return EXIT_FAILURE;
         }

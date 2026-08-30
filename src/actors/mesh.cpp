@@ -144,8 +144,8 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
 
 
 void create_mesh(TextureFactory* texture_factory,
-                 std::shared_ptr<ConfigTable> items,
-                 std::vector<std::shared_ptr<ActorBase> >* actor_ptrs)
+                 shared_ptr<ConfigTable> items,
+                 std::vector<shared_ptr<ActorBase> >* actor_ptrs)
 {
     std::string filename = items->get_text("file3ds");
     if (filename.empty()) {
@@ -159,7 +159,7 @@ void create_mesh(TextureFactory* texture_factory,
         return;
     }
 
-    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_dummy_mapper(
+    shared_ptr<TextureMapper> texture_mapper_ptr = create_dummy_mapper(
                 items, "color", "reflect");
     if (!texture_mapper_ptr) {
         return;
@@ -243,7 +243,7 @@ void create_mesh(TextureFactory* texture_factory,
         StandardBasis local_basis;
         set_basis(&local_basis, vec_o, vec_i, vec_j, vec_k);
 
-        std::shared_ptr<ActorBase> triangle_ptr = std::shared_ptr<ActorBase>(
+        shared_ptr<ActorBase> triangle_ptr = shared_ptr<ActorBase>(
                     new SimpleTriangle(local_basis, A, B, C, texture_mapper_ptr));
 
         actor_ptrs->push_back(triangle_ptr);

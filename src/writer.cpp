@@ -94,14 +94,14 @@ public:
 };
 
 
-std::shared_ptr<SceneWriterBase> create_writer(SceneRendererBase* renderer, WriterType type)
+shared_ptr<SceneWriterBase> create_writer(SceneRendererBase* renderer, WriterType type)
 {
     if (type == WriterType_PNG) {
-        return std::shared_ptr<SceneWriterBase>(new SceneWriterPNG(renderer));
+        return shared_ptr<SceneWriterBase>(new SceneWriterPNG(renderer));
     }
 
     //TODO Configure quality
-    return std::shared_ptr<SceneWriterBase>(new SceneWriterJPEG(renderer, 90));
+    return shared_ptr<SceneWriterBase>(new SceneWriterJPEG(renderer, 90));
 }
 
 

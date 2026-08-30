@@ -11,7 +11,7 @@ class SimpleTriangle : public ActorBase
 {
 public:
     SimpleTriangle(const StandardBasis&, const Vector3d&, const Vector3d&,
-            const Vector3d&, std::shared_ptr<TextureMapper>);
+            const Vector3d&, shared_ptr<TextureMapper>);
 
     double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override
@@ -28,7 +28,7 @@ private:
     Vector3d TC_;
 };
 
-void create_triangle(TextureFactory*, std::shared_ptr<ConfigTable>, std::vector<std::shared_ptr<ActorBase> >*);
+void create_triangle(TextureFactory*, shared_ptr<ConfigTable>, std::vector<shared_ptr<ActorBase> >*);
 
 }
 

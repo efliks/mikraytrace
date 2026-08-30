@@ -7,7 +7,7 @@
 namespace mrtp {
 
 SimpleSphere::SimpleSphere(const StandardBasis& local_basis, double radius, 
-        std::shared_ptr<TextureMapper> texture_mapper_ptr) : 
+        shared_ptr<TextureMapper> texture_mapper_ptr) : 
     ActorBase(local_basis, texture_mapper_ptr), 
     radius_(radius) {
 
@@ -43,8 +43,8 @@ double SimpleSphere::solve_light_ray(const Vector3d& O, const Vector3d& D,
 
 
 void create_sphere(TextureFactory* texture_factory,
-                   std::shared_ptr<ConfigTable> sphere_items,
-                   std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
+                   shared_ptr<ConfigTable> sphere_items,
+                   std::vector<shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d sphere_center_vec = sphere_items->get_vector("center");
     if (!sphere_center_vec.size()) {
@@ -69,13 +69,13 @@ void create_sphere(TextureFactory* texture_factory,
     set_basis(&sphere_basis, sphere_center_vec, sphere_vec_i,
               sphere_vec_j, sphere_axis_vec);
 
-    std::shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
+    shared_ptr<TextureMapper> texture_mapper_ptr = create_texture_mapper(
                 sphere_items, ActorType_Sphere, texture_factory);
     if (!texture_mapper_ptr) {
         return;
     }
 
-    std::shared_ptr<ActorBase> sphere_ptr = std::shared_ptr<ActorBase>(
+    shared_ptr<ActorBase> sphere_ptr = shared_ptr<ActorBase>(
             new SimpleSphere(sphere_basis, sphere_radius, texture_mapper_ptr));
 
     actor_ptrs->push_back(sphere_ptr);

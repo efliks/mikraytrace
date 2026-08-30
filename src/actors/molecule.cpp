@@ -61,8 +61,8 @@ static void create_tables(const std::string& mol2file,
 }
 
 void create_molecule(TextureFactory* texture_factory,
-                     std::shared_ptr<ConfigTable> items,
-                     std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
+                     shared_ptr<ConfigTable> items,
+                     std::vector<shared_ptr<ActorBase> >* actor_ptrs) 
 {
     std::string mol2file_str = items->get_text("mol2file");
     if (mol2file_str.empty()) {
@@ -99,12 +99,12 @@ void create_molecule(TextureFactory* texture_factory,
 
     Matrix3d m_rot = create_rotation_matrix(items);
 
-    std::shared_ptr<TextureMapper> sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
+    shared_ptr<TextureMapper> sphere_mapper_ptr = create_dummy_mapper(items, "atom_color", "atom_reflect");
     if (!sphere_mapper_ptr) {
         return;
     }
 
-    std::shared_ptr<TextureMapper> cylinder_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
+    shared_ptr<TextureMapper> cylinder_mapper_ptr = create_dummy_mapper(items, "bond_color", "bond_reflect");
     if (!cylinder_mapper_ptr) {
         return;
     }
@@ -125,7 +125,7 @@ void create_molecule(TextureFactory* texture_factory,
         StandardBasis sphere_basis;
         sphere_basis.o = *it;
 
-        actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleSphere(
+        actor_ptrs->push_back(shared_ptr<ActorBase>(new SimpleSphere(
                 sphere_basis, sphere_scale, sphere_mapper_ptr)));
     }
 
@@ -151,7 +151,7 @@ void create_molecule(TextureFactory* texture_factory,
         set_basis(&cylinder_basis, cylinder_center_vec, cylinder_i_vec,
                   cylinder_j_vec, cylinder_k_vec);
 
-        actor_ptrs->push_back(std::shared_ptr<ActorBase>(new SimpleCylinder(
+        actor_ptrs->push_back(shared_ptr<ActorBase>(new SimpleCylinder(
                 cylinder_basis, cylinder_scale, cylinder_span, cylinder_mapper_ptr)));
     }
 }

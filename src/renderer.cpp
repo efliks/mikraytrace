@@ -32,7 +32,7 @@ bool SceneRendererBase::solve_shadows(const Vector3d& O,
     ActorIterator actor_iterator = scene_world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        std::shared_ptr<ActorBase> actor = *actor_iterator.current();
+        shared_ptr<ActorBase> actor = *actor_iterator.current();
         if (actor->has_shadow()) {
             double distance = actor->solve_light_ray(O, D, 0, max_dist);
             if (distance > 0) {
@@ -52,7 +52,7 @@ ActorBase* SceneRendererBase::solve_hits(const Vector3d& O,
     ActorIterator actor_iterator = scene_world_->get_actor_iterator();
 
     for (; !actor_iterator.is_done(); actor_iterator.next()) {
-        std::shared_ptr<ActorBase> actor = *actor_iterator.current();
+        shared_ptr<ActorBase> actor = *actor_iterator.current();
         double distance = actor->solve_light_ray(O, D, 0, config_.light_dist);
         if (distance > 0 && distance < *curr_dist) {
             *curr_dist = distance;
@@ -200,15 +200,15 @@ public:
 };
 
 
-std::shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
+shared_ptr<SceneRendererBase> create_renderer(const RendererConfig& config)
 {
 #ifdef _OPENMP
     if (config.num_thread > 1) {
-        return std::shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config));
+        return shared_ptr<SceneRendererBase>(new ParallelSceneRenderer(config));
     }
 #endif  // _OPENMP
 
-    return std::shared_ptr<SceneRendererBase>(new SceneRenderer(config));
+    return shared_ptr<SceneRendererBase>(new SceneRenderer(config));
 }
 
 

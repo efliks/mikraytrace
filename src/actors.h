@@ -1,7 +1,7 @@
 #ifndef ACTORS_H
 #define ACTORS_H
 
-#include <memory>
+#include "shrptr.h"
 #include "vector3.h"
 
 #include "common.h"
@@ -12,7 +12,7 @@ namespace mrtp {
 class ActorBase 
 {
 public:
-    ActorBase(const StandardBasis&, std::shared_ptr<TextureMapper>);
+    ActorBase(const StandardBasis&, shared_ptr<TextureMapper>);
 
     virtual ~ActorBase() {}
 
@@ -25,7 +25,7 @@ public:
 
 protected:
     StandardBasis local_basis_;
-    std::shared_ptr<TextureMapper> texture_mapper_;
+    shared_ptr<TextureMapper> texture_mapper_;
 };
 
 

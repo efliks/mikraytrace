@@ -10,8 +10,8 @@
 namespace mrtp {
 
 void create_cube(TextureFactory* texture_factory,
-                 std::shared_ptr<ConfigTable> cube_items,
-                 std::vector<std::shared_ptr<ActorBase> >* actor_ptrs) 
+                 shared_ptr<ConfigTable> cube_items,
+                 std::vector<shared_ptr<ActorBase> >* actor_ptrs) 
 {
     Vector3d cube_vec_o = cube_items->get_vector("center");
     if (!cube_vec_o.size()) {
@@ -23,7 +23,7 @@ void create_cube(TextureFactory* texture_factory,
 
     double cube_scale = cube_items->get_value("scale", 1) / 2;
 
-    std::shared_ptr<TextureMapper> texture_mapper = create_dummy_mapper(cube_items, "color", "reflect");
+    shared_ptr<TextureMapper> texture_mapper = create_dummy_mapper(cube_items, "color", "reflect");
     if (!texture_mapper) {
         return;
     }
@@ -67,17 +67,17 @@ void create_cube(TextureFactory* texture_factory,
     StandardBasis face_f_basis;
     set_basis(&face_f_basis, face_f_o, -cube_vec_k, cube_vec_i, -cube_vec_j);
 
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_a_basis, texture_mapper, cube_scale, cube_scale)));
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_b_basis, texture_mapper, cube_scale, cube_scale)));
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_c_basis, texture_mapper, cube_scale, cube_scale)));
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_d_basis, texture_mapper, cube_scale, cube_scale)));
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_e_basis, texture_mapper, cube_scale, cube_scale)));
-    actor_ptrs->push_back(std::shared_ptr<ActorBase>(
+    actor_ptrs->push_back(shared_ptr<ActorBase>(
                               new SimplePolygon(face_f_basis, texture_mapper, cube_scale, cube_scale)));
 }
 
