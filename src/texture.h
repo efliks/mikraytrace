@@ -13,7 +13,6 @@ public:
     TexturePixel();
     TexturePixel(const Vector3d&);
     TexturePixel(unsigned char, unsigned char, unsigned char);
-    ~TexturePixel() = default;
 
     Vector3d to_vec() const;
     void from_vec(const Vector3d&);
@@ -34,8 +33,6 @@ struct MyPixel {
 class TextureSharedState {
 public:
     TextureSharedState(const std::string&);
-    TextureSharedState() = delete;
-    ~TextureSharedState() = default;
 
     TexturePixel pick_pixel(double, double, double) const;
     bool is_same_texture(const std::string&) const;
@@ -53,8 +50,6 @@ private:
 class MyTexture {
 public:
     MyTexture(TextureSharedState*, double, double);
-    MyTexture() = delete;
-    ~MyTexture() = default;
 
     MyPixel pick_pixel(double, double) const;
 
@@ -69,7 +64,6 @@ private:
 class TextureFactory {
 public:
     TextureFactory(std::list<TextureSharedState>*);
-    ~TextureFactory() = default;
 
     MyTexture* create_texture(const std::string&, double, double);
 

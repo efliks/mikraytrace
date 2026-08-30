@@ -16,8 +16,6 @@ public:
         reflection_coef_(reflection_coef) {
     }
 
-    ~DummyTextureMapper() = default; // override
-
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
                        const StandardBasis& local_basis) const { // override
@@ -36,8 +34,6 @@ public:
     PlaneTextureMapper(MyTexture* texture) :
         texture_(texture) {
     }
-
-    ~PlaneTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
@@ -59,8 +55,6 @@ public:
     SphereTextureMapper(MyTexture* texture) :
         texture_(texture) {
     }
-
-    ~SphereTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,
@@ -90,8 +84,6 @@ public:
         texture_(texture),
         radius_(radius) {
     }
-
-    ~CylinderTextureMapper() = default; // override
 
     MyPixel pick_pixel(const Vector3d& hit,
                        const Vector3d& normal_at_hit,

@@ -69,8 +69,6 @@ public:
     {
     }
 
-    ~TextTable() = default; // override
-
     double get_value(const std::string& key, double val_default) // override
     {
         std::map<std::string, std::string>::iterator it = fields_.find(key);
@@ -132,8 +130,6 @@ public:
     {
     }
 
-    ~TextTableIterator() = default; // override
-
     void first() // override
     {
         iter_ = tables_.begin();
@@ -167,8 +163,6 @@ public:
         : rows_(rows)
     {
     }
-
-    ~TextReader() = default; // override
 
     std::shared_ptr<ConfigTableIterator> get_tables(const std::string& row_type) // override
     {

@@ -10,13 +10,10 @@ namespace mrtp {
 class SimpleCylinder : public ActorBase 
 {
 public:
-    SimpleCylinder(const StandardBasis&, 
+    SimpleCylinder(const StandardBasis&,
             double, double, std::shared_ptr<TextureMapper>);
 
-    SimpleCylinder() = delete;
-    ~SimpleCylinder() = default; // override
-
-    double solve_light_ray(const Vector3d&, const Vector3d&, 
+    double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override
 
     Vector3d calculate_normal_at_hit(const Vector3d&) const; // override

@@ -11,8 +11,7 @@ namespace mrtp {
 class ConfigTable
 {
 public:
-    ConfigTable() = default;
-    virtual ~ConfigTable() = default;
+    virtual ~ConfigTable() {}
 
     virtual double get_value(const std::string&, double) = 0;
 
@@ -26,8 +25,7 @@ public:
 class ConfigTableIterator
 {
 public:
-    ConfigTableIterator() = default;
-    virtual ~ConfigTableIterator() = default;
+    virtual ~ConfigTableIterator() {}
 
     virtual void first() = 0;
     virtual void next() = 0;
@@ -39,8 +37,7 @@ public:
 class ConfigReader
 {
 public:
-    ConfigReader() = default;
-    virtual ~ConfigReader() = default;
+    virtual ~ConfigReader() {}
 
     virtual std::shared_ptr<ConfigTableIterator> get_tables(const std::string&) = 0;
 };

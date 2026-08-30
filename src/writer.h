@@ -20,8 +20,7 @@ class SceneWriterBase
 {
 public:
     SceneWriterBase(SceneRendererBase*);
-    SceneWriterBase() = delete;
-    virtual ~SceneWriterBase() = default;
+    virtual ~SceneWriterBase() {}
 
     virtual void write_to_file(const std::string&) = 0;
 

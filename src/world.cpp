@@ -80,9 +80,6 @@ public:
 
     }
 
-    WorldBuilder() = delete;
-    ~WorldBuilder() = default;
-
     std::shared_ptr<SceneWorld> build() const
     {
         std::shared_ptr<ConfigReader> world_config = open_config(world_filename_);

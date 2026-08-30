@@ -10,8 +10,6 @@ class Camera {
 public:
     Camera(const Vector3d& eye, const Vector3d& lookat, double roll);
 
-    ~Camera() = default;
-
     void calculate_window(unsigned int width, unsigned int height, double perspective);
 
     Vector3d calculate_origin(unsigned int windowx, unsigned int windowy) const;

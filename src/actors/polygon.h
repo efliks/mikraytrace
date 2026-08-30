@@ -11,9 +11,6 @@ class SimplePolygon : public ActorBase
 public:
     SimplePolygon(const StandardBasis&, std::shared_ptr<TextureMapper>,
                   double, double);
-    SimplePolygon() = delete;
-
-    ~SimplePolygon() = default; // override
 
     double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override

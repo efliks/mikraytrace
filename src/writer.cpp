@@ -34,8 +34,6 @@ public:
     {
     }
 
-    ~SceneWriterJPEG() = default; // override
-
     void write_to_file(const std::string& filename) // override
     {
         std::vector<unsigned char> buffer;
@@ -69,8 +67,6 @@ public:
         : SceneWriterBase(renderer)
     {
     }
-
-    ~SceneWriterPNG() = default; // override
 
     void write_to_file(const std::string& filename) // override
     {

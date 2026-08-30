@@ -13,8 +13,7 @@ namespace mrtp {
 
 class TextureMapper {
 public:
-    TextureMapper() = default;
-    virtual ~TextureMapper() = default;
+    virtual ~TextureMapper() {}
 
     virtual MyPixel pick_pixel(const Vector3d&,
                                const Vector3d&,

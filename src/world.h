@@ -15,8 +15,6 @@ namespace mrtp {
 class ActorIterator {
 public:
     ActorIterator(std::vector<std::shared_ptr<ActorBase> >*);
-    ActorIterator() = delete;
-    ~ActorIterator() = default;
 
     void first();
     void next();
@@ -31,9 +29,6 @@ private:
 
 class SceneWorld {
 public:
-    SceneWorld() = default;
-    ~SceneWorld() = default;
-
     void add_light(std::shared_ptr<Light>);
     void add_camera(std::shared_ptr<Camera>);
     void add_actor(std::shared_ptr<ActorBase>);

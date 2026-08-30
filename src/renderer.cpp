@@ -146,8 +146,6 @@ public:
         std::cout << "INFO: Using parallel renderer with " << config.num_thread << " threads" << std::endl;
     }
 
-    ~ParallelSceneRenderer() = default; // override
-
     float do_render(SceneWorld* scene_world) // override
     {
         scene_world_ = scene_world;
@@ -187,8 +185,6 @@ public:
     {
         std::cout << "INFO: Using standard renderer with 1 thread" << std::endl;
     }
-
-    ~SceneRenderer() = default; // override
 
     float do_render(SceneWorld* scene_world) // override
     {

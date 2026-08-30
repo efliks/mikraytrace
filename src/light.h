@@ -9,7 +9,6 @@ namespace mrtp {
 class Light {
 public:
     Light(const Vector3d& center);
-    ~Light() = default;
 
     Vector3d calculate_ray(const Vector3d& hit) const;
 

@@ -10,13 +10,10 @@ namespace mrtp {
 class SimpleTriangle : public ActorBase 
 {
 public:
-    SimpleTriangle(const StandardBasis&, const Vector3d&, const Vector3d&, 
+    SimpleTriangle(const StandardBasis&, const Vector3d&, const Vector3d&,
             const Vector3d&, std::shared_ptr<TextureMapper>);
-    SimpleTriangle() = delete;
 
-    ~SimpleTriangle() = default; // override
-
-    double solve_light_ray(const Vector3d&, const Vector3d&, 
+    double solve_light_ray(const Vector3d&, const Vector3d&,
             double, double) const; // override
 
     Vector3d calculate_normal_at_hit(const Vector3d&) const; // override

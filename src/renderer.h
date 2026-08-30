@@ -41,8 +41,7 @@ class SceneRendererBase {
 
 public:
     SceneRendererBase(const RendererConfig&);
-    SceneRendererBase() = delete;
-    virtual ~SceneRendererBase() = default;
+    virtual ~SceneRendererBase() {}
 
     virtual float do_render(SceneWorld*) = 0;
 

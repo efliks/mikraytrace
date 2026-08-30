@@ -13,9 +13,8 @@ class ActorBase
 {
 public:
     ActorBase(const StandardBasis&, std::shared_ptr<TextureMapper>);
-    ActorBase() = delete;
 
-    virtual ~ActorBase() = default;
+    virtual ~ActorBase() {}
 
     virtual double solve_light_ray(const Vector3d&, const Vector3d&, 
                                     double, double) const = 0;
