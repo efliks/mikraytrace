@@ -12,28 +12,28 @@ namespace mrtp {
 
 struct RendererConfig
 {
-    double fov = 93;
-    double ray_bias = 0.001;
-    double light_dist = 60;
-    double shadow_coeff = 0.25;
+    double fov;
+    double ray_bias;
+    double light_dist;
+    double shadow_coeff;
 
-    unsigned int width = 640;
-    unsigned int height = 480;
+    unsigned int width;
+    unsigned int height;
 
-    unsigned int max_recurse = 3;
-    unsigned int num_thread = 1;
+    unsigned int max_recurse;
+    unsigned int num_thread;
 
-    const double fov_min = 70;
-    const double fov_max = 150;
+    const double fov_min;
+    const double fov_max;
 
-    const unsigned int width_min = 320;
-    const unsigned int width_max = 3200;
+    const unsigned int width_min;
+    const unsigned int width_max;
 
-    const unsigned int height_min = 240;
-    const unsigned int height_max = 2400;
+    const unsigned int height_min;
+    const unsigned int height_max;
 
-    const unsigned int num_min_thread = 1;
-    const unsigned int num_max_thread = 32;
+    const unsigned int num_min_thread;
+    const unsigned int num_max_thread;
 };
 
 

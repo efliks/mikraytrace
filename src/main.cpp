@@ -80,7 +80,24 @@ int main(int argc, char* argv[])
     std::string output_file;
     std::string output_format = "png";
 
-    mrtp::RendererConfig config;
+    mrtp::RendererConfig config = {
+        93,     // fov
+        0.001,  // ray_bias
+        60,     // light_dist
+        0.25,   // shadow_coeff
+        640,    // width
+        480,    // height
+        3,      // max_recurse
+        1,      // num_thread
+        70,     // fov_min
+        150,    // fov_max
+        320,    // width_min
+        3200,   // width_max
+        240,    // height_min
+        2400,   // height_max
+        1,      // num_min_thread
+        32      // num_max_thread
+    };
 
     // Rudimentary scan of argv
     for (int i = 1; i < argc; i++) {
