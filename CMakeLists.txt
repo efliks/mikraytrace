@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.13)
 
 project(mrtp)
 
+set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -O2")
 add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
 
