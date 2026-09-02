@@ -165,7 +165,7 @@ void create_mesh(TextureFactory* texture_factory,
         return;
     }
 
-    size_t idx = filename.rfind(".");
+    std::size_t idx = filename.rfind(".");
     std::string ext = filename.substr(idx + 1, filename.length() - idx - 1);
     std::vector<Vector3d> vertex_list;
 
@@ -181,7 +181,7 @@ void create_mesh(TextureFactory* texture_factory,
     }
 #endif  // USE_LIB3DS
     else {
-        std::cerr << "ERROR: Unknown file extension " << ext << std::endl;
+        std::cerr << "ERROR: Unknown file extension " << ext.c_str() << std::endl;
         return;
     }
 
@@ -226,7 +226,7 @@ void create_mesh(TextureFactory* texture_factory,
     }
 
     // Create triangles
-    for (size_t i = 0; i < vertex_list.size() / 3; i++) {
+    for (std::size_t i = 0; i < vertex_list.size() / 3; i++) {
         Vector3d A(vertex_list[i * 3]);
         Vector3d B(vertex_list[i * 3 + 1]);
         Vector3d C(vertex_list[i * 3 + 2]);

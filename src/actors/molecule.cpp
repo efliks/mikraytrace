@@ -72,7 +72,7 @@ void create_molecule(TextureFactory* texture_factory,
 
     std::fstream check(mol2file_str.c_str());
     if (!check.good()) {
-        std::cerr << "ERROR: Cannot open mol2 file " << mol2file_str << std::endl;
+        std::cerr << "ERROR: Cannot open mol2 file " << mol2file_str.c_str() << std::endl;
         return;
     }
 

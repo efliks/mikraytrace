@@ -171,7 +171,7 @@ public:
         }
 
         if (!it || it->is_done()) {
-            std::cerr << "ERROR: No " << table_name << " found" << std::endl;
+            std::cerr << "ERROR: No " << table_name.c_str() << " found" << std::endl;
             return shared_ptr<ConfigTable>();
         }
 
@@ -179,7 +179,7 @@ public:
 
         it->next();
         if (!it->is_done()) {
-            std::cerr << "ERROR: Multiple " << table_name << "s found" << std::endl;
+            std::cerr << "ERROR: Multiple " << table_name.c_str() << "s found" << std::endl;
             return shared_ptr<ConfigTable>();
         }
 

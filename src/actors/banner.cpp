@@ -23,7 +23,7 @@ static void create_char3d(char c,
         c += ('A' - 'a');
     }
 
-    size_t idx = static_cast<size_t>((c - 32) & 63);
+    std::size_t idx = static_cast<std::size_t>((c - 32) & 63);
     const unsigned char* cptr = &kCharacterData[idx << 3];
 
     for (int i = 0; i < 8; i++, cptr++) {

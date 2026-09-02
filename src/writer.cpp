@@ -49,7 +49,7 @@ public:
             }
         }
 
-        fileout.open(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+        fileout.open(filename.c_str(), std::ios::out | std::ios::binary);
         TooJpeg::writeJpeg(write_byte, &buffer[0], scene_renderer_->config_.width, scene_renderer_->config_.height, true, quality_);
 
         fileout.close();
@@ -83,7 +83,7 @@ public:
         unsigned int error = lodepng::encode(buffer, static_cast<unsigned char *>(static_cast<void *>(&scene_renderer_->framebuffer_[0])), scene_renderer_->config_.width, scene_renderer_->config_.height, state);
 
         if (!error) {
-            std::cout << "INFO: Writing scene image " << filename << " ..." << std::endl;
+            std::cout << "INFO: Writing scene image " << filename.c_str() << " ..." << std::endl;
             error = lodepng::save_file(buffer, filename);
         }
 

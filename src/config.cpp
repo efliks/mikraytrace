@@ -29,12 +29,12 @@ namespace {
 
 std::string trim(const std::string& text)
 {
-    size_t begin = text.find_first_not_of(" \t\r\n");
+    std::size_t begin = text.find_first_not_of(" \t\r\n");
     if (begin == std::string::npos) {
         return std::string();
     }
 
-    size_t end = text.find_last_not_of(" \t\r\n");
+    std::size_t end = text.find_last_not_of(" \t\r\n");
     return text.substr(begin, end - begin + 1);
 }
 
@@ -45,7 +45,7 @@ std::map<std::string, std::string> parse_fields(const std::string& body)
     std::stringstream stream(body);
     std::string field;
     while (std::getline(stream, field, ';')) {
-        size_t eq_pos = field.find('=');
+        std::size_t eq_pos = field.find('=');
         if (eq_pos == std::string::npos) {
             continue;
         }
@@ -203,11 +203,11 @@ shared_ptr<ConfigReader> open_config(const std::string& filename)
             continue;
         }
 
-        size_t open_paren = trimmed.find('(');
-        size_t close_paren = trimmed.rfind(')');
+        std::size_t open_paren = trimmed.find('(');
+        std::size_t close_paren = trimmed.rfind(')');
         if (open_paren == std::string::npos || close_paren == std::string::npos ||
                 close_paren < open_paren) {
-            std::cerr << "ERROR: Malformed line in world file: " << line << std::endl;
+            std::cerr << "ERROR: Malformed line in world file: " << line.c_str() << std::endl;
             return shared_ptr<ConfigReader>();
         }
 

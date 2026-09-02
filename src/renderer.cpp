@@ -11,7 +11,7 @@
 #include "camera.h"
 #include "light.h"
 
-static double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1.0) * 4; }
 
 
 namespace mrtp {
@@ -156,7 +156,7 @@ public:
             omp_set_num_threads(static_cast<int>(config_.num_thread));
         }
 
-        clock_t time_start = clock();
+        std::clock_t time_start = std::clock();
 
 #pragma omp parallel for
         for (unsigned int i = 0; i < config_.num_thread; i++) {
@@ -169,7 +169,7 @@ public:
             render_block(config_.num_thread, rows_fill);
         }
 
-        clock_t time_elapsed = std::clock() - time_start;
+        std::clock_t time_elapsed = std::clock() - time_start;
         float time_used = static_cast<float>(time_elapsed) / CLOCKS_PER_SEC / config_.num_thread;
 
         return time_used;
@@ -192,7 +192,7 @@ public:
         Camera* my_camera = scene_world_->get_camera_ptr();
         my_camera->calculate_window(config_.width, config_.height, perspective_);
 
-        clock_t time_start = clock();
+        std::clock_t time_start = std::clock();
         render_block(0, config_.height);
 
         return static_cast<float>(std::clock() - time_start) / CLOCKS_PER_SEC;

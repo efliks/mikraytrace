@@ -35,7 +35,7 @@ void print_usage(const char* program_name)
 bool next_value(int argc, char* argv[], int& i, const std::string& flag, std::string* value)
 {
     if (++i >= argc) {
-        std::cerr << "ERROR: Missing value for option " << flag << std::endl;
+        std::cerr << "ERROR: Missing value for option " << flag.c_str() << std::endl;
         return false;
     }
     *value = argv[i];
@@ -48,7 +48,7 @@ bool parse_double_option(const std::string& text, const std::string& flag,
     char* end = 0;
     double value = std::strtod(text.c_str(), &end);
     if (*end != '\0' || value < min_value || value > max_value) {
-        std::cerr << "ERROR: Value for option " << flag << " must be a number in range ["
+        std::cerr << "ERROR: Value for option " << flag.c_str() << " must be a number in range ["
                   << min_value << ", " << max_value << "]" << std::endl;
         return false;
     }
@@ -63,7 +63,7 @@ bool parse_uint_option(const std::string& text, const std::string& flag,
     long value = std::strtol(text.c_str(), &end, 10);
     if (*end != '\0' || value < 0 ||
         static_cast<unsigned int>(value) < min_value || static_cast<unsigned int>(value) > max_value) {
-        std::cerr << "ERROR: Value for option " << flag << " must be an integer in range ["
+        std::cerr << "ERROR: Value for option " << flag.c_str() << " must be an integer in range ["
                   << min_value << ", " << max_value << "]" << std::endl;
         return false;
     }
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
             }
             if (value != "png" && value != "jpg") {
-                std::cerr << "ERROR: Value for option " << arg << " must be one of: png, jpg" << std::endl;
+                std::cerr << "ERROR: Value for option " << arg.c_str() << " must be one of: png, jpg" << std::endl;
                 return EXIT_FAILURE;
             }
             output_format = value;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
             }
         }
         else if (!arg.empty() && arg[0] == '-') {
-            std::cerr << "ERROR: Unknown option: " << arg << std::endl;
+            std::cerr << "ERROR: Unknown option: " << arg.c_str() << std::endl;
             return EXIT_FAILURE;
         }
         else {
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
     }
 
     if (!output_file.empty()) {
-        size_t pos = output_file.rfind(".");
+        std::size_t pos = output_file.rfind(".");
         if (pos != std::string::npos) {
             std::string extension = output_file.substr(pos + 1, output_file.size());
             if (extension != output_format) {
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
     for (std::vector<std::string>::iterator it = input_files.begin();
          it != input_files.end(); ++it) {
         std::string& input_file = *it;
-        std::cout << "INFO: Processing " << input_file << " ..." << std::endl;
+        std::cout << "INFO: Processing " << input_file.c_str() << " ..." << std::endl;
 
         mrtp::TextureFactory texture_factory(&texture_cache);
         mrtp::shared_ptr<mrtp::SceneWorld> world_ptr = mrtp::build_world(input_file, &texture_factory);
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 
         if (auto_name) {
             std::string foo(input_file);
-            size_t pos = input_file.rfind(".toml");  //FIXME
+            std::size_t pos = input_file.rfind(".toml");  //FIXME
             if (pos == std::string::npos) {
                 pos = input_file.rfind(".txt");
             }

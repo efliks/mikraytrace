@@ -4,7 +4,7 @@
 
 #include "mappers.h"
 
-static double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1.0) * 4; }
 
 
 namespace mrtp {
@@ -92,7 +92,7 @@ public:
 
         double alpha = t.dot(local_basis.vk);
         double dot = normal_at_hit.dot(local_basis.vi);
-        double frac_x = acos(dot) / pi();
+        double frac_x = std::acos(dot) / pi();
         double frac_y = alpha / (2 * pi() * radius_);
 
         return texture_->pick_pixel(frac_x, frac_y);
@@ -120,7 +120,7 @@ shared_ptr<TextureMapper> create_texture_mapper(shared_ptr<ConfigTable> actor_it
 
         std::fstream check(actor_texture.c_str());
         if (!check.good()) {
-            std::cerr << "ERROR: Cannot open texture file " << actor_texture << std::endl;
+            std::cerr << "ERROR: Cannot open texture file " << actor_texture.c_str() << std::endl;
             return shared_ptr<TextureMapper>();
         }
 

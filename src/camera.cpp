@@ -1,7 +1,7 @@
 #include <cmath>
 #include "camera.h"
 
-static double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1.0) * 4; }
 
 
 namespace mrtp {

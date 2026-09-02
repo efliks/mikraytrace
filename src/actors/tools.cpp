@@ -4,7 +4,7 @@
 #include "actors/tools.h"
 #include "common.h"
 
-static double pi() { return std::atan(1) * 4; }
+static double pi() { return std::atan(1.0) * 4; }
 
 
 namespace mrtp
@@ -24,7 +24,7 @@ double solve_quadratic(double a, double b, double c)
         return -b / (2 * a);
     }
 
-    double sqdelta = sqrt(delta);
+    double sqdelta = std::sqrt(delta);
     double t = 0.5 / a;
     double ta = (-b - sqdelta) * t;
     double tb = (-b + sqdelta) * t;
