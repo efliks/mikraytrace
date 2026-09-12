@@ -1,5 +1,4 @@
 #include <fstream>
-#include <sstream>
 #include <iostream>
 #include <map>
 #include <cstdlib>
@@ -38,24 +37,68 @@ std::string trim(const std::string& text)
     return text.substr(begin, end - begin + 1);
 }
 
+bool read_line(std::istream& stream, std::string& line)
+{
+    char buffer[256];
+
+    stream.getline(buffer, sizeof(buffer));
+    line = buffer;
+
+    return !stream.fail();
+}
+
+std::vector<std::string> split(const std::string& line, const std::string& delims)
+{
+    std::vector<std::string> tokens;
+    std::string::size_type pos = 0;
+
+    while (pos < line.size()) {
+        pos = line.find_first_not_of(delims, pos);
+        if (pos == std::string::npos) {
+            break;
+        }
+
+        std::string::size_type end = line.find_first_of(delims, pos);
+        if (end == std::string::npos) {
+            end = line.size();
+        }
+
+        tokens.push_back(line.substr(pos, end - pos));
+        pos = end;
+    }
+
+    return tokens;
+}
+
 std::map<std::string, std::string> parse_fields(const std::string& body)
 {
     std::map<std::string, std::string> fields;
 
-    std::stringstream stream(body);
-    std::string field;
-    while (std::getline(stream, field, ';')) {
-        std::size_t eq_pos = field.find('=');
+    std::vector<std::string> parts = split(body, ";");
+    for (std::vector<std::string>::const_iterator it = parts.begin(); it != parts.end(); ++it) {
+        std::size_t eq_pos = it->find('=');
         if (eq_pos == std::string::npos) {
             continue;
         }
 
-        std::string key = trim(field.substr(0, eq_pos));
-        std::string value = trim(field.substr(eq_pos + 1));
+        std::string key = trim(it->substr(0, eq_pos));
+        std::string value = trim(it->substr(eq_pos + 1));
         fields[key] = value;
     }
 
     return fields;
+}
+
+Vector3d parse_vector(const std::string& value)
+{
+    double components[3] = {0, 0, 0};
+
+    std::vector<std::string> parts = split(value, ",");
+    for (std::size_t i = 0; i < 3 && i < parts.size(); ++i) {
+        components[i] = std::atof(trim(parts[i]).c_str());
+    }
+
+    return Vector3d(components);
 }
 
 } // unnamed namespace
@@ -105,19 +148,6 @@ public:
     }
 
 private:
-    static Vector3d parse_vector(const std::string& value)
-    {
-        double components[3] = {0, 0, 0};
-
-        std::stringstream stream(value);
-        std::string token;
-        for (int i = 0; i < 3 && std::getline(stream, token, ','); ++i) {
-            components[i] = std::atof(trim(token).c_str());
-        }
-
-        return Vector3d(components);
-    }
-
     std::map<std::string, std::string> fields_;
 };
 
@@ -197,7 +227,7 @@ shared_ptr<ConfigReader> open_config(const std::string& filename)
     std::vector<std::pair<std::string, shared_ptr<ConfigTable> > > rows;
 
     std::string line;
-    while (std::getline(in, line)) {
+    while (read_line(in, line)) {
         std::string trimmed = trim(line);
         if (trimmed.empty()) {
             continue;

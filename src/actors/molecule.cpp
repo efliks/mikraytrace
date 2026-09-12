@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 #include "actors/molecule.h"
@@ -11,22 +10,37 @@
 
 namespace mrtp {
 
-static std::vector<std::string> tokenize_line(const std::string& line)
+static std::vector<std::string> tokenize_line(const std::string& line, const std::string& delims = " \t\r\n")
 {
     std::vector<std::string> tokens;
-    std::istringstream str(line);
-    std::string token("");
+    std::string::size_type pos = 0;
 
-    while (str >> token) {
-        tokens.push_back(token);
+    while (pos < line.size()) {
+        pos = line.find_first_not_of(delims, pos);
+        if (pos == std::string::npos) {
+            break;
+        }
+
+        std::string::size_type end = line.find_first_of(delims, pos);
+        if (end == std::string::npos) {
+            end = line.size();
+        }
+
+        tokens.push_back(line.substr(pos, end - pos));
+        pos = end;
     }
 
     return tokens;
 }
 
-static bool read_line(std::ifstream& f, std::string& buffer, const std::string& pattern)
+static bool read_line(std::ifstream& stream, std::string& line, const std::string& pattern)
 {
-    return std::getline(f, buffer) && buffer.find(pattern) == std::string::npos;
+    char buffer[256];
+
+    stream.getline(buffer, sizeof(buffer));
+    line = buffer;
+
+    return stream && line.find(pattern) == std::string::npos;
 }
 
 static void create_tables(const std::string& mol2file,
