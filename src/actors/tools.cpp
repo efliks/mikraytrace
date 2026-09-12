@@ -4,7 +4,9 @@
 #include "actors/tools.h"
 #include "common.h"
 
-static double pi() { return std::atan(1.0) * 4; }
+namespace {
+double pi() { return std::atan(1.0) * 4; }
+}
 
 
 namespace mrtp

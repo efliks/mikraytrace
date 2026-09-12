@@ -19,9 +19,11 @@ SceneWriterBase::SceneWriterBase(SceneRendererBase* renderer)
 //FIXME
 static std::ofstream fileout;
 
-static void write_byte(unsigned char b)
+namespace {
+void write_byte(unsigned char b)
 {
     fileout << b;
+}
 }
 
 

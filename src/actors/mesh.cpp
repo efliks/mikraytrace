@@ -43,7 +43,9 @@ public:
 };
 
 
-static void load_node_r(Lib3dsFile* libfile,
+namespace {
+
+void load_node_r(Lib3dsFile* libfile,
                         Lib3dsNode* node,
                         std::vector<Vector3d>* vertex_list)
 {
@@ -79,7 +81,7 @@ static void load_node_r(Lib3dsFile* libfile,
 }
 
 
-static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
+int load_3ds_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
 {
     File3dsWrapper filewrap(filename);
     if (filewrap.is_failed()) {
@@ -94,6 +96,8 @@ static int load_3ds_file(const std::string& filename, std::vector<Vector3d>* ver
 
     return 1;  // Success
 }
+
+} // unnamed namespace
 #endif  // USE_LIB3DS
 
 struct TriangleFace
@@ -101,7 +105,9 @@ struct TriangleFace
     unsigned short a, b, c;
 };
 
-static void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
+namespace {
+
+void load_custom_file(const std::string& filename, std::vector<Vector3d>* vertex_list)
 {
     std::ifstream f(filename.c_str(), std::ios::binary);
 
@@ -141,6 +147,8 @@ static void load_custom_file(const std::string& filename, std::vector<Vector3d>*
         }
     }
 }
+
+} // unnamed namespace
 
 
 void create_mesh(TextureFactory* texture_factory,

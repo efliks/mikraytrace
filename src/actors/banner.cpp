@@ -13,11 +13,13 @@ namespace mrtp {
 
 extern const unsigned char kCharacterData[];
 
-static void create_char3d(char c,
-                          double char_scale,
-                          const StandardBasis& char_basis,
-                          shared_ptr<TextureMapper> texture_mapper,
-                          std::vector<shared_ptr<ActorBase> >* actor_ptrs)
+namespace {
+
+void create_char3d(char c,
+                   double char_scale,
+                   const StandardBasis& char_basis,
+                   shared_ptr<TextureMapper> texture_mapper,
+                   std::vector<shared_ptr<ActorBase> >* actor_ptrs)
 {
     if (c > 'a' && c < 'z') {
         c += ('A' - 'a');
@@ -45,6 +47,8 @@ static void create_char3d(char c,
         }
     }
 }
+
+} // unnamed namespace
 
 
 void create_banner(TextureFactory* texture_factory,

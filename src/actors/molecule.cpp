@@ -10,7 +10,9 @@
 
 namespace mrtp {
 
-static std::vector<std::string> tokenize_line(const std::string& line, const std::string& delims = " \t\r\n")
+namespace {
+
+std::vector<std::string> tokenize_line(const std::string& line, const std::string& delims = " \t\r\n")
 {
     std::vector<std::string> tokens;
     std::string::size_type pos = 0;
@@ -33,7 +35,7 @@ static std::vector<std::string> tokenize_line(const std::string& line, const std
     return tokens;
 }
 
-static bool read_line(std::ifstream& stream, std::string& line, const std::string& pattern)
+bool read_line(std::ifstream& stream, std::string& line, const std::string& pattern)
 {
     char buffer[256];
 
@@ -43,7 +45,7 @@ static bool read_line(std::ifstream& stream, std::string& line, const std::strin
     return stream && line.find(pattern) == std::string::npos;
 }
 
-static void create_tables(const std::string& mol2file,
+void create_tables(const std::string& mol2file,
     std::vector<unsigned int>* atomic_nums,
     std::vector<Vector3d>* positions,
     std::vector<std::pair<unsigned int, unsigned int> >* bonds)
@@ -73,6 +75,8 @@ static void create_tables(const std::string& mol2file,
         }
     }
 }
+
+} // unnamed namespace
 
 void create_molecule(TextureFactory* texture_factory,
                      shared_ptr<ConfigTable> items,
