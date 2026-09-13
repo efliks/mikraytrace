@@ -1,6 +1,0 @@
-[submodule "thirdparty/toojpeg"]
-	path = thirdparty/toojpeg
-	url = https://github.com/efliks/toojpeg98
-[submodule "thirdparty/lodepng"]
-	path = thirdparty/lodepng
-	url = https://github.com/lvandeve/lodepng.git
