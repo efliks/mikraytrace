@@ -17,7 +17,7 @@ mikraytrace > apt-get install build-essential cmake
 Some external libraries are used for image processing (toojpeg98 and lodepng); these 
 are vendored directly.
 
-Secondly, you may need example textures. I created a [texture pack](https://drive.google.com/file/d/1e9myBNpWHDAlyTtKmfqpKNdgcAeiuVQ_/view?usp=share_link) based on free textures from OpenGameArt.org.
+Secondly, you may need example textures. I created a [texture pack](https://drive.google.com/file/d/1j9sTHGRlamizDvwZmB7ZeNoZRA_oAIDM/view?usp=drive_link) based on free textures from OpenGameArt.org.
 Create a textures directory and unpack the textures there.
 
 Finally, review CMakeLists.txt. If everything looks okay, create a build directory
