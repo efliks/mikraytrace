@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cstdlib>
 #include <list>
 #include <vector>
@@ -28,6 +29,15 @@ void print_usage(const char* program_name)
               << "  -W, --width ARG    Image width\n"
               << "  -H, --height ARG   Image height\n"
               << "  -t, --threads ARG  Rendering threads, 0 for auto\n";
+}
+
+std::string to_lower(const std::string& text)
+{
+    std::string result(text);
+    for (std::string::iterator it = result.begin(); it != result.end(); ++it) {
+        *it = static_cast<char>(std::tolower(static_cast<unsigned char>(*it)));
+    }
+    return result;
 }
 
 // Parses the value following an option flag; returns false (and logs) if
@@ -173,7 +183,7 @@ int main(int argc, char* argv[])
     if (!output_file.empty()) {
         std::size_t pos = output_file.rfind(".");
         if (pos != std::string::npos) {
-            std::string extension = output_file.substr(pos + 1, output_file.size());
+            std::string extension = to_lower(output_file.substr(pos + 1, output_file.size()));
             if (extension != output_format) {
                 std::cerr << "ERROR: Output format and output file extension should match" << std::endl;
                 return EXIT_FAILURE;
@@ -204,12 +214,12 @@ int main(int argc, char* argv[])
 
         if (auto_name) {
             std::string foo(input_file);
-            std::size_t pos = input_file.rfind(".toml");  //FIXME
-            if (pos == std::string::npos) {
-                pos = input_file.rfind(".txt");
-            }
+            std::size_t pos = input_file.rfind(".");
             if (pos != std::string::npos) {
-                foo = input_file.substr(0, pos);
+                std::string extension = to_lower(input_file.substr(pos + 1));
+                if (extension == "txt") {
+                    foo = input_file.substr(0, pos);
+                }
             }
             output_file = foo + "." + output_format;
         }
