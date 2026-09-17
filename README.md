@@ -20,17 +20,14 @@ are vendored directly.
 Secondly, you may need example textures. I created a [texture pack](https://drive.google.com/file/d/1j9sTHGRlamizDvwZmB7ZeNoZRA_oAIDM/view?usp=drive_link) based on free textures from OpenGameArt.org.
 Create a textures directory and unpack the textures there.
 
-Finally, review CMakeLists.txt. If everything looks okay, create a build directory
-and run CMake followed by make:
+Finally, review CMakeLists.txt. If everything looks okay, build the project using
+one of the provided build scripts.
+
+The Watcom script looks for the compiler at `/home/mikolaj/open-watcom-v2` by
+default; set the `WATCOM` environment variable to override this.
+
+In order to test the program, render the example scene, e.g.:
 
 ```
-mikraytrace/build > cmake ..
-mikraytrace/build > make
-```
-
-This should generate an executable file mrtp\_cli. In order to test the program, 
-render the example scene:
-
-```
-mikraytrace > ./build/mrtp_cli bluemol.toml
+mikraytrace > ./build-gcc/mrtp_cli bluemol.toml
 ```

@@ -1,5 +1,6 @@
 src/*~
 src/*.swp
-build/*
+build-gcc/*
+build-watcom/*
 textures/*.png
 CMakeLists.txt.user

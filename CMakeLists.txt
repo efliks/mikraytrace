@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(mrtp)
+project(mrtp CXX)
 
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -O2")
-add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "OpenWatcom")
+    set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -O2")
+    add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+endif()
 
 add_library(lodepng STATIC thirdparty/lodepng/lodepng.cpp)
 target_include_directories(lodepng PUBLIC thirdparty/lodepng)
@@ -34,4 +36,5 @@ if(USE_LIB3DS)
     target_link_libraries(mrtp_cli PUBLIC 3ds)
 endif()
 
+# Watcom's CRT already includes libm
 target_link_libraries(mrtp_cli PUBLIC m lodepng toojpeg)
