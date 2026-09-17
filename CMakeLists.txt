@@ -9,6 +9,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "OpenWatcom")
     set(GCC_COVERAGE_COMPILE_FLAGS "-W -Wall -pedantic -O2")
     add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+else()
+    # -ot: optimize for time, Watcom's equivalent of GCC's -O2
+    add_definitions(-ot)
 endif()
 
 add_library(lodepng STATIC thirdparty/lodepng/lodepng.cpp)
