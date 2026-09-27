@@ -1,6 +1,6 @@
 # mikraytrace
 
-A hobby portable raytracer in C++. 
+A hobby raytracer in C++. 
 
 <div align="center">
     <img src="./sample.png" width="300" />
@@ -42,3 +42,25 @@ Render a scene by passing one or more scene files to `mrtp_cli`:
 ```
 mikraytrace > ./build-gcc/mrtp_cli bluemol.txt
 ```
+
+## Makefiles
+
+Plain makefiles are provided. They build `mrtp_cli` in the source tree:
+
+| Makefile       | Host   | Target | Compiler        | Build system | Output         | OpenMP | Command                     |
+|----------------|--------|--------|-----------------|--------------|----------------|--------|-----------------------------|
+| `makefile`     | Linux  | Linux  | GCC             | GNU make     | `mrtp_cli`     | Yes    | `make`                      |
+| `makefile.wcl` | Linux  | Linux  | Open Watcom v2  | GNU make     | `mrtp_cli`     | No     | `make -f makefile.wcl`      |
+| `makefile.dj`  | Linux  | MS-DOS | DJGPP           | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.dj`       |
+| `makefile.wc`  | Linux  | MS-DOS | Open Watcom v2  | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.wc`       |
+| `makefile.ddj` | MS-DOS | MS-DOS | DJGPP           | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.ddj`      |
+| `makefile.dwc` | MS-DOS | MS-DOS | Open Watcom v2  | wmake        | `mrtp_cli.exe` | No     | `wmake -f makefile.dwc`     |
+
+Some makefiles have hardcoded compiler paths; set the `WATCOM` and `DJGPP` environment 
+variables to override this, e.g. `make -f makefile.wc WATCOM=/opt/watcom`.
+
+When building under MS-DOS, the compiler environment should be set up beforehand (see inside 
+comments).
+
+The Watcom MS-DOS executables require the DOS/4GW extender, and the DJGPP ones require 
+a DPMI host such as CWSDPMI.

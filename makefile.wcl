@@ -1,0 +1,123 @@
+# Host: Linux
+# Target: Linux
+# Compiler: Open Watcom v2 (GNU make)
+
+WATCOM ?= /home/mikolaj/.local/opt/open-watcom-v2
+export WATCOM
+export PATH := $(WATCOM)/binl64:$(PATH)
+export INCLUDE := $(WATCOM)/lh
+
+CXX = $(WATCOM)/binl64/wcl386
+WLINK = $(WATCOM)/binl64/wlink
+
+CXXFLAGS = -bt=linux -cc++ -w3 -ot -zq -xs -Isrc -Ideps/lodepng -Ideps/toojpeg
+
+TARGET = mrtp_cli
+
+OBJS = \
+	src/actors.o \
+	src/camera.o \
+	src/config.o \
+	src/light.o \
+	src/main.o \
+	src/mappers.o \
+	src/matrix3.o \
+	src/renderer.o \
+	src/texture.o \
+	src/vector3.o \
+	src/world.o \
+	src/writer.o \
+	src/banner.o \
+	src/cube.o \
+	src/cylinder.o \
+	src/mesh.o \
+	src/molecule.o \
+	src/plane.o \
+	src/polygon.o \
+	src/sphere.o \
+	src/tools.o \
+	src/triangle.o \
+	deps/lodepng/lodepng.o \
+	deps/toojpeg/toojpeg.o
+
+.PHONY: all clean
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(WLINK) option quiet name $(TARGET) system linux debug all file {$(OBJS)}
+
+src/actors.o: src/actors.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/camera.o: src/camera.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/config.o: src/config.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/light.o: src/light.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/main.o: src/main.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/mappers.o: src/mappers.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/matrix3.o: src/matrix3.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/renderer.o: src/renderer.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/texture.o: src/texture.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/vector3.o: src/vector3.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/world.o: src/world.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/writer.o: src/writer.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/banner.o: src/banner.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/cube.o: src/cube.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/cylinder.o: src/cylinder.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/mesh.o: src/mesh.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/molecule.o: src/molecule.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/plane.o: src/plane.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/polygon.o: src/polygon.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/sphere.o: src/sphere.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/tools.o: src/tools.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+src/triangle.o: src/triangle.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+deps/lodepng/lodepng.o: deps/lodepng/lodepng.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+deps/toojpeg/toojpeg.o: deps/toojpeg/toojpeg.cpp
+	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
+
+clean:
+	rm -f $(TARGET) $(OBJS)
