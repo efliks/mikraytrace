@@ -3,14 +3,14 @@
 #include "config.h"
 #include "world.h"
 
-#include "actors/mesh.h"
-#include "actors/banner.h"
-#include "actors/cube.h"
-#include "actors/cylinder.h"
-#include "actors/molecule.h"
-#include "actors/plane.h"
-#include "actors/sphere.h"
-#include "actors/triangle.h"
+#include "mesh.h"
+#include "banner.h"
+#include "cube.h"
+#include "cylinder.h"
+#include "molecule.h"
+#include "plane.h"
+#include "sphere.h"
+#include "triangle.h"
 
 
 namespace mrtp {

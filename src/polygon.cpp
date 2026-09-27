@@ -1,5 +1,5 @@
-#include "actors/polygon.h"
-#include "actors/plane.h"
+#include "polygon.h"
+#include "plane.h"
 
 
 namespace mrtp {

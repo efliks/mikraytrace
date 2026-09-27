@@ -21,7 +21,6 @@ target_include_directories(toojpeg PUBLIC thirdparty/toojpeg)
 
 add_executable(mrtp_cli "")
 add_subdirectory("src")
-add_subdirectory("src/actors")
 target_include_directories(mrtp_cli PUBLIC src)
 
 option(USE_OPENMP "Support OpenMP" ON)

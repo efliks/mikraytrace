@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "actors/plane.h"
-#include "actors/tools.h"
+#include "plane.h"
+#include "tools.h"
 
 
 namespace mrtp {

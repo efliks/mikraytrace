@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "actors/sphere.h"
-#include "actors/tools.h"
+#include "sphere.h"
+#include "tools.h"
 
 
 namespace mrtp {

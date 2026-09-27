@@ -1,7 +1,7 @@
 #include <cmath>
 #include "matrix3.h"
 
-#include "actors/tools.h"
+#include "tools.h"
 #include "common.h"
 
 namespace {

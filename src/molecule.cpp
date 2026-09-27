@@ -2,10 +2,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "actors/molecule.h"
-#include "actors/cylinder.h"
-#include "actors/sphere.h"
-#include "actors/tools.h"
+#include "molecule.h"
+#include "cylinder.h"
+#include "sphere.h"
+#include "tools.h"
 
 
 namespace mrtp {

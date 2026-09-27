@@ -12,9 +12,9 @@
 #include <lib3ds/mesh.h>
 #endif
 
-#include "actors/mesh.h"
-#include "actors/tools.h"
-#include "actors/triangle.h"
+#include "mesh.h"
+#include "tools.h"
+#include "triangle.h"
 
 namespace mrtp {
 

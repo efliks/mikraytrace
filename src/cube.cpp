@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "actors/cube.h"
-#include "actors/tools.h"
-#include "actors/plane.h"
-#include "actors/polygon.h"
-#include "actors/triangle.h"
+#include "cube.h"
+#include "tools.h"
+#include "plane.h"
+#include "polygon.h"
+#include "triangle.h"
 
 
 namespace mrtp {

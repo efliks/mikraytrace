@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "actors/triangle.h"
-#include "actors/plane.h"
+#include "triangle.h"
+#include "plane.h"
 
 #include "tools.h"
 

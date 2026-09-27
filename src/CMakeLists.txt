@@ -1,1 +1,1 @@
-target_sources(mrtp_cli PRIVATE actors.cpp camera.cpp config.cpp light.cpp main.cpp mappers.cpp matrix3.cpp renderer.cpp texture.cpp vector3.cpp world.cpp writer.cpp)
+target_sources(mrtp_cli PRIVATE actors.cpp banner.cpp camera.cpp config.cpp cube.cpp cylinder.cpp light.cpp main.cpp mappers.cpp matrix3.cpp mesh.cpp molecule.cpp plane.cpp polygon.cpp renderer.cpp sphere.cpp texture.cpp tools.cpp triangle.cpp vector3.cpp world.cpp writer.cpp)

@@ -1,9 +1,9 @@
 #include <string>
 #include <iostream>
 
-#include "actors/banner.h"
-#include "actors/sphere.h"
-#include "actors/tools.h"
+#include "banner.h"
+#include "sphere.h"
+#include "tools.h"
 
 #include "common.h"
 #include "mappers.h"

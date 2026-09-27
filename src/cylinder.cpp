@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "actors/tools.h"
-#include "actors/cylinder.h"
+#include "tools.h"
+#include "cylinder.h"
 
 
 namespace mrtp {
