@@ -1,0 +1,33 @@
+
+#$(WLINK) option quiet name $(TARGET) system dos4g debug all file {$(OBJS)}
+
+system dos4g
+option quiet
+debug all
+
+name mrtp_cli.exe
+
+file src/actors.o
+file src/camera.o
+file src/config.o
+file src/light.o
+file src/main.o
+file src/mappers.o
+file src/matrix3.o
+file src/renderer.o
+file src/texture.o
+file src/vector3.o
+file src/world.o
+file src/writer.o
+file src/banner.o
+file src/cube.o
+file src/cylinder.o
+file src/mesh.o
+file src/molecule.o
+file src/plane.o
+file src/polygon.o
+file src/sphere.o
+file src/tools.o
+file src/triangle.o
+file deps/lodepng/lodepng.o
+file deps/toojpeg/toojpeg.o

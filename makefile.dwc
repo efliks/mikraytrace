@@ -44,7 +44,7 @@ OBJS = &
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(WLINK) option quiet name $(TARGET) system dos4g debug all file {$(OBJS)}
+	wlink @wcdos.lnk
 
 src/actors.o: src/actors.cpp
 	$(CXX) $(CXXFLAGS) -c -fo=$@ $<
