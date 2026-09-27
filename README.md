@@ -45,19 +45,19 @@ mikraytrace > ./build-gcc/mrtp_cli bluemol.txt
 
 ## Makefiles
 
-Plain makefiles are provided. They build `mrtp_cli` in the source tree:
+There are makefiles for native and cross compilations:
 
-| Makefile       | Host   | Target | Compiler        | Build system | Output         | OpenMP | Command                     |
-|----------------|--------|--------|-----------------|--------------|----------------|--------|-----------------------------|
-| `makefile`     | Linux  | Linux  | GCC             | GNU make     | `mrtp_cli`     | Yes    | `make`                      |
-| `makefile.wcl` | Linux  | Linux  | Open Watcom v2  | GNU make     | `mrtp_cli`     | No     | `make -f makefile.wcl`      |
-| `makefile.dj`  | Linux  | MS-DOS | DJGPP           | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.dj`       |
-| `makefile.wc`  | Linux  | MS-DOS | Open Watcom v2  | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.wc`       |
-| `makefile.ddj` | MS-DOS | MS-DOS | DJGPP           | GNU make     | `mrtp_cli.exe` | No     | `make -f makefile.ddj`      |
-| `makefile.dwc` | MS-DOS | MS-DOS | Open Watcom v2  | wmake        | `mrtp_cli.exe` | No     | `wmake -f makefile.dwc`     |
+| Makefile       | Host   | Target | Compiler  | Build system | OpenMP | Command                     |
+|----------------|--------|--------|-----------|--------------|--------|-----------------------------|
+| `makefile`     | Linux  | Linux  | GCC       | GNU make     | Yes    | `make`                      |
+| `makefile.wcl` | Linux  | Linux  | Watcom    | GNU make     | No     | `make -f makefile.wcl`      |
+| `makefile.dj`  | Linux  | MS-DOS | DJGPP     | GNU make     | No     | `make -f makefile.dj`       |
+| `makefile.wc`  | Linux  | MS-DOS | Watcom    | GNU make     | No     | `make -f makefile.wc`       |
+| `makefile.ddj` | MS-DOS | MS-DOS | DJGPP     | GNU make     | No     | `make -f makefile.ddj`      |
+| `makefile.dwc` | MS-DOS | MS-DOS | Watcom    | wmake        | No     | `wmake -f makefile.dwc`     |
 
-Some makefiles have hardcoded compiler paths; set the `WATCOM` and `DJGPP` environment 
-variables to override this, e.g. `make -f makefile.wc WATCOM=/opt/watcom`.
+Watch for hardcoded compiler paths; set the `WATCOM` and `DJGPP` environment variables 
+to override this.
 
 When building under MS-DOS, the compiler environment should be set up beforehand (see inside 
 comments).
