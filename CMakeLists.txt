@@ -13,11 +13,11 @@ else()
     add_definitions(-ot)
 endif()
 
-add_library(lodepng STATIC thirdparty/lodepng/lodepng.cpp)
-target_include_directories(lodepng PUBLIC thirdparty/lodepng)
+add_library(lodepng STATIC deps/lodepng/lodepng.cpp)
+target_include_directories(lodepng PUBLIC deps/lodepng)
 
-add_library(toojpeg STATIC thirdparty/toojpeg/toojpeg.cpp)
-target_include_directories(toojpeg PUBLIC thirdparty/toojpeg)
+add_library(toojpeg STATIC deps/toojpeg/toojpeg.cpp)
+target_include_directories(toojpeg PUBLIC deps/toojpeg)
 
 add_executable(mrtp_cli "")
 add_subdirectory("src")
